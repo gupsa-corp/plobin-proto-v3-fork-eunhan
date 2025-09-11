@@ -5,8 +5,8 @@
             <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
                 이름
             </label>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 id="first_name"
                 wire:model="first_name"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -19,8 +19,8 @@
             <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
                 성
             </label>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 id="last_name"
                 wire:model="last_name"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -34,8 +34,8 @@
         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
             이메일
         </label>
-        <input 
-            type="email" 
+        <input
+            type="email"
             id="email"
             wire:model="email"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -50,20 +50,20 @@
             휴대폰 번호
         </label>
         <div class="flex gap-2">
-            <select 
+            <select
                 wire:model="country_code"
                 class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
                 <option value="+82">+82 (한국)</option>
             </select>
-            <input 
-                type="tel" 
+            <input
+                type="tel"
                 id="phone_number"
                 wire:model="phone_number"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="010-1234-5678"
             />
-            <button 
+            <button
                 type="button"
                 wire:click="sendVerificationCode"
                 wire:loading.attr="disabled"
@@ -98,8 +98,8 @@
             @endif
         </label>
         <div class="flex gap-2">
-            <input 
-                type="text" 
+            <input
+                type="text"
                 id="verification_code"
                 wire:model="verification_code"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -108,7 +108,7 @@
                 @if($phone_verified) disabled @endif
             />
             @if(!$phone_verified)
-            <button 
+            <button
                 type="button"
                 wire:click="verifyPhoneNumber"
                 wire:loading.attr="disabled"
@@ -137,8 +137,8 @@
         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
             비밀번호
         </label>
-        <input 
-            type="password" 
+        <input
+            type="password"
             id="password"
             wire:model="password"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -151,8 +151,8 @@
         <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
             비밀번호 확인
         </label>
-        <input 
-            type="password" 
+        <input
+            type="password"
             id="password_confirmation"
             wire:model="password_confirmation"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -161,8 +161,8 @@
         @error('password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
     </div>
 
-    <button 
-        type="submit" 
+    <button
+        type="submit"
         @if(!$phone_verified || $is_sending || $is_verifying) disabled @endif
         class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
         wire:loading.attr="disabled"
@@ -180,17 +180,6 @@
         <span wire:loading>가입 중...</span>
     </button>
 </form>
-
-<!-- SMS 전송 모드 알림 -->
-@if(config('solapi.force_real_sms'))
-    <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">📱 실제 SMS 전송 모드: 인증번호가 실제 휴대폰으로 전송됩니다.</span>
-    </div>
-@elseif(app()->environment(['local', 'testing']) || !config('solapi.api_key') || config('solapi.api_key') === 'your_solapi_api_key_here')
-    <div class="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">⚠️ 개발 모드: SMS는 실제로 전송되지 않으며 로그에서 인증번호를 확인할 수 있습니다.</span>
-    </div>
-@endif
 
 <!-- 메시지 표시 -->
 @if (session()->has('success'))
@@ -210,30 +199,30 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let countdownInterval;
-    
+
     // Livewire 이벤트 리스너 등록 - Livewire 3 방식
     document.addEventListener('livewire:initialized', function() {
         Livewire.on('startCountdown', function(data) {
             let seconds = data.seconds || data[0]?.seconds || 60;
             const countdownElement = document.getElementById('countdown');
-            
+
             console.log('Starting countdown with', seconds, 'seconds');
-            
+
             if (countdownInterval) {
                 clearInterval(countdownInterval);
             }
-            
+
             if (countdownElement) {
                 countdownElement.textContent = seconds;
             }
-            
+
             countdownInterval = setInterval(function() {
                 if (countdownElement) {
                     countdownElement.textContent = seconds;
                 }
-                
+
                 seconds--;
-                
+
                 if (seconds < 0) {
                     clearInterval(countdownInterval);
                     // Livewire 컴포넌트에 카운트다운 완료 알림
