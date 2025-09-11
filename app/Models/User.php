@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'country_code',
         'phone_number',
+        'phone_verified_at',
         'nickname',
         'first_name',
         'last_name',
@@ -40,6 +41,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -97,6 +99,32 @@ class User extends Authenticatable
     public function getPhoneTypeAttribute(): ?string
     {
         return PhoneNumberHelper::getPhoneType($this->phone_number ?? '', $this->country_code ?? '');
+    }
+
+    /**
+     * 휴대폰 인증 여부 확인
+     */
+    public function hasVerifiedPhone(): bool
+    {
+        return !is_null($this->phone_verified_at);
+    }
+
+    /**
+     * 휴대폰 인증 완료 처리
+     */
+    public function markPhoneAsVerified(): void
+    {
+        $this->phone_verified_at = now();
+        $this->save();
+    }
+
+    /**
+     * 휴대폰 인증 해제 처리
+     */
+    public function markPhoneAsUnverified(): void
+    {
+        $this->phone_verified_at = null;
+        $this->save();
     }
 
     public function organizationMemberships(): HasMany
