@@ -181,8 +181,12 @@
     </button>
 </form>
 
-<!-- 개발 환경 알림 -->
-@if(app()->environment(['local', 'testing']) || !config('solapi.api_key') || config('solapi.api_key') === 'your_solapi_api_key_here')
+<!-- SMS 전송 모드 알림 -->
+@if(config('solapi.force_real_sms'))
+    <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline">📱 실제 SMS 전송 모드: 인증번호가 실제 휴대폰으로 전송됩니다.</span>
+    </div>
+@elseif(app()->environment(['local', 'testing']) || !config('solapi.api_key') || config('solapi.api_key') === 'your_solapi_api_key_here')
     <div class="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
         <span class="block sm:inline">⚠️ 개발 모드: SMS는 실제로 전송되지 않으며 로그에서 인증번호를 확인할 수 있습니다.</span>
     </div>
