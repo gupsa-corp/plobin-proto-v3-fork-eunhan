@@ -215,49 +215,47 @@
                 {{-- 모달 내용이 여기에 동적으로 추가됩니다 --}}
             </div>
         </div>
-    </div>
-</div>
+        
+        @php
+        function getFileIcon($fileName, $type) {
+            if ($type === 'image') return '🖼️';
+            if ($type === 'document') return '📄';
+            if ($type === 'spreadsheet') return '📊';
+            if ($type === 'archive') return '📦';
+            
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $icons = [
+                'pdf' => '📄', 'doc' => '📝', 'docx' => '📝', 'txt' => '📄',
+                'xls' => '📊', 'xlsx' => '📊', 'csv' => '📊',
+                'zip' => '📦', 'rar' => '📦', '7z' => '📦',
+                'mp4' => '🎥', 'avi' => '🎥', 'mov' => '🎥',
+                'mp3' => '🎵', 'wav' => '🎵', 'flac' => '🎵',
+                'jpg' => '🖼️', 'jpeg' => '🖼️', 'png' => '🖼️', 'gif' => '🖼️'
+            ];
+            return $icons[$ext] ?? '📄';
+        }
 
-@php
-function getFileIcon($fileName, $type) {
-    if ($type === 'image') return '🖼️';
-    if ($type === 'document') return '📄';
-    if ($type === 'spreadsheet') return '📊';
-    if ($type === 'archive') return '📦';
-    
-    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $icons = [
-        'pdf' => '📄', 'doc' => '📝', 'docx' => '📝', 'txt' => '📄',
-        'xls' => '📊', 'xlsx' => '📊', 'csv' => '📊',
-        'zip' => '📦', 'rar' => '📦', '7z' => '📦',
-        'mp4' => '🎥', 'avi' => '🎥', 'mov' => '🎥',
-        'mp3' => '🎵', 'wav' => '🎵', 'flac' => '🎵',
-        'jpg' => '🖼️', 'jpeg' => '🖼️', 'png' => '🖼️', 'gif' => '🖼️'
-    ];
-    return $icons[$ext] ?? '📄';
-}
+        function formatFileSize($bytes) {
+            if ($bytes == 0) return '0 B';
+            $k = 1024;
+            $sizes = ['B', 'KB', 'MB', 'GB'];
+            $i = floor(log($bytes) / log($k));
+            return round(($bytes / pow($k, $i)), 2) . ' ' . $sizes[$i];
+        }
 
-function formatFileSize($bytes) {
-    if ($bytes == 0) return '0 B';
-    $k = 1024;
-    $sizes = ['B', 'KB', 'MB', 'GB'];
-    $i = floor(log($bytes) / log($k));
-    return round(($bytes / pow($k, $i)), 2) . ' ' . $sizes[$i];
-}
+        function getFileTypeName($type) {
+            $types = [
+                'image' => '이미지',
+                'document' => '문서',
+                'spreadsheet' => '스프레드시트',
+                'archive' => '압축파일',
+                'other' => '기타'
+            ];
+            return $types[$type] ?? '알 수 없음';
+        }
+        @endphp
 
-function getFileTypeName($type) {
-    $types = [
-        'image' => '이미지',
-        'document' => '문서',
-        'spreadsheet' => '스프레드시트',
-        'archive' => '압축파일',
-        'other' => '기타'
-    ];
-    return $types[$type] ?? '알 수 없음';
-}
-@endphp
-
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     const gridView = document.getElementById('grid-view');
     const listView = document.getElementById('list-view');
@@ -538,4 +536,5 @@ document.addEventListener('DOMContentLoaded', function() {
         return types[type] || '알 수 없음';
     }
 });
-</script>
+    </script>
+</div>

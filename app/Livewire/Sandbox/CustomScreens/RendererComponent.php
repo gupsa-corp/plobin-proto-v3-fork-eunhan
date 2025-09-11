@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 
 class RendererComponent extends Component
 {
+    public $skipMultipleRootElementDetection = true;
     public $screenData;
 
     public function mount($screenData = null)
@@ -43,16 +44,18 @@ class RendererComponent extends Component
                 $tempViewPath = 'sandbox-renderer-temp-' . time() . '-' . rand(1000, 9999);
                 $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
 
-                // 사용자 템플릿에 단일 root element 보장을 위해 div로 감싸기
-                $wrappedTemplate = '<div class="user-template-wrapper">' . $this->screenData['blade_template'] . '</div>';
+                // 템플릿을 단순히 wrapper div로 감싸기 (Livewire 호환성을 위해)
+                $template = $this->screenData['blade_template'];
+                $wrappedTemplate = '<div class="livewire-template-wrapper">' . $template . '</div>';
                 File::put($tempViewFile, $wrappedTemplate);
 
                 try {
                     // 블레이드 템플릿 렌더링
-                    $rawContent = view($tempViewPath, $sampleData)->render();
+                    $renderedContent = view($tempViewPath, $sampleData)->render();
                     
-                    // Livewire 호환성을 위해 항상 단일 div로 감싸기
-                    $renderedContent = '<div class="rendered-screen-content">' . trim($rawContent) . '</div>';
+                    // 렌더링된 HTML이 이미 wrapper div 안에 있지만, Livewire가 여전히 multiple root elements를 감지하는 경우가 있음
+                    // 추가적인 wrapper로 확실하게 single root element 보장
+                    $renderedContent = '<div class="livewire-single-root">' . $renderedContent . '</div>';
                 } catch (\Exception $e) {
                     $renderedContent = '<div class="text-red-600 p-4">렌더링 오류: ' . $e->getMessage() . '</div>';
                 } finally {
