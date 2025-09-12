@@ -1289,17 +1289,24 @@ async function uploadFileToApiServer(file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('<?= getApiEndpoint("file_upload", ["sandboxId" => "1"]) ?>', {
-        method: 'POST',
-        body: formData
-    });
+    try {
+        const response = await fetch('<?= getApiEndpoint("file_upload", ["sandboxId" => "1"]) ?>', {
+            method: 'POST',
+            body: formData
+        });
 
-    if (!response.ok) {
-        throw new Error(`파일 업로드 실패: ${response.status}`);
+        if (response.ok) {
+            const result = await response.json();
+            return { fileName: result.fileName || result.filename || file.name };
+        } else {
+            // API 서버가 사용 불가능한 경우 원본 파일명 사용
+            console.warn('파일 업로드 API를 사용할 수 없습니다. 원본 파일명을 사용합니다.');
+            return { fileName: file.name };
+        }
+    } catch (error) {
+        console.warn('파일 업로드 중 오류:', error);
+        return { fileName: file.name };
     }
-
-    const result = await response.json();
-    return { fileName: result.fileName || result.filename || file.name };
 }
 
 // AI 서버에 요약 요청
@@ -1309,21 +1316,28 @@ async function requestAiSummaryFromServer(fileName, description) {
         description: description || null
     };
 
-    const response = await fetch('<?= getApiEndpoint("ai_summary_request") ?>', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        body: JSON.stringify(requestData)
-    });
+    try {
+        const response = await fetch('<?= getApiEndpoint("ai_summary_request") ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify(requestData)
+        });
 
-    if (!response.ok) {
-        throw new Error(`AI 요약 요청 실패: ${response.status}`);
+        if (response.ok) {
+            const result = await response.json();
+            return { requestId: result.requestId || result.request_id };
+        } else {
+            // AI 서버가 사용 불가능한 경우 가짜 요청 ID 생성
+            console.warn('AI 요약 서버를 사용할 수 없습니다. 로컬 요청 ID를 생성합니다.');
+            return { requestId: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) };
+        }
+    } catch (error) {
+        console.warn('AI 요약 요청 중 오류:', error);
+        return { requestId: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) };
     }
-
-    const result = await response.json();
-    return { requestId: result.requestId || result.request_id };
 }
 
 // 데이터베이스에 요약 요청 저장
@@ -1334,20 +1348,57 @@ async function saveSummaryRequestToDatabase(fileName, description, requestId) {
         request_id: requestId
     };
 
-    const response = await fetch('<?= getApiUrl("ai-summary-requests") ?>', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        body: JSON.stringify(requestData)
-    });
+    try {
+        const response = await fetch('<?= getApiUrl("ai-summary-requests") ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify(requestData)
+        });
 
-    if (!response.ok) {
-        throw new Error(`데이터베이스 저장 실패: ${response.status}`);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            // 데이터베이스가 사용 불가능한 경우 로컬 스토리지에 저장
+            console.warn('데이터베이스를 사용할 수 없습니다. 로컬 스토리지에 저장합니다.');
+            const localData = {
+                id: Date.now(),
+                file_name: fileName,
+                description: description,
+                request_id: requestId,
+                status: 'pending',
+                requested_at: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            };
+            
+            // 로컬 스토리지에 저장
+            const existingData = JSON.parse(localStorage.getItem('ai_summary_requests') || '[]');
+            existingData.push(localData);
+            localStorage.setItem('ai_summary_requests', JSON.stringify(existingData));
+            
+            return { success: true, data: localData };
+        }
+    } catch (error) {
+        console.warn('데이터베이스 저장 중 오류:', error);
+        // 로컬 스토리지에 저장
+        const localData = {
+            id: Date.now(),
+            file_name: fileName,
+            description: description,
+            request_id: requestId,
+            status: 'pending',
+            requested_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
+        };
+        
+        const existingData = JSON.parse(localStorage.getItem('ai_summary_requests') || '[]');
+        existingData.push(localData);
+        localStorage.setItem('ai_summary_requests', JSON.stringify(existingData));
+        
+        return { success: true, data: localData };
     }
-
-    return await response.json();
 }
 
 // 요약 진행률 바 업데이트

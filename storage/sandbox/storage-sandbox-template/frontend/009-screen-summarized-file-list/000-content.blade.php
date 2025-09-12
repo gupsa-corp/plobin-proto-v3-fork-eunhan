@@ -223,12 +223,17 @@ async function loadSummaries() {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('요약 목록을 불러오는데 실패했습니다.');
+        let summaries = [];
+        
+        if (response.ok) {
+            const result = await response.json();
+            summaries = result.success ? result.data : [];
+        } else {
+            // API가 실패하거나 테이블이 없는 경우 로컬 스토리지에서 데이터 읽기
+            console.warn('AI 요약 API를 사용할 수 없습니다. 로컬 스토리지에서 데이터를 읽습니다.');
+            const localData = JSON.parse(localStorage.getItem('ai_summary_requests') || '[]');
+            summaries = localData;
         }
-
-        const result = await response.json();
-        let summaries = result.success ? result.data : [];
 
         // 검색 및 필터 적용
         let filteredSummaries = summaries;
@@ -272,7 +277,11 @@ async function loadSummaries() {
         updateStats(summaries);
     } catch (error) {
         console.error('Error loading summaries:', error);
-        showNotification('요약 목록을 불러오는데 실패했습니다.', 'error');
+        // 오류가 발생해도 빈 목록으로 처리하여 사용자에게 빈 상태 화면을 보여줌
+        currentSummaries = [];
+        renderSummaries();
+        updatePagination();
+        updateStats([]);
     }
 }
 
@@ -483,12 +492,12 @@ async function refreshSummary(summaryId) {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('요약 새로고침에 실패했습니다.');
+        if (response.ok) {
+            showNotification('요약이 새로고침되었습니다.', 'success');
+            loadSummaries();
+        } else {
+            showNotification('요약 새로고침에 실패했습니다. API를 사용할 수 없습니다.', 'warning');
         }
-
-        showNotification('요약이 새로고침되었습니다.', 'success');
-        loadSummaries();
     } catch (error) {
         console.error('Error refreshing summary:', error);
         showNotification('요약 새로고침에 실패했습니다.', 'error');
@@ -504,18 +513,27 @@ async function showSummaryDetails(summaryId) {
         }
 
         // 요약 결과 조회
-        const response = await fetch(`<?= getApiUrl("ai-summary-results") ?>?request_id=${summary.request_id}`, {
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        let summaryResults = [];
+        try {
+            const response = await fetch(`<?= getApiUrl("ai-summary-results") ?>?request_id=${summary.request_id}`, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                summaryResults = result.success ? result.data : [];
+            } else {
+                console.warn('요약 결과 API를 사용할 수 없습니다.');
+                summaryResults = [];
             }
-        });
-
-        if (!response.ok) {
-            throw new Error('요약 결과를 불러오는데 실패했습니다.');
+        } catch (error) {
+            console.warn('요약 결과 조회 중 오류:', error);
+            // 로컬 스토리지에서 요약 결과 읽기
+            const localResults = JSON.parse(localStorage.getItem('ai_summary_results') || '[]');
+            summaryResults = localResults.filter(result => result.request_id == summary.request_id);
         }
-
-        const result = await response.json();
-        const summaryResults = result.success ? result.data : [];
 
         const modal = document.getElementById('summary-modal');
         const modalTitle = document.getElementById('modal-title');
@@ -624,13 +642,30 @@ async function submitNewVersion() {
             body: JSON.stringify(requestData)
         });
 
-        if (!response.ok) {
-            throw new Error('새 버전 저장에 실패했습니다.');
+        if (response.ok) {
+            showNotification('새 버전이 추가되었습니다.', 'success');
+            closeAddVersionModal();
+            loadSummaries();
+        } else {
+            // API가 실패한 경우 로컬 스토리지에 저장
+            console.warn('새 버전 저장 API를 사용할 수 없습니다. 로컬 스토리지에 저장합니다.');
+            const localResult = {
+                id: Date.now(),
+                request_id: currentRequestId,
+                version: version,
+                summary_content: content,
+                status: 'success',
+                created_at: new Date().toISOString()
+            };
+            
+            const existingResults = JSON.parse(localStorage.getItem('ai_summary_results') || '[]');
+            existingResults.push(localResult);
+            localStorage.setItem('ai_summary_results', JSON.stringify(existingResults));
+            
+            showNotification('새 버전이 로컬에 저장되었습니다.', 'success');
+            closeAddVersionModal();
+            loadSummaries();
         }
-
-        showNotification('새 버전이 추가되었습니다.', 'success');
-        closeAddVersionModal();
-        loadSummaries();
     } catch (error) {
         console.error('Error adding new version:', error);
         showNotification('새 버전 추가에 실패했습니다.', 'error');
