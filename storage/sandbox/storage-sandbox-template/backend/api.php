@@ -79,7 +79,12 @@ function routeRequest($method, $pathSegments) {
                 'DELETE /columns/{id}' => '컬럼 삭제',
                 'GET /user-column-settings' => '사용자 컬럼 설정 조회',
                 'POST /user-column-settings' => '사용자 컬럼 설정 저장',
-                'PUT /user-column-settings' => '사용자 컬럼 설정 업데이트'
+                'PUT /user-column-settings' => '사용자 컬럼 설정 업데이트',
+                'GET /dashboard/stats' => '대시보드 통계 정보 조회',
+                'GET /projects' => '프로젝트 목록 조회',
+                'GET /kanban/boards' => '칸반 보드 조회',
+                'PUT /kanban/cards/{id}' => '칸반 카드 이동',
+                'POST /kanban/cards' => '칸반 카드 생성'
             ]
         ];
     }
@@ -101,6 +106,12 @@ function routeRequest($method, $pathSegments) {
 
         case 'user-column-settings':
             return handleUserColumnSettingsEndpoint($method, array_slice($pathSegments, 1));
+
+        case 'dashboard':
+            return handleDashboardEndpoint($method, array_slice($pathSegments, 1));
+
+        case 'kanban':
+            return handleKanbanEndpoint($method, array_slice($pathSegments, 1));
 
         default:
             return null;
@@ -171,7 +182,10 @@ function handleProjectsEndpoint($method, $pathSegments) {
 
     switch ($method) {
         case 'GET':
-            if (count($pathSegments) === 1) {
+            if (empty($pathSegments)) {
+                // GET /projects - 프로젝트 목록 조회
+                return requireFunction($functionPath . '/list.php');
+            } elseif (count($pathSegments) === 1) {
                 // GET /projects/{id} - 프로젝트 정보 조회
                 $projectId = $pathSegments[0];
                 return requireFunction($functionPath . '/show.php', ['id' => $projectId]);
@@ -264,6 +278,57 @@ function handleUserColumnSettingsEndpoint($method, $pathSegments) {
         case 'PUT':
             // PUT /user-column-settings - 사용자 컬럼 설정 업데이트
             return requireFunction($functionPath . '/update.php');
+    }
+
+    return null;
+}
+
+/**
+ * 대시보드 엔드포인트 처리
+ */
+function handleDashboardEndpoint($method, $pathSegments) {
+    $functionPath = __DIR__ . '/functions/dashboard';
+
+    switch ($method) {
+        case 'GET':
+            if (count($pathSegments) === 1 && $pathSegments[0] === 'stats') {
+                // GET /dashboard/stats - 대시보드 통계 정보 조회
+                return requireFunction($functionPath . '/stats.php');
+            }
+            break;
+    }
+
+    return null;
+}
+
+/**
+ * 칸반 엔드포인트 처리
+ */
+function handleKanbanEndpoint($method, $pathSegments) {
+    $functionPath = __DIR__ . '/functions/kanban';
+
+    switch ($method) {
+        case 'GET':
+            if (count($pathSegments) === 1 && $pathSegments[0] === 'boards') {
+                // GET /kanban/boards - 칸반 보드 데이터 조회
+                return requireFunction($functionPath . '/boards.php');
+            }
+            break;
+
+        case 'POST':
+            if (count($pathSegments) === 1 && $pathSegments[0] === 'cards') {
+                // POST /kanban/cards - 새 칸반 카드 생성
+                return requireFunction($functionPath . '/create-card.php');
+            }
+            break;
+
+        case 'PUT':
+            if (count($pathSegments) === 2 && $pathSegments[0] === 'cards') {
+                // PUT /kanban/cards/{id} - 칸반 카드 이동/수정
+                $cardId = $pathSegments[1];
+                return requireFunction($functionPath . '/update-card.php', ['id' => $cardId]);
+            }
+            break;
     }
 
     return null;
