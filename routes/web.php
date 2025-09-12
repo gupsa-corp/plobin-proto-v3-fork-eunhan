@@ -374,58 +374,9 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     $currentSandboxName = ($page && $page->project) ? $page->project->sandbox_folder : null;
     $currentCustomScreenId = $page ? $page->sandbox_custom_screen_folder : null;
 
-    // 템플릿 파일에서 직접 커스텀 화면 데이터 가져오기 (샌드박스 브라우저 컴포넌트와 동일한 로직)
-    $customScreens = [];
-    if (!empty($currentSandboxName)) {
-        try {
-            $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
-
-            if (\File::exists($templatePath)) {
-                $folders = \File::directories($templatePath);
-
-                foreach ($folders as $folder) {
-                    $folderName = basename($folder);
-                    $contentFile = $folder . '/000-content.blade.php';
-
-                    if (\File::exists($contentFile)) {
-                        // 폴더명에서 화면 정보 추출
-                        $parts = explode('-', $folderName, 3);
-                        $screenId = $parts[0] ?? '000';
-                        $screenType = $parts[1] ?? 'screen';
-                        $screenName = $parts[2] ?? 'unnamed';
-
-                        // 파일 내용 읽기
-                        $fileContent = \File::get($contentFile);
-
-                        $customScreens[] = [
-                            'id' => $folderName, // 전체 폴더명을 사용해서 고유한 ID 생성
-                            'title' => str_replace('-', ' ', $screenName),
-                            'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
-                            'type' => $screenType,
-                            'folder_name' => $folderName,
-                            'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
-                            'created_at' => date('Y-m-d H:i:s', \File::lastModified($contentFile)),
-                            'file_exists' => true,
-                            'full_path' => $contentFile,
-                            'file_size' => \File::size($contentFile),
-                            'file_modified' => date('Y-m-d H:i:s', \File::lastModified($contentFile)),
-                            'is_template' => true,
-                            'blade_template' => $fileContent,
-                        ];
-                    }
-                }
-            }
-
-            // 생성 날짜 기준 내림차순 정렬
-            usort($customScreens, function($a, $b) {
-                return strcmp($b['created_at'], $a['created_at']);
-            });
-
-        } catch (\Exception $e) {
-            \Log::error('커스텀 화면 데이터 로드 오류', ['error' => $e->getMessage(), 'sandbox_folder' => $currentSandboxName]);
-            $customScreens = [];
-        }
-    }
+    // 샌드박스 템플릿 서비스를 사용하여 커스텀 화면 데이터 가져오기
+    $sandboxTemplateService = app(\App\Services\SandboxTemplateService::class);
+    $customScreens = $sandboxTemplateService->getCustomScreens($currentSandboxName ?? '');
 
     return view('300-page-service.311-page-settings-custom-screen.000-index', [
         'currentPageId' => $pageId,
@@ -586,8 +537,8 @@ Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\CoreVi
 Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
-Route::any('/sandbox/storage-sandbox-template/backend/api.php/{path?}', function ($path = '') {
-    $apiFile = storage_path('sandbox/storage-sandbox-template/backend/api.php');
+Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {
+    $apiFile = storage_path("sandbox/{$sandboxName}/backend/api.php");
     
     if (!file_exists($apiFile)) {
         return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다.'], 404);
