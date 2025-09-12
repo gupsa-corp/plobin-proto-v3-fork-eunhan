@@ -233,6 +233,32 @@ function getDownloadUrl($relativePath) {
 }
 
 /**
+ * API 엔드포인트 상수 정의
+ */
+function getApiEndpoints() {
+    return [
+        'file_upload' => 'http://seoul.gupsa.net:8080/api/sandboxes/files/{sandboxId}/uploads',
+        'ai_summary_request' => 'http://seoul.gupsa.net:8080/api/ai/summary/request',
+        'ai_summary_retrieve' => 'http://seoul.gupsa.net:8080/api/ai/summary/retrieve',
+    ];
+}
+
+/**
+ * 특정 API 엔드포인트 URL 반환
+ */
+function getApiEndpoint($endpointName, $params = []) {
+    $endpoints = getApiEndpoints();
+    $url = $endpoints[$endpointName] ?? '';
+    
+    // 파라미터 치환
+    foreach ($params as $key => $value) {
+        $url = str_replace('{' . $key . '}', $value, $url);
+    }
+    
+    return $url;
+}
+
+/**
  * 현재 화면에 대한 디버그 정보 출력
  */
 function debugCurrentLocation() {

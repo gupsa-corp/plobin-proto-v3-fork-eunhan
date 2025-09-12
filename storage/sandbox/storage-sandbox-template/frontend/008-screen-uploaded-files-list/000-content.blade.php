@@ -95,6 +95,9 @@
                         <button type="button" onclick="bulkDownload()" class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-1 px-3 rounded">
                             다운로드
                         </button>
+                        <button type="button" onclick="openAiSummaryModal()" class="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded">
+                            AI 요약 요청
+                        </button>
                         <button type="button" onclick="bulkDelete()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded">
                             삭제
                         </button>
@@ -229,6 +232,63 @@
             </button>
             <button type="button" id="upload-btn" onclick="uploadFiles()" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700" disabled>
                 업로드
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AI 요약 요청 모달 -->
+<div id="ai-summary-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">AI 요약 요청</h3>
+            <button type="button" onclick="closeAiSummaryModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <!-- 선택된 파일 목록 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">선택된 파일</label>
+                <div id="selected-files-for-summary" class="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-3">
+                    <!-- 선택된 파일들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 파일 설명 입력 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">파일 설명 (선택사항)</label>
+                <textarea id="file-description" rows="3" placeholder="요약할 파일에 대한 설명을 입력하세요..."
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+            </div>
+
+            <!-- 요약 요청 진행 상태 -->
+            <div id="summary-progress" class="space-y-2" style="display: none;">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-gray-700">요약 요청 진행률</span>
+                    <span id="summary-progress-text" class="text-sm text-gray-500">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="summary-progress-bar" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 요약 요청 결과 메시지 -->
+            <div id="summary-messages">
+                <!-- 성공/실패 메시지가 여기에 표시됩니다 -->
+            </div>
+        </div>
+
+        <!-- 버튼들 -->
+        <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" onclick="closeAiSummaryModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                취소
+            </button>
+            <button type="button" id="summary-request-btn" onclick="submitAiSummaryRequest()" class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
+                요약 요청
             </button>
         </div>
     </div>
@@ -381,6 +441,12 @@ function renderFiles() {
                             class="text-blue-600 hover:text-blue-800 p-1">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="requestAiSummary(${file.id}, '${file.original_name}')"
+                            class="text-green-600 hover:text-green-800 p-1" title="AI 요약 요청">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                         </svg>
                     </button>
                     <button type="button" onclick="deleteFile(${file.id})"
@@ -1056,6 +1122,275 @@ function displayUploadResults(results) {
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-red-800">
                         ${failCount}개 파일 업로드에 실패했습니다.
+                    </h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        ${results.filter(r => !r.success).map(r => `• ${r.file}: ${r.message}`).join('<br>')}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    messagesDiv.innerHTML = html;
+}
+
+// AI 요약 요청 관련 변수
+let selectedFilesForSummary = [];
+let isSummaryRequesting = false;
+
+// AI 요약 요청 모달 열기
+function openAiSummaryModal() {
+    const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+    if (checkedBoxes.length === 0) {
+        showNotification('요약할 파일을 선택해주세요.', 'warning');
+        return;
+    }
+
+    selectedFilesForSummary = Array.from(checkedBoxes).map(cb => {
+        const fileId = cb.dataset.fileId;
+        const file = currentFiles.find(f => f.id == fileId);
+        return file;
+    }).filter(file => file);
+
+    if (selectedFilesForSummary.length === 0) {
+        showNotification('선택된 파일을 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    displaySelectedFilesForSummary();
+    document.getElementById('ai-summary-modal').style.display = 'block';
+}
+
+// AI 요약 요청 모달 닫기
+function closeAiSummaryModal() {
+    if (isSummaryRequesting) {
+        if (!confirm('요약 요청이 진행 중입니다. 정말로 취소하시겠습니까?')) {
+            return;
+        }
+    }
+    document.getElementById('ai-summary-modal').style.display = 'none';
+    resetAiSummaryModal();
+}
+
+// AI 요약 요청 모달 초기화
+function resetAiSummaryModal() {
+    selectedFilesForSummary = [];
+    isSummaryRequesting = false;
+    document.getElementById('file-description').value = '';
+    document.getElementById('summary-progress').style.display = 'none';
+    document.getElementById('summary-messages').innerHTML = '';
+    document.getElementById('summary-request-btn').disabled = false;
+    updateSummaryProgressBar(0);
+}
+
+// 선택된 파일 목록 표시 (요약용)
+function displaySelectedFilesForSummary() {
+    const container = document.getElementById('selected-files-for-summary');
+    
+    const filesHtml = selectedFilesForSummary.map(file => `
+        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+            <div class="flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                    ${getFileIcon(file.mime_type)}
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-900">${file.original_name}</p>
+                    <p class="text-sm text-gray-500">${formatFileSize(file.file_size)}</p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = filesHtml;
+}
+
+// 개별 파일 AI 요약 요청
+function requestAiSummary(fileId, fileName) {
+    const file = currentFiles.find(f => f.id == fileId);
+    if (!file) {
+        showNotification('파일을 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    selectedFilesForSummary = [file];
+    displaySelectedFilesForSummary();
+    document.getElementById('ai-summary-modal').style.display = 'block';
+}
+
+// AI 요약 요청 제출
+async function submitAiSummaryRequest() {
+    if (selectedFilesForSummary.length === 0 || isSummaryRequesting) return;
+
+    isSummaryRequesting = true;
+    document.getElementById('summary-request-btn').disabled = true;
+    document.getElementById('summary-progress').style.display = 'block';
+    document.getElementById('summary-messages').innerHTML = '';
+
+    const description = document.getElementById('file-description').value.trim();
+    const totalFiles = selectedFilesForSummary.length;
+    let completedFiles = 0;
+    const results = [];
+
+    try {
+        // 각 파일을 순차적으로 처리
+        for (let i = 0; i < selectedFilesForSummary.length; i++) {
+            const file = selectedFilesForSummary[i];
+
+            try {
+                const result = await processFileForAiSummary(file, description);
+                results.push({ file: file.original_name, success: true, message: '요약 요청 완료', requestId: result.requestId });
+            } catch (error) {
+                results.push({ file: file.original_name, success: false, message: error.message });
+            }
+
+            completedFiles++;
+            const progress = (completedFiles / totalFiles) * 100;
+            updateSummaryProgressBar(progress);
+        }
+
+        // 결과 표시
+        displaySummaryResults(results);
+
+        // 성공한 요청이 있으면 요약 목록 페이지로 이동 안내
+        if (results.some(r => r.success)) {
+            setTimeout(() => {
+                const goToSummary = confirm('요약 요청이 완료되었습니다. 요약 목록 페이지로 이동하시겠습니까?');
+                if (goToSummary) {
+                    window.location.href = '<?= getScreenUrl("frontend", "009-screen-summarized-file-list") ?>';
+                }
+            }, 2000);
+        }
+
+    } catch (error) {
+        showNotification('요약 요청 중 오류가 발생했습니다: ' + error.message, 'error');
+    } finally {
+        isSummaryRequesting = false;
+        document.getElementById('summary-request-btn').textContent = '완료';
+        document.getElementById('summary-request-btn').disabled = false;
+    }
+}
+
+// 단일 파일 AI 요약 처리
+async function processFileForAiSummary(file, description) {
+    // 1. 파일을 API 서버로 업로드하고 파일명 반환
+    const uploadResult = await uploadFileToApiServer(file);
+    
+    // 2. AI 서버에 요약 요청 전송
+    const summaryRequest = await requestAiSummaryFromServer(uploadResult.fileName, description);
+    
+    // 3. 요청 ID를 데이터베이스에 저장
+    const saveResult = await saveSummaryRequestToDatabase(file.original_name, description, summaryRequest.requestId);
+    
+    return { requestId: summaryRequest.requestId };
+}
+
+// API 서버에 파일 업로드
+async function uploadFileToApiServer(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('<?= getApiEndpoint("file_upload", ["sandboxId" => "1"]) ?>', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (!response.ok) {
+        throw new Error(`파일 업로드 실패: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { fileName: result.fileName || result.filename || file.name };
+}
+
+// AI 서버에 요약 요청
+async function requestAiSummaryFromServer(fileName, description) {
+    const requestData = {
+        fileName: fileName,
+        description: description || null
+    };
+
+    const response = await fetch('<?= getApiEndpoint("ai_summary_request") ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify(requestData)
+    });
+
+    if (!response.ok) {
+        throw new Error(`AI 요약 요청 실패: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { requestId: result.requestId || result.request_id };
+}
+
+// 데이터베이스에 요약 요청 저장
+async function saveSummaryRequestToDatabase(fileName, description, requestId) {
+    const requestData = {
+        file_name: fileName,
+        description: description,
+        request_id: requestId
+    };
+
+    const response = await fetch('<?= getApiUrl("ai-summary-requests") ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        body: JSON.stringify(requestData)
+    });
+
+    if (!response.ok) {
+        throw new Error(`데이터베이스 저장 실패: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+// 요약 진행률 바 업데이트
+function updateSummaryProgressBar(percent) {
+    const progressBar = document.getElementById('summary-progress-bar');
+    const progressText = document.getElementById('summary-progress-text');
+
+    progressBar.style.width = percent + '%';
+    progressText.textContent = Math.round(percent) + '%';
+}
+
+// 요약 결과 표시
+function displaySummaryResults(results) {
+    const messagesDiv = document.getElementById('summary-messages');
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.length - successCount;
+
+    let html = '';
+
+    if (successCount > 0) {
+        html += `<div class="p-3 bg-green-100 border border-green-200 rounded-md">
+            <div class="flex">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-green-800">
+                        ${successCount}개 파일의 AI 요약 요청이 완료되었습니다.
+                    </h3>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    if (failCount > 0) {
+        html += `<div class="p-3 bg-red-100 border border-red-200 rounded-md mt-2">
+            <div class="flex">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">
+                        ${failCount}개 파일 요약 요청에 실패했습니다.
                     </h3>
                     <div class="mt-2 text-sm text-red-700">
                         ${results.filter(r => !r.success).map(r => `• ${r.file}: ${r.message}`).join('<br>')}

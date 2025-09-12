@@ -68,5 +68,14 @@ return [
             'allow_methods' => ['GET', 'POST', 'DELETE', 'OPTIONS'],
             'allow_headers' => ['Content-Type', 'Authorization', 'X-Requested-With']
         ]
+    ],
+
+    // AI 서버 설정
+    'ai_server' => [
+        'summary_request_url' => 'http://seoul.gupsa.net:8080/api/ai/summary/request',
+        'summary_retrieve_url' => 'http://seoul.gupsa.net:8080/api/ai/summary/retrieve',
+        'file_upload_url' => 'http://seoul.gupsa.net:8080/api/sandboxes/files/{sandboxId}/uploads',
+        'timeout' => 30, // 초
+        'retry_attempts' => 3
     ]
 ];

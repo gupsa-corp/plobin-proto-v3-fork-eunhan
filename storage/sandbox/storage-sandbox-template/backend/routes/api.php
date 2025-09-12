@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Sandbox\FileUploadController;
+use App\Http\Controllers\AiSummaryController;
+use App\Http\Controllers\AiSummaryResultController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +45,36 @@ Route::prefix('sandbox')->middleware(['auth:sanctum'])->group(function () {
     // 파일 통계 정보
     Route::get('/files-stats', [FileUploadController::class, 'stats'])
         ->name('api.sandbox.files.stats');
+});
+
+// AI 요약 관련 라우트
+Route::prefix('ai-summary')->middleware(['auth:sanctum'])->group(function () {
+    
+    // AI 요약 요청 관리
+    Route::get('/requests', [AiSummaryController::class, 'index'])
+        ->name('api.ai-summary.requests.index');
+    
+    Route::post('/requests', [AiSummaryController::class, 'store'])
+        ->name('api.ai-summary.requests.store');
+    
+    Route::post('/requests/{id}/refresh', [AiSummaryController::class, 'refresh'])
+        ->name('api.ai-summary.requests.refresh');
+    
+    // AI 요약 결과 관리
+    Route::get('/results', [AiSummaryResultController::class, 'index'])
+        ->name('api.ai-summary.results.index');
+    
+    Route::post('/results', [AiSummaryResultController::class, 'store'])
+        ->name('api.ai-summary.results.store');
+    
+    Route::get('/results/{id}', [AiSummaryResultController::class, 'show'])
+        ->name('api.ai-summary.results.show');
+    
+    Route::put('/results/{id}', [AiSummaryResultController::class, 'update'])
+        ->name('api.ai-summary.results.update');
+    
+    Route::delete('/results/{id}', [AiSummaryResultController::class, 'destroy'])
+        ->name('api.ai-summary.results.destroy');
 });
 
 /*
