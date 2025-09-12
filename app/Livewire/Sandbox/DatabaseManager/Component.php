@@ -31,8 +31,7 @@ class Component extends LivewireComponent
 
     private function setupSandboxDatabase()
     {
-        $selectedSandbox = Session::get('sandbox_storage', '1');
-        $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/Backend/Databases/Release.sqlite");
+        $sandboxDbPath = storage_path('sandbox-template/storage-sandbox-template/backend/database/release.sqlite');
 
         if (file_exists($sandboxDbPath)) {
             Config::set('database.connections.sandbox_sqlite', [
@@ -47,12 +46,11 @@ class Component extends LivewireComponent
     private function getSandboxConnection()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', '1');
-            $sandboxDbPath = storage_path("storage-sandbox-{$selectedSandbox}/Backend/Databases/Release.sqlite");
+            $sandboxDbPath = storage_path('sandbox-template/storage-sandbox-template/backend/database/release.sqlite');
 
             // 파일 존재 확인
             if (!file_exists($sandboxDbPath)) {
-                $this->addError('connection', "선택된 샌드박스({$selectedSandbox})의 데이터베이스 파일이 존재하지 않습니다.");
+                $this->addError('connection', "샌드박스 템플릿 데이터베이스 파일이 존재하지 않습니다.");
                 return null;
             }
 

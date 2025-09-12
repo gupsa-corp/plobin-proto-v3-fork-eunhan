@@ -7,9 +7,9 @@
             </h1>
             <p class="text-gray-600 mt-1">템플릿 화면들을 관리하고 미리보기할 수 있습니다. 모든 화면은 템플릿 스토리지에 저장됩니다.</p>
         </div>
-        
+
         <div class="flex space-x-3">
-            <a href="{{ route('sandbox.custom-screen-creator') }}" 
+            <a href="{{ route('sandbox.custom-screen-creator') }}"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                 ✨ 새 화면 만들기
             </a>
@@ -41,7 +41,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-500">총 {{ count($screens) }}개 템플릿 화면</span>
                     <button wire:click="loadScreens" class="text-sm text-blue-600 hover:text-blue-800">
@@ -86,7 +86,7 @@
                                         class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
                                     ✏️ 편집
                                 </button>
-                                <a href="/sandbox/{{ $selectedSandbox }}/{{ sprintf('%03d', $screen['id']) }}-screen-{{ str_replace(' ', '-', strtolower($screen['title'])) }}" 
+                                <a href="/sandbox/{{ $selectedSandbox }}/{{ sprintf('%03d', $screen['id']) }}-screen-{{ str_replace(' ', '-', strtolower($screen['title'])) }}"
                                    target="_blank"
                                    onclick="event.stopPropagation()"
                                    class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 inline-block text-center">
@@ -109,7 +109,7 @@
                         <div class="text-gray-400 text-6xl mb-4">🎨</div>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">템플릿 화면이 없습니다</h3>
                         <p class="text-gray-500 mb-4">새로운 템플릿 화면을 만들어보세요!</p>
-                        <a href="{{ route('sandbox.custom-screen-creator') }}" 
+                        <a href="{{ route('sandbox.custom-screen-creator') }}"
                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                             ✨ 첫 번째 템플릿 화면 만들기
                         </a>
@@ -126,19 +126,15 @@
                         <h3 class="font-semibold text-gray-900">미리보기</h3>
                         @if($selectedScreen)
                             <div class="flex space-x-2">
-                                <button wire:click="togglePreview" 
+                                <button wire:click="togglePreview"
                                         class="text-sm px-3 py-1 rounded-md {{ $previewMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                     {{ $previewMode ? '📝 코드 보기' : '👁️ 미리보기' }}
-                                </button>
-                                <button wire:click="openPreviewInNewWindow('{{ $selectedScreen['id'] }}')"
-                                        class="text-sm px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700">
-                                    🚀 새 창에서 보기
                                 </button>
                             </div>
                         @endif
                     </div>
                 </div>
-                
+
                 <div class="p-4">
                     @if($selectedScreen)
                         @if($previewMode)
@@ -230,19 +226,19 @@
                 console.error('No URL provided for preview window');
                 return;
             }
-            
+
             const width = Math.min(1200, screen.width * 0.8);
             const height = Math.min(800, screen.height * 0.8);
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
-            
+
             console.log('Opening URL:', url);
-            
+
             try {
                 // 팝업 창 열기 시도
-                const newWindow = window.open(url, `preview_${Date.now()}`, 
+                const newWindow = window.open(url, `preview_${Date.now()}`,
                     `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes,menubar=no,toolbar=no,status=no`);
-                
+
                 if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
                     console.warn('Popup blocked, opening in new tab instead');
                     // 팝업이 차단된 경우 새 탭으로 열기
@@ -262,14 +258,14 @@
         Livewire.on('update-url', (event) => {
             console.log('Updating URL:', event);
             const params = event[0] || event;
-            
+
             const url = new URL(window.location);
-            
+
             // URL 파라미터 업데이트
             if (params.screen) {
                 url.searchParams.set('screen', params.screen);
             }
-            
+
             if (params.previewMode !== undefined) {
                 if (params.previewMode === '1' || params.previewMode === true) {
                     url.searchParams.set('previewMode', '1');
@@ -277,10 +273,10 @@
                     url.searchParams.delete('previewMode');
                 }
             }
-            
+
             // 브라우저 히스토리에 추가하지 않고 URL만 변경
             window.history.replaceState({}, '', url);
-            
+
             console.log('URL updated to:', url.toString());
         });
     });
