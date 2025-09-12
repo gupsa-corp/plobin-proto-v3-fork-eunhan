@@ -10,61 +10,77 @@
     </div>
 
     {{-- 네비게이션 메뉴 --}}
-    <div style="flex: 1; overflow-y: auto; padding: 16px 0;">
-        <ul class="space-y-2">
+    <div style="flex: 1; overflow-y: auto; padding: 8px 0;">
+        <ul class="space-y-1">
+            {{-- 대시보드 --}}
             <li>
-                <a href="{{ route('platform.admin.dashboard') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.dashboard') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                    </svg>
-                    대시보드
-                </a>
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">대시보드</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.dashboard.overview') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard*') ? 'bg-blue-50 text-blue-700' : '' }}">📊 개요</a></li>
+                    <li><a href="{{ route('platform.admin.dashboard.statistics') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard.statistics') ? 'bg-blue-50 text-blue-700' : '' }}">📈 통계</a></li>
+                    <li><a href="{{ route('platform.admin.dashboard.activities') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard.activities') ? 'bg-blue-50 text-blue-700' : '' }}">🕒 최근 활동</a></li>
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('platform.admin.organizations') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.organizations*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    조직 목록
-                </a>
+
+            {{-- 조직 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">조직 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.organizations.list') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.organizations.list') || request()->routeIs('platform.admin.organizations') ? 'bg-blue-50 text-blue-700' : '' }}">🏢 조직 목록</a></li>
+                    <li><a href="{{ route('platform.admin.organizations.points') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.organizations.points*') ? 'bg-blue-50 text-blue-700' : '' }}">⭐ 포인트 관리</a></li>
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('platform.admin.users') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.users*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                    </svg>
-                    사용자 관리
-                </a>
+
+            {{-- 사용자 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">사용자 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.users.list') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.users.list') || request()->routeIs('platform.admin.users') ? 'bg-blue-50 text-blue-700' : '' }}">👥 사용자 목록</a></li>
+                    <li><a href="{{ route('platform.admin.users.activity-logs') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.users.activity-logs') ? 'bg-blue-50 text-blue-700' : '' }}">📋 활동 로그</a></li>
+                    <li><a href="{{ route('platform.admin.users.reports') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.users.reports') ? 'bg-blue-50 text-blue-700' : '' }}">📊 리포트</a></li>
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('platform.admin.pricing') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.pricing*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                    </svg>
-                    요금제 관리
-                </a>
+
+            {{-- 결제 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">결제 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.payments.history') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.payments.history') || request()->routeIs('platform.admin.payments') ? 'bg-blue-50 text-blue-700' : '' }}">💳 결제 내역</a></li>
+                    <li><a href="{{ route('platform.admin.payments.refunds') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.payments.refunds') ? 'bg-blue-50 text-blue-700' : '' }}">🔄 환불 관리</a></li>
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('platform.admin.permissions') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.permissions*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    권한 관리
-                </a>
+
+            {{-- 권한 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">권한 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.permissions.overview') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.permissions.overview') || request()->routeIs('platform.admin.permissions') ? 'bg-blue-50 text-blue-700' : '' }}">🔐 권한 개요</a></li>
+                    <li><a href="{{ route('platform.admin.permissions.roles') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.permissions.roles') ? 'bg-blue-50 text-blue-700' : '' }}">👑 역할 관리</a></li>
+                    <li><a href="{{ route('platform.admin.permissions.users') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.permissions.users') ? 'bg-blue-50 text-blue-700' : '' }}">🔑 사용자 권한</a></li>
+                    <li><a href="{{ route('platform.admin.permissions.audit') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.permissions.audit*') ? 'bg-blue-50 text-blue-700' : '' }}">📝 감사 로그</a></li>
+                </ul>
             </li>
-            <li>
-                <a href="{{ route('platform.admin.sandboxes') }}"
-                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md mx-2 {{ request()->routeIs('platform.admin.sandboxes*') ? 'bg-blue-50 text-blue-700' : '' }}">
-                    <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2 2v6h10V7H5zm2-2h6v2H7V5z" clip-rule="evenodd"/>
-                    </svg>
-                    샌드박스 관리
-                </a>
+
+            {{-- 요금제 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">요금제 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.pricing.overview') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.overview') || request()->routeIs('platform.admin.pricing') ? 'bg-blue-50 text-blue-700' : '' }}">💰 요금제 개요</a></li>
+                    <li><a href="{{ route('platform.admin.pricing.plans') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.plans') ? 'bg-blue-50 text-blue-700' : '' }}">📋 플랜 관리</a></li>
+                    <li><a href="{{ route('platform.admin.pricing.subscriptions') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.subscriptions') ? 'bg-blue-50 text-blue-700' : '' }}">🔄 구독 관리</a></li>
+                    <li><a href="{{ route('platform.admin.pricing.analytics') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.analytics') ? 'bg-blue-50 text-blue-700' : '' }}">📈 분석</a></li>
+                </ul>
+            </li>
+
+            {{-- 샌드박스 관리 --}}
+            <li class="mt-4">
+                <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">샌드박스 관리</div>
+                <ul class="space-y-1 ml-2">
+                    <li><a href="{{ route('platform.admin.sandboxes.list') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.list') || request()->routeIs('platform.admin.sandboxes') ? 'bg-blue-50 text-blue-700' : '' }}">🛠️ 샌드박스 목록</a></li>
+                    <li><a href="{{ route('platform.admin.sandboxes.templates') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.templates') ? 'bg-blue-50 text-blue-700' : '' }}">📄 템플릿 관리</a></li>
+                    <li><a href="{{ route('platform.admin.sandboxes.usage') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.usage') ? 'bg-blue-50 text-blue-700' : '' }}">📊 사용량 분석</a></li>
+                    <li><a href="{{ route('platform.admin.sandboxes.settings') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.settings') ? 'bg-blue-50 text-blue-700' : '' }}">⚙️ 설정</a></li>
+                </ul>
             </li>
         </ul>
     </div>

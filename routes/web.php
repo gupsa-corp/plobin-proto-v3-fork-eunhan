@@ -483,58 +483,63 @@ Route::get('/organizations/{id}/settings/users', [\App\Http\Controllers\Organiza
 // 플랫폼 관리자 라우트들 (platform_admin 권한 필요) - 개발용으로 일시적으로 인증 제거
 // 추후 배포시 ->middleware(['auth', 'role:platform_admin']) 적용 예정
 
-// 플랫폼 관리자 메인 대시보드
-Route::get('/platform/admin', function () {
-    return view('900-page-platform-admin.901-page-dashboard.000-index');
-})->name('platform.admin.dashboard');
+// ========== 대시보드 ==========
+Route::get('/platform/admin', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard');
+Route::get('/platform/admin/dashboard', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard.full');
+Route::get('/platform/admin/dashboard/overview', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard.overview');
+Route::get('/platform/admin/dashboard/statistics', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard.statistics');
+Route::get('/platform/admin/dashboard/recent-activities', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'recentActivities'])->name('platform.admin.dashboard.activities');
 
-// 플랫폼 관리자 대시보드 (명시적 경로)
-Route::get('/platform/admin/dashboard', function () {
-    return view('900-page-platform-admin.901-page-dashboard.000-index');
-})->name('platform.admin.dashboard.full');
+// ========== 조직 관리 ==========
+Route::get('/platform/admin/organizations', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'list'])->name('platform.admin.organizations');
+Route::get('/platform/admin/organizations/list', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'list'])->name('platform.admin.organizations.list');
+Route::get('/platform/admin/organizations/details/{organization}', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'details'])->name('platform.admin.organizations.details');
+Route::get('/platform/admin/organizations/points', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'points'])->name('platform.admin.organizations.points');
+Route::get('/platform/admin/organizations/points/{organization}', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'pointsDetail'])->name('platform.admin.organizations.points.detail');
+Route::post('/platform/admin/organizations/points/{organization}/adjust', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'adjustPoints'])->name('platform.admin.organizations.points.adjust');
 
-// 플랫폼 관리자 - 조직 목록
-Route::get('/platform/admin/organizations', function () {
-    return view('900-page-platform-admin.902-page-organizations.000-index');
-})->name('platform.admin.organizations');
+// ========== 사용자 관리 ==========
+Route::get('/platform/admin/users', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'list'])->name('platform.admin.users');
+Route::get('/platform/admin/users/list', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'list'])->name('platform.admin.users.list');
+Route::get('/platform/admin/users/details/{user}', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'details'])->name('platform.admin.users.details');
+Route::get('/platform/admin/users/activity-logs', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'activityLogs'])->name('platform.admin.users.activity-logs');
+Route::get('/platform/admin/users/reports', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'reports'])->name('platform.admin.users.reports');
 
-// 플랫폼 관리자 - 사용자 관리
-Route::get('/platform/admin/users', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'users'])->name('platform.admin.users');
+// ========== 결제 관리 ==========
+Route::get('/platform/admin/payments', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'list'])->name('platform.admin.payments');
+Route::get('/platform/admin/payments/history', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'history'])->name('platform.admin.payments.history');
+Route::get('/platform/admin/payments/details/{billingHistory}', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'details'])->name('platform.admin.payments.details');
+Route::get('/platform/admin/payments/refunds', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'refunds'])->name('platform.admin.payments.refunds');
+Route::post('/platform/admin/payments/{billingHistory}/cancel', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'cancel'])->name('platform.admin.payments.cancel');
+Route::post('/platform/admin/payments/{billingHistory}/refund', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'refund'])->name('platform.admin.payments.refund');
 
-// 플랫폼 관리자 - 요금제 관리
-Route::get('/platform/admin/pricing', function () {
-    return view('900-page-platform-admin.906-page-pricing.000-index');
-})->name('platform.admin.pricing');
+// ========== 권한 관리 ==========
+Route::get('/platform/admin/permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'overview'])->name('platform.admin.permissions');
+Route::get('/platform/admin/permissions/overview', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'overview'])->name('platform.admin.permissions.overview');
+Route::get('/platform/admin/permissions/roles', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'roles'])->name('platform.admin.permissions.roles');
+Route::get('/platform/admin/permissions/permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'permissions'])->name('platform.admin.permissions.permissions');
+Route::get('/platform/admin/permissions/users', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'users'])->name('platform.admin.permissions.users');
+Route::get('/platform/admin/permissions/audit', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'audit'])->name('platform.admin.permissions.audit');
+Route::get('/platform/admin/permissions/audit/details/{id}', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'auditDetails'])->name('platform.admin.permissions.audit.details');
 
-// 플랫폼 관리자 - 샌드박스 관리
-Route::get('/platform/admin/sandboxes', function () {
-    return view('900-page-platform-admin.907-page-sandboxes.000-index');
-})->name('platform.admin.sandboxes');
+// ========== 권한 관리 API ==========
+Route::post('/platform/admin/permissions/users/change-role', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'changeUserRole'])->name('platform.admin.permissions.users.change-role');
+Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
+Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
 
-// 플랫폼 관리자 - 권한 관리 (기본적으로 역할 관리 탭으로 리다이렉트)
-Route::get('/platform/admin/permissions', function () {
-    return redirect()->route('platform.admin.permissions.roles');
-})->name('platform.admin.permissions');
+// ========== 요금제 관리 ==========
+Route::get('/platform/admin/pricing', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing');
+Route::get('/platform/admin/pricing/overview', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing.overview');
+Route::get('/platform/admin/pricing/plans', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'plans'])->name('platform.admin.pricing.plans');
+Route::get('/platform/admin/pricing/subscriptions', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'subscriptions'])->name('platform.admin.pricing.subscriptions');
+Route::get('/platform/admin/pricing/analytics', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'analytics'])->name('platform.admin.pricing.analytics');
 
-// 플랫폼 관리자 - 권한 관리 탭별 라우트
-Route::get('/platform/admin/permissions/roles', function () {
-    return view('900-page-platform-admin.905-page-permissions.901-tab-roles.000-index');
-})->name('platform.admin.permissions.roles');
-
-Route::get('/platform/admin/permissions/permissions', function () {
-    return view('900-page-platform-admin.905-page-permissions.902-tab-permissions.000-index');
-})->name('platform.admin.permissions.permissions');
-
-Route::get('/platform/admin/permissions/users', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'permissionsUsers'])->name('platform.admin.permissions.users');
-
-Route::get('/platform/admin/permissions/audit', function () {
-    return view('900-page-platform-admin.905-page-permissions.904-tab-audit.000-index');
-})->name('platform.admin.permissions.audit');
-
-// 플랫폼 관리자 - 사용자 권한 관리 API
-Route::post('/platform/admin/permissions/users/change-role', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'changeUserRole'])->name('platform.admin.permissions.users.change-role');
-Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
-Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\CoreView\PlatformAdmin\Controller::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
+// ========== 샌드박스 관리 ==========
+Route::get('/platform/admin/sandboxes', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'list'])->name('platform.admin.sandboxes');
+Route::get('/platform/admin/sandboxes/list', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'list'])->name('platform.admin.sandboxes.list');
+Route::get('/platform/admin/sandboxes/templates', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'templates'])->name('platform.admin.sandboxes.templates');
+Route::get('/platform/admin/sandboxes/usage', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'usage'])->name('platform.admin.sandboxes.usage');
+Route::get('/platform/admin/sandboxes/settings', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'settings'])->name('platform.admin.sandboxes.settings');
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
 Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {

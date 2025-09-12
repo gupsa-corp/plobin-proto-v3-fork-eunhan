@@ -62,6 +62,11 @@ class ViewService
     {
         $folder = $this->findViewDirectory();
         
+        // 900-page-platform-admin 형식 지원
+        if (preg_match('/^(900-page-platform-admin)\./', $folder)) {
+            return '900-page-platform-admin.900-common';
+        }
+        
         // 800-page-organization-admin 형식 지원
         if (preg_match('/^(800-page-organization-admin)\./', $folder)) {
             return '800-page-organization-admin.800-common';

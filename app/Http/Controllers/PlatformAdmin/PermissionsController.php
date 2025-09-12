@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Http\Controllers\PlatformAdmin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class PermissionsController extends Controller
+{
+    public function overview()
+    {
+        return view('900-page-platform-admin.905-permissions.000-overview.000-index');
+    }
+
+    public function roles()
+    {
+        return view('900-page-platform-admin.905-permissions.100-roles.000-index');
+    }
+
+    public function permissions()
+    {
+        return view('900-page-platform-admin.905-permissions.200-permissions.000-index');
+    }
+
+    public function users()
+    {
+        return view('900-page-platform-admin.905-permissions.300-users.000-index');
+    }
+
+    public function audit()
+    {
+        return view('900-page-platform-admin.905-permissions.400-audit.000-index');
+    }
+
+    public function auditDetails($id)
+    {
+        return view('900-page-platform-admin.905-permissions.400-audit.100-details.000-index', [
+            'auditId' => $id
+        ]);
+    }
+
+    // Legacy API methods (기존 코드와의 호환성)
+    public function changeUserRole(Request $request)
+    {
+        return response()->json(['success' => true]);
+    }
+
+    public function toggleUserStatus(Request $request)
+    {
+        return response()->json(['success' => true]);
+    }
+
+    public function updateTenantPermissions(Request $request)
+    {
+        return response()->json(['success' => true]);
+    }
+}

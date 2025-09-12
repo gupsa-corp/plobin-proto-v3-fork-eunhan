@@ -17,7 +17,8 @@ class Organization extends Model
         'description',
         'user_id',
         'status',
-        'members_count'
+        'members_count',
+        'points_balance'
     ];
 
     protected $hidden = [
@@ -214,5 +215,66 @@ class Organization extends Model
         $totalSeats = $this->getTotalLicenseQuantity('pro', 'seat') + $this->getTotalLicenseQuantity('enterprise', 'seat');
 
         return max(0, $totalSeats - $currentMembers);
+    }
+
+    // ========== 포인트 시스템 관련 메서드 ==========
+
+    public function pointAccount(): HasOne
+    {
+        return $this->hasOne(OrganizationPoint::class);
+    }
+
+    public function pointTransactions(): HasMany
+    {
+        return $this->hasMany(PointTransaction::class);
+    }
+
+    /**
+     * 포인트 잔액 조회 (성능 최적화용)
+     */
+    public function getPointsBalance(): float
+    {
+        return $this->points_balance ?? $this->pointAccount?->current_balance ?? 0;
+    }
+
+    /**
+     * 포맷된 포인트 잔액
+     */
+    public function getFormattedPointsBalance(): string
+    {
+        return number_format($this->getPointsBalance()) . 'P';
+    }
+
+    /**
+     * 포인트 사용 가능 여부
+     */
+    public function canSpendPoints(float $amount): bool
+    {
+        return $this->getPointsBalance() >= $amount;
+    }
+
+    /**
+     * 포인트 계정 생성 또는 조회
+     */
+    public function getOrCreatePointAccount(): OrganizationPoint
+    {
+        return $this->pointAccount()->firstOrCreate([
+            'organization_id' => $this->id
+        ], [
+            'current_balance' => 0,
+            'lifetime_earned' => 0,
+            'lifetime_spent' => 0,
+        ]);
+    }
+
+    /**
+     * 최근 포인트 거래 내역
+     */
+    public function getRecentPointTransactions(int $limit = 10)
+    {
+        return $this->pointTransactions()
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 }
