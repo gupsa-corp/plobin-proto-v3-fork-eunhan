@@ -66,6 +66,12 @@ class Register extends Component
     public function sendVerificationCode()
     {
         try {
+            // 휴대폰 번호가 비어있는지 먼저 확인
+            if (empty($this->phone_number)) {
+                session()->flash('error', '휴대폰 번호를 입력해주세요.');
+                return;
+            }
+
             $this->validateOnly('phone_number');
 
             if (!$this->can_resend) {

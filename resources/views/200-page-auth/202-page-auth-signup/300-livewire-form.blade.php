@@ -49,27 +49,29 @@
         <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">
             휴대폰 번호
         </label>
-        <div class="flex gap-2">
-            <select
-                wire:model="country_code"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-                <option value="+82">+82 (한국)</option>
-            </select>
-            <input
-                type="tel"
-                id="phone_number"
-                wire:model="phone_number"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="010-1234-5678"
-            />
+        <div class="space-y-2">
+            <div class="flex gap-2">
+                <select
+                    wire:model="country_code"
+                    class="w-24 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                    <option value="+82">+82</option>
+                </select>
+                <input
+                    type="tel"
+                    id="phone_number"
+                    wire:model.live="phone_number"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="010-1234-5678"
+                />
+            </div>
             <button
                 type="button"
                 wire:click="sendVerificationCode"
                 wire:loading.attr="disabled"
                 wire:loading.class="opacity-50"
-                @if(!$can_resend || $is_sending) disabled @endif
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+                @if(!$can_resend || $is_sending || !$phone_number) disabled @endif
+                class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
                 <span wire:loading.remove wire:target="sendVerificationCode">
                     @if($verification_sent && !$can_resend)
