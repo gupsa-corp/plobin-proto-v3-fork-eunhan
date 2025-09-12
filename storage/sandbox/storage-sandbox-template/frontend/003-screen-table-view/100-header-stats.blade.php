@@ -10,12 +10,8 @@
                 <p class="text-gray-600">실제 데이터베이스 연동으로 프로젝트를 체계적으로 관리하세요</p>
             </div>
         </div>
-        <div class="flex space-x-2">
-            <a href="?view=gantt" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">간트차트</a>
-            <button class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">내보내기</button>
-        </div>
     </div>
-    
+
     <!-- 통계 카드 -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-blue-50 p-4 rounded-lg">

@@ -239,6 +239,39 @@ Route::prefix('sandbox')->group(function () {
     Route::prefix('form-publisher')->group(function () {
         Route::post('/save', \App\Http\Sandbox\FormPublisher\Save\Controller::class);
     });
+    
+    // 샌드박스 템플릿 백엔드 API 프록시
+    Route::any('storage-sandbox-template/backend/api.php/{path?}', function ($path = '') {
+        $apiFile = storage_path('sandbox/storage-sandbox-template/backend/api.php');
+        
+        if (!file_exists($apiFile)) {
+            return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다.'], 404);
+        }
+        
+        // 원래 URI를 API 파일에 맞게 설정
+        $_SERVER['REQUEST_URI'] = '/backend/api.php/' . $path;
+        
+        // 출력 버퍼링 시작
+        ob_start();
+        
+        // API 파일 실행
+        $result = include $apiFile;
+        
+        // 출력 내용 캡처
+        $output = ob_get_clean();
+        
+        // 결과가 배열이면 JSON으로 반환
+        if (is_array($result)) {
+            return response()->json($result);
+        }
+        
+        // 출력이 있으면 그대로 반환 (이미 JSON 헤더가 설정되어 있을 것)
+        if (!empty($output)) {
+            return response($output)->header('Content-Type', 'application/json');
+        }
+        
+        return response()->json(['success' => false, 'message' => '응답이 없습니다.'], 500);
+    })->where('path', '.*');
 });
 
 // 플랫폼 관리자 - 요금제 관리 API (개발용 - 인증 없음)

@@ -68,7 +68,8 @@ function routeRequest($method, $pathSegments) {
                 'POST /upload' => '파일 업로드',
                 'GET /files/{id}' => '파일 상세 조회',
                 'DELETE /files/{id}' => '파일 삭제',
-                'GET /files/{id}/download' => '파일 다운로드'
+                'GET /files/{id}/download' => '파일 다운로드',
+                'PUT /projects/{id}' => '프로젝트 정보 업데이트'
             ]
         ];
     }
@@ -81,6 +82,9 @@ function routeRequest($method, $pathSegments) {
             
         case 'upload':
             return handleUploadEndpoint($method, array_slice($pathSegments, 1));
+            
+        case 'projects':
+            return handleProjectsEndpoint($method, array_slice($pathSegments, 1));
             
         default:
             return null;
@@ -138,6 +142,33 @@ function handleUploadEndpoint($method, $pathSegments) {
     if ($method === 'POST' && empty($pathSegments)) {
         // POST /upload - 파일 업로드
         return requireFunction($functionPath . '/upload.php');
+    }
+    
+    return null;
+}
+
+/**
+ * 프로젝트 관련 엔드포인트 처리
+ */
+function handleProjectsEndpoint($method, $pathSegments) {
+    $functionPath = __DIR__ . '/functions/projects';
+    
+    switch ($method) {
+        case 'GET':
+            if (count($pathSegments) === 1) {
+                // GET /projects/{id} - 프로젝트 정보 조회
+                $projectId = $pathSegments[0];
+                return requireFunction($functionPath . '/show.php', ['id' => $projectId]);
+            }
+            break;
+            
+        case 'PUT':
+            if (count($pathSegments) === 1) {
+                // PUT /projects/{id} - 프로젝트 정보 업데이트
+                $projectId = $pathSegments[0];
+                return requireFunction($functionPath . '/update.php', ['id' => $projectId]);
+            }
+            break;
     }
     
     return null;

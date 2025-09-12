@@ -2,21 +2,25 @@
 <?php 
     $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
     require_once $commonPath;
+    
+    // 백엔드 common.php도 로드하여 getSandboxConfig 함수 사용
+    $backendCommonPath = storage_path('sandbox/storage-sandbox-template/backend/common.php');
+    require_once $backendCommonPath;
+    
     $screenInfo = getCurrentScreenInfo();
     $uploadPaths = getUploadPaths();
 
-    // SQLite 데이터베이스 연결
-    $dbPath = storage_path('sandbox/storage-sandbox-template/backend/database/release.sqlite');
-    
     try {
-        $pdo = new PDO('sqlite:' . $dbPath);
+        // SQLite 데이터베이스 연결 - common.php 설정 사용
+        $config = getSandboxConfig();
+        $pdo = new PDO("sqlite:" . $config['database']['path']);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // 검색 및 필터 파라미터 처리
         $search = $_GET['search'] ?? '';
         $status = $_GET['status'] ?? '';
         $priority = $_GET['priority'] ?? '';
-        $sortBy = $_GET['sort'] ?? 'created_date';
+        $sortBy = $_GET['sort'] ?? 'created_at';
         $sortOrder = $_GET['order'] ?? 'desc';
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 10;
@@ -44,8 +48,8 @@
         $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
         
         // 정렬 컬럼 검증
-        $allowedSortColumns = ['name', 'status', 'priority', 'created_date', 'progress', 'start_date', 'end_date'];
-        $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'created_date';
+        $allowedSortColumns = ['name', 'status', 'priority', 'created_at', 'progress', 'start_date', 'end_date'];
+        $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'created_at';
         $sortOrder = strtolower($sortOrder) === 'asc' ? 'ASC' : 'DESC';
         
         // 전체 개수 조회
@@ -58,7 +62,7 @@
         $sql = "SELECT 
                     id, name, description, status, progress, team_members, priority, 
                     start_date, end_date, client, category, budget, 
-                    created_date, estimated_hours, actual_hours
+                    created_at
                 FROM projects 
                 $whereClause 
                 ORDER BY $sortBy $sortOrder 
