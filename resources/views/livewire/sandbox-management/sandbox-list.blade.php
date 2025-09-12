@@ -289,22 +289,22 @@
                                     <div class="mt-4 space-y-4">
                                         <div>
                                             <label for="storageName" class="block text-sm font-medium text-gray-700">샌드박스 이름 *</label>
-                                            <input wire:model="storageName" type="text" id="storageName"
+                                            <input wire:model="newSandbox.name" type="text" id="storageName"
                                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                                    placeholder="예: my-sandbox">
-                                            @error('storageName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                            @error('newSandbox.name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                         </div>
 
                                         <div>
                                             <label for="selectedTemplate" class="block text-sm font-medium text-gray-700">템플릿 *</label>
-                                            <select wire:model="selectedTemplate" id="selectedTemplate"
+                                            <select wire:model="newSandbox.template_id" id="selectedTemplate"
                                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                 <option value="">템플릿 선택</option>
                                                 @foreach($templates as $template)
                                                     <option value="{{ $template['name'] }}">{{ $template['display_name'] }} ({{ $template['file_count'] }}개 파일)</option>
                                                 @endforeach
                                             </select>
-                                            @error('selectedTemplate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                            @error('newSandbox.template_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
                                 </div>

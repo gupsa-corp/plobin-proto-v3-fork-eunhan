@@ -12,6 +12,7 @@ class ProjectSandbox extends Model
         'project_id',
         'name',
         'description',
+        'template_id',
         'status',
         'settings',
         'last_accessed_at',
