@@ -7,6 +7,11 @@
         </div>
     </div>
 
+    <!-- 표시명 설정 섹션 -->
+    <div class="mb-6">
+        @livewire('profile.display-name-settings')
+    </div>
+
     @if(empty($organizationsPermissions))
     <!-- 조직이 없는 경우 -->
     <div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">

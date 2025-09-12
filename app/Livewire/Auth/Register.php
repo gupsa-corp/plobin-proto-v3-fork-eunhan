@@ -16,6 +16,7 @@ class Register extends Component
 {
     public $first_name = '';
     public $last_name = '';
+    public $nickname = '';
     public $email = '';
     public $password = '';
     public $password_confirmation = '';
@@ -57,6 +58,7 @@ class Register extends Component
         $rules = [
             'first_name' => 'required|min:1|max:50|regex:/^[\p{Hangul}a-zA-Z\s]+$/u',
             'last_name' => 'required|min:1|max:50|regex:/^[\p{Hangul}a-zA-Z\s]+$/u',
+            'nickname' => 'nullable|min:2|max:20|unique:users|regex:/^[\p{Hangul}a-zA-Z0-9_]+$/u',
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|min:8|confirmed|regex:/^(?=.*[a-zA-Z])(?=.*\d).*$/',
             'phone_number' => 'required|regex:/^01[0-9]-?[0-9]{4}-?[0-9]{4}$/|unique:users,phone_number',
@@ -89,6 +91,10 @@ class Register extends Component
         'last_name.min' => '성을 입력해주세요.',
         'last_name.max' => '성은 최대 50자까지 입력 가능합니다.',
         'last_name.regex' => '성은 한글, 영문, 공백만 입력 가능합니다.',
+        'nickname.min' => '닉네임은 최소 2자 이상이어야 합니다.',
+        'nickname.max' => '닉네임은 최대 20자까지 입력 가능합니다.',
+        'nickname.unique' => '이미 사용중인 닉네임입니다.',
+        'nickname.regex' => '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 입력 가능합니다.',
         'email.required' => '이메일을 입력해주세요.',
         'email.email' => '올바른 이메일 주소를 입력해주세요.',
         'email.unique' => '이미 사용중인 이메일입니다.',
@@ -512,12 +518,14 @@ class Register extends Component
             $user = User::create([
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
+                'nickname' => $this->nickname,
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
                 'phone_number' => $this->phone_number,
                 'country_code' => $this->country_code,
                 'phone_verified_at' => now(),
                 'email_verified_at' => now(),
+                'marketing_consent' => $this->agree_marketing,
             ]);
 
             Auth::login($user);

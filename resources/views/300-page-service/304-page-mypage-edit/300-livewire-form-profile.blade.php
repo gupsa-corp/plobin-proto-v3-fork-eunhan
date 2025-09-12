@@ -19,14 +19,40 @@
         @endif
 
         <form wire:submit.prevent="updateProfile" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">성 <span class="text-red-500">*</span></label>
+                    <input type="text"
+                           wire:model="first_name"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                           id="first_name"
+                           required>
+                    @error('first_name')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">이름 <span class="text-red-500">*</span></label>
+                    <input type="text"
+                           wire:model="last_name"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                           id="last_name"
+                           required>
+                    @error('last_name')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">이름 <span class="text-red-500">*</span></label>
+                <label for="nickname" class="block text-sm font-medium text-gray-700 mb-2">닉네임 <span class="text-gray-500 text-sm">(선택)</span></label>
                 <input type="text"
-                       wire:model="name"
+                       wire:model="nickname"
                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                       id="name"
-                       required>
-                @error('name')
+                       id="nickname"
+                       placeholder="닉네임을 입력하세요 (2-20자, 한글/영문/숫자/언더스코어)">
+                <div class="text-xs text-gray-500 mt-1">닉네임을 입력하지 않으면 실명으로 표시됩니다.</div>
+                @error('nickname')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -61,6 +87,58 @@
                        id="organization"
                        readonly>
                 <p class="text-xs text-gray-500 mt-1">소속은 조직 목록에서 변경할 수 있습니다.</p>
+            </div>
+
+            <!-- 마케팅 수신동의 -->
+            <div class="border-t border-gray-200 pt-4">
+                <h4 class="text-md font-medium text-gray-900 mb-3">마케팅 정보 수신</h4>
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="marketing_consent" 
+                               type="checkbox" 
+                               wire:model="marketing_consent"
+                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="marketing_consent" class="font-medium text-gray-700 cursor-pointer">
+                            마케팅 정보 수신에 동의합니다
+                        </label>
+                        <p class="text-gray-500 mt-1">이벤트, 프로모션, 새로운 기능 소식을 이메일과 SMS로 받으실 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 표시명 설정 -->
+            <div class="border-t border-gray-200 pt-4">
+                <h4 class="text-md font-medium text-gray-900 mb-3">표시명 설정</h4>
+                <p class="text-sm text-gray-600 mb-4">다른 사용자들에게 어떤 이름으로 표시될지 선택하세요.</p>
+                
+                <div class="space-y-3">
+                    @foreach($displayNameOptions as $value => $option)
+                        <div class="relative">
+                            <label class="flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors
+                                {{ $display_name_preference === $value ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : '' }}">
+                                <input
+                                    type="radio"
+                                    wire:model="display_name_preference"
+                                    value="{{ $value }}"
+                                    class="mt-0.5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                >
+                                <div class="ml-3 flex-1 min-w-0">
+                                    <div class="font-medium text-gray-900">{{ $option['label'] }}</div>
+                                    <div class="text-sm text-gray-600 mt-1">{{ $option['description'] }}</div>
+                                    <div class="mt-2 text-sm">
+                                        <span class="text-gray-500">미리보기:</span>
+                                        <span class="font-semibold text-gray-900 ml-1">{{ $option['preview'] }}</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+                @error('display_name_preference')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="pt-4 flex space-x-3">

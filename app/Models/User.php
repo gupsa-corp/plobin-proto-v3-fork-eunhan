@@ -31,6 +31,8 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'name',
+        'marketing_consent',
+        'display_name_preference',
     ];
 
     protected $hidden = [
@@ -44,6 +46,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'marketing_consent' => 'boolean',
         ];
     }
 
@@ -59,16 +62,32 @@ class User extends Authenticatable
 
     public function getDisplayNameAttribute(): string
     {
-        if ($this->nickname) {
-            return $this->nickname;
+        // 사용자 설정에 따라 표시명 결정
+        switch ($this->display_name_preference) {
+            case 'real_name':
+                $fullName = $this->full_name;
+                return $fullName ?: explode('@', $this->email)[0];
+                
+            case 'nickname':
+                return $this->nickname ?: $this->full_name ?: explode('@', $this->email)[0];
+                
+            case 'email':
+                return explode('@', $this->email)[0];
+                
+            case 'auto':
+            default:
+                // 기존 자동 로직: 닉네임 -> 실명 -> 이메일
+                if ($this->nickname) {
+                    return $this->nickname;
+                }
+                
+                $fullName = $this->full_name;
+                if ($fullName) {
+                    return $fullName;
+                }
+                
+                return explode('@', $this->email)[0];
         }
-
-        $fullName = $this->full_name;
-        if ($fullName) {
-            return $fullName;
-        }
-
-        return explode('@', $this->email)[0];
     }
 
     public function getPhoneNumberInstance(): ?PhoneNumber

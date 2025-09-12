@@ -14,8 +14,20 @@
                 <div class="p-6">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
-                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->name ?? '이름 없음' }}</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">실명</label>
+                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->full_name ?: '이름 없음' }}</p>
+                        </div>
+
+                        @if($user->nickname)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
+                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->nickname }}</p>
+                        </div>
+                        @endif
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">표시명</label>
+                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->display_name }}</p>
                         </div>
 
                         <div>
@@ -23,10 +35,10 @@
                             <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->email }}</p>
                         </div>
 
-                        @if($user->formatted_phone)
+                        @if($user->phone_number)
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->formatted_phone }}</p>
+                            <p class="text-base text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ $user->formatted_phone ?: $user->phone_number }}</p>
                         </div>
                         @endif
 
