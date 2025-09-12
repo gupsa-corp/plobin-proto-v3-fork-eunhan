@@ -29,9 +29,6 @@
         <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
             마이페이지
         </a>
-        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-            계정 설정
-        </a>
         <div class="border-t border-gray-100 my-1"></div>
         <button wire:click="logout" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
             로그아웃
