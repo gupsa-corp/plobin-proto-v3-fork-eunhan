@@ -1,189 +1,233 @@
 <div>
-<form wire:submit.prevent="register" class="space-y-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
-                이름
-            </label>
-            <input
-                type="text"
-                id="first_name"
-                wire:model="first_name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="이름을 입력하세요"
-            />
-            @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-        </div>
+{{-- ============================================
+     LIVEWIRE 회원가입 폼 - 섹션별 구분
+     ============================================ --}}
 
-        <div>
-            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
-                성
-            </label>
-            <input
-                type="text"
-                id="last_name"
-                wire:model="last_name"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="성을 입력하세요"
-            />
-            @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-        </div>
-    </div>
-
-    <div>
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-            이메일
-        </label>
-        <input
-            type="email"
-            id="email"
-            wire:model="email"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="이메일을 입력하세요"
-        />
-        @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-    </div>
-
-    <!-- 휴대폰 번호 입력 -->
-    <div>
-        <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">
-            휴대폰 번호
-        </label>
-        <div class="space-y-2">
-            <div class="flex gap-2">
-                <select
-                    wire:model="country_code"
-                    class="w-24 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                >
-                    <option value="+82">+82</option>
-                </select>
+<form wire:submit.prevent="register" class="space-y-6">
+    
+    {{-- ========================================
+         1. 기본 정보 섹션 (이름, 성, 이메일)
+         ======================================== --}}
+    <div class="space-y-4">
+        <h3 class="text-sm font-semibold text-gray-600 border-b border-gray-200 pb-2">기본 정보</h3>
+        
+        <!-- 이름 + 성 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
+                    이름
+                </label>
                 <input
-                    type="tel"
-                    id="phone_number"
-                    wire:model.live="phone_number"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="010-1234-5678"
+                    type="text"
+                    id="first_name"
+                    wire:model="first_name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="이름을 입력하세요"
                 />
+                @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
-            <button
-                type="button"
-                wire:click="sendVerificationCode"
-                wire:loading.attr="disabled"
-                wire:loading.class="opacity-50"
-                @if(!$can_resend || $is_sending || !$phone_number) disabled @endif
-                class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-                <span wire:loading.remove wire:target="sendVerificationCode">
-                    @if($verification_sent && !$can_resend)
-                        재전송 (<span wire:poll.1s="updateCountdown" id="countdown">{{ $resend_countdown }}</span>)
-                    @elseif($is_sending)
-                        전송 중...
-                    @else
-                        인증번호 전송
-                    @endif
-                </span>
-                <span wire:loading wire:target="sendVerificationCode">전송 중...</span>
-            </button>
+
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
+                    성
+                </label>
+                <input
+                    type="text"
+                    id="last_name"
+                    wire:model="last_name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="성을 입력하세요"
+                />
+                @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
         </div>
-        @error('phone_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+
+        <!-- 이메일 -->
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                이메일
+            </label>
+            <input
+                type="email"
+                id="email"
+                wire:model="email"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="이메일을 입력하세요"
+            />
+            @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
     </div>
 
-    <!-- SMS 인증번호 입력 (인증번호가 전송된 경우에만 표시) -->
-    @if($verification_sent)
-    <div>
-        <label for="verification_code" class="block text-sm font-medium text-gray-700 mb-1">
-            인증번호
-            @if($phone_verified)
-                <span class="text-green-600 text-sm ml-2">✓ 인증 완료</span>
-            @elseif($verification_attempts > 0)
-                <span class="text-orange-600 text-sm ml-2">시도 {{ $verification_attempts }}/{{ $max_attempts }}</span>
-            @endif
-        </label>
-        <div class="flex gap-2">
-            <input
-                type="text"
-                id="verification_code"
-                wire:model="verification_code"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="6자리 인증번호 입력"
-                maxlength="6"
-                @if($phone_verified) disabled @endif
-            />
-            @if(!$phone_verified)
-            <button
-                type="button"
-                wire:click="verifyPhoneNumber"
-                wire:loading.attr="disabled"
-                wire:loading.class="opacity-50"
-                @if($is_verifying || $verification_attempts >= $max_attempts) disabled @endif
-                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-                <span wire:loading.remove wire:target="verifyPhoneNumber">
-                    @if($is_verifying)
-                        확인 중...
-                    @elseif($verification_attempts >= $max_attempts)
-                        시도 초과
-                    @else
-                        인증 확인
-                    @endif
-                </span>
-                <span wire:loading wire:target="verifyPhoneNumber">확인 중...</span>
-            </button>
-            @endif
+    {{-- ========================================
+         2. 휴대폰 인증 섹션 (번호 입력 + SMS 전송)
+         ======================================== --}}
+    <div class="space-y-4">
+        <h3 class="text-sm font-semibold text-gray-600 border-b border-gray-200 pb-2">휴대폰 인증</h3>
+        
+        <!-- 휴대폰 번호 입력 -->
+        <div>
+            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">
+                휴대폰 번호
+            </label>
+            <div class="space-y-2">
+                <div class="flex gap-2">
+                    <select
+                        wire:model="country_code"
+                        class="w-24 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    >
+                        <option value="+82">+82</option>
+                    </select>
+                    <input
+                        type="tel"
+                        id="phone_number"
+                        wire:model.live="phone_number"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="010-1234-5678"
+                    />
+                </div>
+                <button
+                    type="button"
+                    wire:click="sendVerificationCode"
+                    wire:loading.attr="disabled"
+                    wire:loading.class="opacity-50"
+                    @if(!$can_resend || $is_sending || !$phone_number) disabled @endif
+                    class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    <span wire:loading.remove wire:target="sendVerificationCode">
+                        @if($verification_sent && !$can_resend)
+                            재전송 (<span wire:poll.1s="updateCountdown" id="countdown">{{ $resend_countdown }}</span>)
+                        @elseif($is_sending)
+                            전송 중...
+                        @else
+                            인증번호 전송
+                        @endif
+                    </span>
+                    <span wire:loading wire:target="sendVerificationCode">전송 중...</span>
+                </button>
+            </div>
+            @error('phone_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
-        @error('verification_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    </div>
+
+    {{-- ========================================
+         3. SMS 인증 섹션 (인증번호 확인)
+         ======================================== --}}
+    @if($verification_sent)
+    <div class="space-y-4">
+        <h3 class="text-sm font-semibold text-gray-600 border-b border-gray-200 pb-2">SMS 인증</h3>
+        
+        <!-- 인증번호 입력 -->
+        <div>
+            <label for="verification_code" class="block text-sm font-medium text-gray-700 mb-1">
+                인증번호
+                @if($phone_verified)
+                    <span class="text-green-600 text-sm ml-2">✓ 인증 완료</span>
+                @elseif($verification_attempts > 0)
+                    <span class="text-orange-600 text-sm ml-2">시도 {{ $verification_attempts }}/{{ $max_attempts }}</span>
+                @endif
+            </label>
+            <div class="flex gap-2">
+                <input
+                    type="text"
+                    id="verification_code"
+                    wire:model="verification_code"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="6자리 인증번호 입력"
+                    maxlength="6"
+                    @if($phone_verified) disabled @endif
+                />
+                @if(!$phone_verified)
+                <button
+                    type="button"
+                    wire:click="verifyPhoneNumber"
+                    wire:loading.attr="disabled"
+                    wire:loading.class="opacity-50"
+                    @if($is_verifying || $verification_attempts >= $max_attempts) disabled @endif
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                    <span wire:loading.remove wire:target="verifyPhoneNumber">
+                        @if($is_verifying)
+                            확인 중...
+                        @elseif($verification_attempts >= $max_attempts)
+                            시도 초과
+                        @else
+                            인증 확인
+                        @endif
+                    </span>
+                    <span wire:loading wire:target="verifyPhoneNumber">확인 중...</span>
+                </button>
+                @endif
+            </div>
+            @error('verification_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
     </div>
     @endif
 
-    <div>
-        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-            비밀번호
-        </label>
-        <input
-            type="password"
-            id="password"
-            wire:model="password"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="비밀번호를 입력하세요 (영문+숫자 8자 이상)"
-        />
-        @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    {{-- ========================================
+         4. 비밀번호 섹션 (비밀번호 + 확인)
+         ======================================== --}}
+    <div class="space-y-4">
+        <h3 class="text-sm font-semibold text-gray-600 border-b border-gray-200 pb-2">비밀번호 설정</h3>
+        
+        <!-- 비밀번호 -->
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호
+            </label>
+            <input
+                type="password"
+                id="password"
+                wire:model="password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="비밀번호를 입력하세요 (영문+숫자 8자 이상)"
+            />
+            @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
+
+        <!-- 비밀번호 확인 -->
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호 확인
+            </label>
+            <input
+                type="password"
+                id="password_confirmation"
+                wire:model="password_confirmation"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="비밀번호를 다시 입력하세요"
+            />
+            @error('password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
     </div>
 
-    <div>
-        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
-            비밀번호 확인
-        </label>
-        <input
-            type="password"
-            id="password_confirmation"
-            wire:model="password_confirmation"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="비밀번호를 다시 입력하세요"
-        />
-        @error('password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    {{-- ========================================
+         5. 제출 섹션 (회원가입 버튼)
+         ======================================== --}}
+    <div class="pt-2">
+        <button
+            type="submit"
+            @if(!$phone_verified || $is_sending || $is_verifying) disabled @endif
+            class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            wire:loading.attr="disabled"
+            wire:loading.class="opacity-50 cursor-not-allowed"
+        >
+            <span wire:loading.remove>
+                @if(!$phone_verified)
+                    휴대폰 인증을 완료해주세요
+                @elseif($is_sending || $is_verifying)
+                    인증 진행 중...
+                @else
+                    회원가입
+                @endif
+            </span>
+            <span wire:loading>가입 중...</span>
+        </button>
     </div>
-
-    <button
-        type="submit"
-        @if(!$phone_verified || $is_sending || $is_verifying) disabled @endif
-        class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        wire:loading.attr="disabled"
-        wire:loading.class="opacity-50 cursor-not-allowed"
-    >
-        <span wire:loading.remove>
-            @if(!$phone_verified)
-                휴대폰 인증을 완료해주세요
-            @elseif($is_sending || $is_verifying)
-                인증 진행 중...
-            @else
-                회원가입
-            @endif
-        </span>
-        <span wire:loading>가입 중...</span>
-    </button>
 </form>
 
-<!-- 메시지 표시 -->
+{{-- ========================================
+     6. 메시지 표시 섹션 (성공/실패 알림)
+     ======================================== --}}
 @if (session()->has('success'))
     <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
         <strong class="font-bold">성공!</strong>
@@ -198,12 +242,19 @@
     </div>
 @endif
 
+{{-- ========================================
+     7. JavaScript 섹션 (Livewire 이벤트 & 인터랙션)
+     ======================================== --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let countdownInterval;
 
-    // Livewire 이벤트 리스너 등록 - Livewire 3 방식
+    // ========================================
+    // Livewire 이벤트 리스너 등록 (Livewire 3)
+    // ========================================
     document.addEventListener('livewire:initialized', function() {
+        
+        // SMS 재전송 카운트다운
         Livewire.on('startCountdown', function(data) {
             let seconds = data.seconds || data[0]?.seconds || 60;
             const countdownElement = document.getElementById('countdown');
@@ -233,7 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         });
 
+        // ========================================
         // SMS 전송 관련 이벤트 리스너
+        // ========================================
         Livewire.on('sms-sending-started', function() {
             console.log('SMS 전송 시작');
         });
@@ -253,6 +306,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('SMS 전송 실패');
         });
 
+        // ========================================
+        // SMS 인증 관련 이벤트 리스너
+        // ========================================
         Livewire.on('verification-started', function() {
             console.log('인증 시작');
         });
@@ -281,7 +337,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 인증번호 입력 필드 자동 포맷팅 (숫자만 입력)
+    // ========================================
+    // 인증번호 입력 필드 자동 포맷팅 (숫자만)
+    // ========================================
     setTimeout(() => {
         const verificationInput = document.getElementById('verification_code');
         if (verificationInput) {
