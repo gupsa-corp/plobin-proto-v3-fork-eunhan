@@ -54,53 +54,96 @@ try {
         'budget'
     ];
 
+    $hasCustomFields = false;
+    
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             $updateFields[] = "$field = ?";
             $values[] = $data[$field];
         }
     }
+    
+    // 커스텀 필드 확인
+    foreach ($data as $key => $value) {
+        if (strpos($key, 'custom_') === 0) {
+            $hasCustomFields = true;
+            break;
+        }
+    }
 
-    if (empty($updateFields)) {
+    // 기본 필드와 커스텀 필드 둘 다 없으면 에러
+    if (empty($updateFields) && !$hasCustomFields) {
         return [
             'success' => false,
             'message' => '업데이트할 필드가 없습니다.'
         ];
     }
 
-    // 업데이트 날짜 추가
-    $updateFields[] = "updated_at = ?";
-    $values[] = date('Y-m-d H:i:s');
+    // 기본 필드가 있는 경우에만 projects 테이블 업데이트
+    if (!empty($updateFields)) {
+        // 업데이트 날짜 추가
+        $updateFields[] = "updated_at = ?";
+        $values[] = date('Y-m-d H:i:s');
 
-    // 프로젝트 ID 추가
-    $values[] = $projectId;
+        // 프로젝트 ID 추가
+        $values[] = $projectId;
 
-    // SQL 쿼리 실행
-    $sql = "UPDATE projects SET " . implode(', ', $updateFields) . " WHERE id = ?";
-    $stmt = $pdo->prepare($sql);
-    $result = $stmt->execute($values);
+        // SQL 쿼리 실행
+        $sql = "UPDATE projects SET " . implode(', ', $updateFields) . " WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        $result = $stmt->execute($values);
 
-    if (!$result || $stmt->rowCount() === 0) {
-        return [
-            'success' => false,
-            'message' => '프로젝트 업데이트에 실패했거나 해당 프로젝트를 찾을 수 없습니다.'
-        ];
+        if (!$result || $stmt->rowCount() === 0) {
+            return [
+                'success' => false,
+                'message' => '프로젝트 업데이트에 실패했거나 해당 프로젝트를 찾을 수 없습니다.'
+            ];
+        }
     }
 
-    // 커스텀 데이터 처리 (있는 경우)
+    // 커스텀 데이터 처리
+    $customFields = [];
+    
+    // custom_data 형태로 온 경우
     if (isset($data['custom_data']) && is_array($data['custom_data'])) {
-        // 기존 커스텀 데이터 삭제
-        $deleteCustomStmt = $pdo->prepare("DELETE FROM project_custom_data WHERE project_id = ?");
-        $deleteCustomStmt->execute([$projectId]);
-
-        // 새로운 커스텀 데이터 삽입
-        $insertCustomStmt = $pdo->prepare("
-            INSERT INTO project_custom_data (project_id, column_name, column_value)
-            VALUES (?, ?, ?)
+        $customFields = $data['custom_data'];
+    }
+    
+    // 개별 custom_ 필드들도 처리
+    foreach ($data as $key => $value) {
+        if (strpos($key, 'custom_') === 0) {
+            $columnName = substr($key, 7); // 'custom_' 제거
+            $customFields[$columnName] = $value;
+        }
+    }
+    
+    // 커스텀 필드가 있는 경우 처리
+    if (!empty($customFields)) {
+        // 먼저 해당 프로젝트의 모든 커스텀 데이터를 조회
+        $selectCustomStmt = $pdo->prepare("
+            SELECT column_name, column_value 
+            FROM project_custom_data 
+            WHERE project_id = ?
         ");
-
-        foreach ($data['custom_data'] as $columnName => $columnValue) {
-            if ($columnValue !== null && $columnValue !== '') {
+        $selectCustomStmt->execute([$projectId]);
+        $existingCustomData = $selectCustomStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        
+        // 개별 커스텀 필드 업데이트/삽입
+        foreach ($customFields as $columnName => $columnValue) {
+            if (isset($existingCustomData[$columnName])) {
+                // 기존 데이터 업데이트
+                $updateCustomStmt = $pdo->prepare("
+                    UPDATE project_custom_data 
+                    SET column_value = ? 
+                    WHERE project_id = ? AND column_name = ?
+                ");
+                $updateCustomStmt->execute([$columnValue, $projectId, $columnName]);
+            } else {
+                // 새 데이터 삽입
+                $insertCustomStmt = $pdo->prepare("
+                    INSERT INTO project_custom_data (project_id, column_name, column_value)
+                    VALUES (?, ?, ?)
+                ");
                 $insertCustomStmt->execute([$projectId, $columnName, $columnValue]);
             }
         }

@@ -457,6 +457,233 @@ async function deleteColumn(columnId, columnName) {
 
 // 컬럼 추가 폼 이벤트 리스너
 document.getElementById('addColumnForm').addEventListener('submit', addColumn);
+
+// 인라인 편집 기능
+window.startEdit = function(event) {
+    event.stopPropagation();
+    
+    const element = event.target;
+    const field = element.dataset.field;
+    const projectId = element.dataset.projectId;
+    const currentValue = element.textContent.trim();
+    const dataType = element.dataset.type || 'text';
+    
+    // 이미 편집 중인 경우 무시
+    if (element.classList.contains('editing')) {
+        return;
+    }
+    
+    // 편집 상태로 변경
+    element.classList.add('editing');
+    
+    // 원본 텍스트 저장
+    element.dataset.originalValue = currentValue;
+    
+    // 입력 요소 생성
+    let input;
+    if (dataType === 'date') {
+        input = document.createElement('input');
+        input.type = 'date';
+        input.value = currentValue.includes('-') ? currentValue : '';
+    } else if (field === 'progress' || field === 'team_members' || field === 'budget') {
+        input = document.createElement('input');
+        input.type = 'number';
+        if (field === 'progress') {
+            input.min = 0;
+            input.max = 100;
+            input.value = currentValue.replace('%', '');
+        } else if (field === 'team_members') {
+            input.min = 1;
+            input.value = currentValue.replace('명', '');
+        } else if (field === 'budget') {
+            input.value = currentValue.replace(/[₩,]/g, '');
+        }
+    } else if (field === 'description') {
+        input = document.createElement('textarea');
+        input.rows = 2;
+        input.value = currentValue.endsWith('...') ? currentValue.slice(0, -3) : currentValue;
+    } else {
+        input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentValue === '-' ? '' : currentValue;
+    }
+    
+    // 입력 요소 스타일 설정
+    input.className = 'w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500';
+    
+    // 원본 요소를 입력 요소로 교체
+    element.innerHTML = '';
+    element.appendChild(input);
+    input.focus();
+    input.select();
+    
+    // 이벤트 리스너 추가
+    input.addEventListener('blur', () => finishEdit(element, projectId, field, input.value));
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            finishEdit(element, projectId, field, input.value);
+        } else if (e.key === 'Escape') {
+            cancelEdit(element);
+        }
+    });
+};
+
+window.startSelectEdit = function(event) {
+    event.stopPropagation();
+    
+    const element = event.target;
+    const field = element.dataset.field;
+    const projectId = element.dataset.projectId;
+    const options = JSON.parse(element.dataset.options);
+    const labels = JSON.parse(element.dataset.labels);
+    const currentValue = Object.keys(labels).find(key => labels[key] === element.textContent.trim()) || element.textContent.trim();
+    
+    // 이미 편집 중인 경우 무시
+    if (element.classList.contains('editing')) {
+        return;
+    }
+    
+    // 편집 상태로 변경
+    element.classList.add('editing');
+    element.dataset.originalValue = element.textContent.trim();
+    
+    // 셀렉트 요소 생성
+    const select = document.createElement('select');
+    select.className = 'w-full px-2 py-1 text-xs border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500';
+    
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = labels[option] || option;
+        if (option === currentValue) {
+            optionElement.selected = true;
+        }
+        select.appendChild(optionElement);
+    });
+    
+    // 원본 요소를 셀렉트로 교체
+    element.innerHTML = '';
+    element.appendChild(select);
+    select.focus();
+    
+    // 이벤트 리스너 추가
+    select.addEventListener('change', () => {
+        const newValue = select.value;
+        const newLabel = labels[newValue] || newValue;
+        finishEdit(element, projectId, field, newValue, newLabel);
+    });
+    
+    select.addEventListener('blur', () => {
+        const newValue = select.value;
+        const newLabel = labels[newValue] || newValue;
+        finishEdit(element, projectId, field, newValue, newLabel);
+    });
+    
+    select.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            cancelEdit(element);
+        }
+    });
+};
+
+window.updateCustomField = async function(event) {
+    const checkbox = event.target;
+    const field = checkbox.dataset.field;
+    const projectId = checkbox.dataset.projectId;
+    const value = checkbox.checked;
+    
+    try {
+        const updateData = {};
+        updateData[field] = value;
+        
+        const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${projectId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            // 실패 시 원래 상태로 복원
+            checkbox.checked = !value;
+            alert('업데이트 실패: ' + (result.message || '알 수 없는 오류'));
+        }
+    } catch (error) {
+        console.error('업데이트 에러:', error);
+        checkbox.checked = !value;
+        alert('네트워크 오류가 발생했습니다: ' + error.message);
+    }
+};
+
+async function finishEdit(element, projectId, field, value, displayValue = null) {
+    try {
+        // API 호출을 위한 데이터 준비
+        const updateData = {};
+        
+        // 모든 필드를 직접 전송 (백엔드에서 custom_ 필드를 자동으로 처리함)
+        if (field === 'progress' || field === 'team_members' || field === 'budget') {
+            updateData[field] = parseInt(value) || 0;
+        } else {
+            updateData[field] = value;
+        }
+        
+        // API 호출
+        const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${projectId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // 성공 시 새 값으로 표시 업데이트
+            let newDisplayValue = displayValue || value;
+            
+            if (field === 'progress') {
+                newDisplayValue = value + '%';
+            } else if (field === 'team_members') {
+                newDisplayValue = value + '명';
+            } else if (field === 'budget' && value > 0) {
+                newDisplayValue = '₩' + parseInt(value).toLocaleString();
+            } else if (field === 'description' && value.length > 100) {
+                newDisplayValue = value.substring(0, 100) + '...';
+            } else if (!value || value === '') {
+                newDisplayValue = '-';
+            }
+            
+            element.textContent = newDisplayValue;
+            element.classList.remove('editing');
+            
+            // 진행률인 경우 프로그래스 바도 업데이트
+            if (field === 'progress') {
+                const progressBar = element.closest('td').querySelector('.bg-blue-500');
+                if (progressBar) {
+                    progressBar.style.width = value + '%';
+                }
+            }
+        } else {
+            // 실패 시 원래 값으로 복원
+            throw new Error(result.message || '업데이트 실패');
+        }
+    } catch (error) {
+        console.error('업데이트 에러:', error);
+        cancelEdit(element);
+        alert('업데이트 실패: ' + error.message);
+    }
+}
+
+function cancelEdit(element) {
+    const originalValue = element.dataset.originalValue;
+    element.textContent = originalValue;
+    element.classList.remove('editing');
+    delete element.dataset.originalValue;
+}
 </script>
 
 <!-- 프로젝트 저장 함수 -->

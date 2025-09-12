@@ -35,22 +35,7 @@
                 </tr>
             <?php else: ?>
                 <?php foreach($projectsData as $project): ?>
-                    <tr class="hover:bg-gray-50 cursor-pointer" 
-                        @click="openSidebar({
-                            id: <?= $project['id'] ?>,
-                            name: '<?= addslashes($project['name']) ?>',
-                            description: '<?= addslashes($project['description']) ?>',
-                            status: '<?= $project['status'] ?>',
-                            progress: <?= $project['progress'] ?>,
-                            team_members: <?= $project['team_members'] ?>,
-                            priority: '<?= $project['priority'] ?>',
-                            client: '<?= addslashes($project['client']) ?>',
-                            budget: <?= $project['budget'] ?>,
-                            start_date: '<?= $project['start_date'] ?>',
-                            end_date: '<?= $project['end_date'] ?>',
-                            category: '<?= $project['category'] ?>'
-                        })"
-                        title="클릭하여 편집">
+                    <tr class="hover:bg-gray-50">
                         
 <?php include storage_path('sandbox/storage-sandbox-template/frontend/003-screen-table-view/303-table-row.blade.php'); ?>
                         
