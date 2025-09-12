@@ -1,11 +1,13 @@
 <td class="px-6 py-4 whitespace-nowrap">
     <input type="checkbox" class="rounded" value="<?= $project['id'] ?>">
 </td>
+<td class="px-6 py-4 whitespace-nowrap text-center" @click.stop data-column="id">
+    <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
+        <span class="text-gray-600 text-sm font-medium"><?= $project['id'] ?></span>
+    </div>
+</td>
 <td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="name">
     <div class="flex items-center">
-        <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
-            <span class="text-gray-600 text-sm"><?= $project['id'] ?></span>
-        </div>
         <div class="flex-1">
             <div class="text-sm font-medium text-gray-900 editable-field" 
                  data-field="name" 
@@ -52,11 +54,15 @@
 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-column="start_date">
     <?php if($project['start_date']): ?>
         <?= date('Y-m-d', strtotime($project['start_date'])) ?>
-        <?php if($project['end_date']): ?>
-            <br><small>~ <?= date('Y-m-d', strtotime($project['end_date'])) ?></small>
-        <?php endif; ?>
     <?php else: ?>
         <?= date('Y-m-d', strtotime($project['created_at'])) ?>
+    <?php endif; ?>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-column="end_date">
+    <?php if($project['end_date']): ?>
+        <?= date('Y-m-d', strtotime($project['end_date'])) ?>
+    <?php else: ?>
+        -
     <?php endif; ?>
 </td>
 <td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="priority">

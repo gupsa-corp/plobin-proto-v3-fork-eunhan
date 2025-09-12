@@ -9,7 +9,7 @@
 function getSandboxConfig() {
     return [
         'database' => [
-            'path' => __DIR__ . '/sandbox.db'
+            'path' => __DIR__ . '/database/release.sqlite'
         ],
         'upload' => [
             'max_file_size' => 50 * 1024 * 1024, // 50MB

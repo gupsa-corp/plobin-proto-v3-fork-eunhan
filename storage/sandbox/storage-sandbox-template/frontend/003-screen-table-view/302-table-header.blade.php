@@ -6,6 +6,11 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <input type="checkbox" class="rounded">
                 </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="id">
+                    <a href="?sort=id&order=<?= $sortBy === 'id' && $sortOrder === 'ASC' ? 'desc' : 'asc' ?>&<?= http_build_query(array_filter(['search' => $search, 'status' => $status, 'priority' => $priority])) ?>" class="hover:text-gray-900">
+                        ID <?= $sortBy === 'id' ? ($sortOrder === 'ASC' ? '↑' : '↓') : '↕️' ?>
+                    </a>
+                </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="name">
                     <a href="?sort=name&order=<?= $sortBy === 'name' && $sortOrder === 'ASC' ? 'desc' : 'asc' ?>&<?= http_build_query(array_filter(['search' => $search, 'status' => $status, 'priority' => $priority])) ?>" class="hover:text-gray-900">
                         프로젝트명 <?= $sortBy === 'name' ? ($sortOrder === 'ASC' ? '↑' : '↓') : '↕️' ?>
@@ -19,6 +24,7 @@
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="team_members">팀 멤버</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="start_date">시작일</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="end_date">종료일</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-column="priority">
                     <a href="?sort=priority&order=<?= $sortBy === 'priority' && $sortOrder === 'ASC' ? 'desc' : 'asc' ?>&<?= http_build_query(array_filter(['search' => $search, 'status' => $status, 'priority' => $priority])) ?>" class="hover:text-gray-900">
                         우선순위 <?= $sortBy === 'priority' ? ($sortOrder === 'ASC' ? '↑' : '↓') : '↕️' ?>

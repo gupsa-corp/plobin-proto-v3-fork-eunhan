@@ -26,6 +26,16 @@
                 <label class="flex items-center opacity-50">
                     <input type="checkbox" 
                            class="rounded text-purple-600 mr-2" 
+                           data-column="id" 
+                           checked 
+                           disabled>
+                    <span class="text-sm">ID</span>
+                    <span class="ml-auto text-xs text-red-500">*</span>
+                </label>
+                
+                <label class="flex items-center opacity-50">
+                    <input type="checkbox" 
+                           class="rounded text-purple-600 mr-2" 
                            data-column="name" 
                            checked 
                            disabled>
@@ -50,6 +60,16 @@
                            checked 
                            disabled>
                     <span class="text-sm">시작일</span>
+                    <span class="ml-auto text-xs text-red-500">*</span>
+                </label>
+                
+                <label class="flex items-center opacity-50">
+                    <input type="checkbox" 
+                           class="rounded text-purple-600 mr-2" 
+                           data-column="end_date" 
+                           checked 
+                           disabled>
+                    <span class="text-sm">종료일</span>
                     <span class="ml-auto text-xs text-red-500">*</span>
                 </label>
             </div>

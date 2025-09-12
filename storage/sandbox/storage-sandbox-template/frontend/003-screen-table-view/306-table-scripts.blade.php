@@ -792,7 +792,7 @@ window.deleteProject = async function(projectId, projectName) {
 // 컬럼 표시/숨김 기능
 function initColumnToggle() {
     // 필수 컬럼 목록
-    const requiredColumns = ['name', 'status', 'start_date'];
+    const requiredColumns = ['id', 'name', 'status', 'start_date', 'end_date'];
     
     // 체크박스 상태 변경 이벤트
     document.querySelectorAll('input[type="checkbox"][data-column]:not([disabled])').forEach(checkbox => {
@@ -813,7 +813,7 @@ function initColumnToggle() {
 // 컬럼 토글 함수
 function toggleColumn(columnName, show) {
     // 필수 컬럼은 숨길 수 없음
-    const requiredColumns = ['name', 'status', 'start_date'];
+    const requiredColumns = ['id', 'name', 'status', 'start_date', 'end_date'];
     if (requiredColumns.includes(columnName) && !show) {
         return;
     }

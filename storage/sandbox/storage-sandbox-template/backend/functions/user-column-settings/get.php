@@ -34,13 +34,15 @@ try {
     // 설정이 없는 경우 기본 설정 반환
     if (empty($settings)) {
         $defaultSettings = [
-            ['column_name' => 'name', 'is_visible' => 1, 'column_order' => 1],
-            ['column_name' => 'status', 'is_visible' => 1, 'column_order' => 2],
-            ['column_name' => 'progress', 'is_visible' => 1, 'column_order' => 3],
-            ['column_name' => 'team_members', 'is_visible' => 1, 'column_order' => 4],
-            ['column_name' => 'priority', 'is_visible' => 1, 'column_order' => 5],
+            ['column_name' => 'id', 'is_visible' => 1, 'column_order' => 1],
+            ['column_name' => 'name', 'is_visible' => 1, 'column_order' => 2],
+            ['column_name' => 'status', 'is_visible' => 1, 'column_order' => 3],
+            ['column_name' => 'progress', 'is_visible' => 1, 'column_order' => 4],
+            ['column_name' => 'team_members', 'is_visible' => 1, 'column_order' => 5],
             ['column_name' => 'start_date', 'is_visible' => 1, 'column_order' => 6],
-            ['column_name' => 'client', 'is_visible' => 1, 'column_order' => 7]
+            ['column_name' => 'end_date', 'is_visible' => 1, 'column_order' => 7],
+            ['column_name' => 'priority', 'is_visible' => 1, 'column_order' => 8],
+            ['column_name' => 'client', 'is_visible' => 1, 'column_order' => 9]
         ];
         
         // 기본 설정을 DB에도 저장
