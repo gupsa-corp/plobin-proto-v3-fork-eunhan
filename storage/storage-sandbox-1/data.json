@@ -1,0 +1,11 @@
+{
+  "user": {
+    "name": "김개발",
+    "email": "dev@example.com",
+    "role": "developer"
+  },
+  "settings": {
+    "theme": "light",
+    "language": "ko"
+  }
+}
