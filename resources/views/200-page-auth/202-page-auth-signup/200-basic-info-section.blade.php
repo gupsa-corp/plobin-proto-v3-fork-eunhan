@@ -46,7 +46,7 @@
         <input
             type="email"
             id="email"
-            wire:model.live="email"
+            wire:model.blur="email"
             @if($email_verified) disabled @endif
             @class([
                 'w-full px-3 py-2 border rounded-md focus:outline-none transition duration-200',

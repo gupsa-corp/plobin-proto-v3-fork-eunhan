@@ -19,7 +19,7 @@
             <input
                 type="tel"
                 id="phone_number"
-                wire:model.live="phone_number"
+                wire:model.blur="phone_number"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="010-1234-5678"
             />
