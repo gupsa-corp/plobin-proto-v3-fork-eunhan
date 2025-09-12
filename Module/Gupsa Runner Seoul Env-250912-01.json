@@ -1,0 +1,33 @@
+{
+	"id": "3e1291cf-b0a6-4bcf-b82b-ba2b78ccdd2a",
+	"name": "Gupsa Runner Seoul Env",
+	"values": [
+		{
+			"key": "HOST",
+			"value": "seoul.gupsa.net:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "memberId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "sandboxId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "fileId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-09-12T04:37:03.254Z",
+	"_postman_exported_using": "Postman/11.62.6"
+}
