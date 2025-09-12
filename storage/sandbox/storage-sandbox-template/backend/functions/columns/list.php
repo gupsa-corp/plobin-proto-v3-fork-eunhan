@@ -52,22 +52,25 @@ try {
     $stmt->execute();
     $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    return [
+    header('Content-Type: application/json');
+    echo json_encode([
         'success' => true,
         'message' => '컬럼 목록을 성공적으로 조회했습니다.',
         'data' => $columns
-    ];
+    ]);
 
 } catch (PDOException $e) {
     error_log('Database Error: ' . $e->getMessage());
-    return [
+    header('Content-Type: application/json');
+    echo json_encode([
         'success' => false,
         'message' => '데이터베이스 오류가 발생했습니다: ' . $e->getMessage()
-    ];
+    ]);
 } catch (Exception $e) {
     error_log('List Error: ' . $e->getMessage());
-    return [
+    header('Content-Type: application/json');
+    echo json_encode([
         'success' => false,
         'message' => '컬럼 목록 조회 중 오류가 발생했습니다: ' . $e->getMessage()
-    ];
+    ]);
 }

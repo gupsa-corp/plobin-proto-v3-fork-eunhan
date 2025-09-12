@@ -196,6 +196,70 @@
     </div>
 </div>
 
+<!-- 컬럼 편집 모달 -->
+<div id="editColumnModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">컬럼 편집</h3>
+                <button onclick="closeEditColumnModal()" class="text-gray-400 hover:text-gray-600">
+                    <span class="text-2xl">&times;</span>
+                </button>
+            </div>
+            <form id="editColumnForm" class="space-y-4">
+                <input type="hidden" id="editColumnId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">표시 이름</label>
+                    <input type="text" id="editColumnLabel" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">데이터 타입 <span class="text-red-500 text-xs">(변경 시 모든 데이터 삭제)</span></label>
+                    <select id="editColumnType" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        <option value="TEXT">텍스트</option>
+                        <option value="INTEGER">숫자</option>
+                        <option value="DECIMAL">소수</option>
+                        <option value="DATE">날짜</option>
+                        <option value="BOOLEAN">예/아니오</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">표시 타입</label>
+                    <select id="editDisplayType"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        <option value="input">입력창</option>
+                        <option value="textarea">텍스트 영역</option>
+                        <option value="select">드롭다운</option>
+                        <option value="checkbox">체크박스</option>
+                        <option value="date">날짜 선택</option>
+                        <option value="number">숫자 입력</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="editIsRequired" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                    <label for="editIsRequired" class="ml-2 block text-sm text-gray-900">필수 항목</label>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditColumnModal()"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm hover:bg-gray-200">
+                        취소
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+                        저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- 컬럼 관리 관련 함수 -->
 <script>
 // 새 프로젝트 생성 모달 열기
@@ -358,11 +422,15 @@ function displayColumns(columns, tabType = 'all') {
                     ${column.is_active ? '비활성' : '활성'}
                 </button>
                 ${!isSystemColumn ?
-                    `<button onclick="deleteColumn(${column.id}, '${column.column_name}')"
+                    `<button onclick="openEditColumnModal(${column.id}, '${column.column_label}', '${column.column_type}', '${column.display_type || 'input'}', ${column.is_required})"
+                            class="text-blue-600 hover:text-blue-800 text-sm">
+                        편집
+                    </button>
+                    <button onclick="deleteColumn(${column.id}, '${column.column_name}')"
                             class="text-red-600 hover:text-red-800 text-sm">
                         삭제
                     </button>` :
-                    '<span class="text-xs text-gray-400">삭제불가</span>'
+                    '<span class="text-xs text-gray-400">편집/삭제불가</span>'
                 }
             </div>
         `;
@@ -397,7 +465,8 @@ async function addColumn(event) {
 
         if (result.success) {
             closeAddColumnModal();
-            loadColumns();
+            // 사용자 컬럼 탭으로 전환하고 해당 데이터 로드
+            switchColumnTab('custom');
         } else {
             alert('컬럼 추가 실패: ' + (result.message || '알 수 없는 오류'));
         }
@@ -421,7 +490,9 @@ async function toggleColumn(columnId, isActive) {
         const result = await response.json();
 
         if (result.success) {
-            loadColumns();
+            // 현재 활성 탭의 타입을 확인해서 해당 탭 데이터만 다시 로드
+            const currentTab = document.getElementById('customTab').className.includes('bg-blue-100') ? 'custom' : 'system';
+            loadColumns(currentTab);
         } else {
             alert('컬럼 상태 변경 실패: ' + (result.message || '알 수 없는 오류'));
         }
@@ -445,7 +516,9 @@ async function deleteColumn(columnId, columnName) {
         const result = await response.json();
 
         if (result.success) {
-            loadColumns();
+            // 현재 활성 탭의 타입을 확인해서 해당 탭 데이터만 다시 로드
+            const currentTab = document.getElementById('customTab').className.includes('bg-blue-100') ? 'custom' : 'system';
+            loadColumns(currentTab);
         } else {
             alert('컬럼 삭제 실패: ' + (result.message || '알 수 없는 오류'));
         }
@@ -960,6 +1033,75 @@ async function saveAllColumnSettings() {
         console.error('전체 컬럼 설정 저장 오류:', error);
     }
 }
+
+// 컬럼 편집 모달 관련 함수들
+let currentEditColumn = null;
+
+function openEditColumnModal(columnId, label, type, displayType, required) {
+    currentEditColumn = {
+        id: columnId,
+        originalType: type
+    };
+    
+    document.getElementById('editColumnId').value = columnId;
+    document.getElementById('editColumnLabel').value = label;
+    document.getElementById('editColumnType').value = type;
+    document.getElementById('editDisplayType').value = displayType;
+    document.getElementById('editIsRequired').checked = required;
+    
+    document.getElementById('editColumnModal').classList.remove('hidden');
+}
+
+function closeEditColumnModal() {
+    document.getElementById('editColumnModal').classList.add('hidden');
+    currentEditColumn = null;
+}
+
+// 컬럼 편집 폼 제출 처리
+document.getElementById('editColumnForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!currentEditColumn) return;
+    
+    const formData = {
+        column_label: document.getElementById('editColumnLabel').value,
+        column_type: document.getElementById('editColumnType').value,
+        display_type: document.getElementById('editDisplayType').value,
+        is_required: document.getElementById('editIsRequired').checked ? 1 : 0
+    };
+    
+    // 타입이 변경되는 경우 경고 메시지 표시
+    if (formData.column_type !== currentEditColumn.originalType) {
+        if (!confirm('컬럼 타입을 변경하면 해당 컬럼의 모든 데이터가 삭제됩니다. 계속하시겠습니까?')) {
+            return;
+        }
+    }
+    
+    try {
+        const response = await fetch(`backend/functions/columns/update.php?id=${currentEditColumn.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            closeEditColumnModal();
+            // 현재 활성 탭의 타입을 확인해서 해당 탭 데이터만 다시 로드
+            const currentTab = document.getElementById('customTab').className.includes('bg-blue-100') ? 'custom' : 'system';
+            loadColumns(currentTab);
+        } else {
+            throw new Error(data.message || 'Failed to update column');
+        }
+    } catch (error) {
+        console.error('Error updating column:', error);
+        alert('컬럼 업데이트 중 오류가 발생했습니다: ' + error.message);
+    }
+});
 
 // DOM 로드 완료 후 초기화
 document.addEventListener('DOMContentLoaded', function() {
