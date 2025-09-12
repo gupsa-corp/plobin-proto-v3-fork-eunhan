@@ -76,7 +76,10 @@ function routeRequest($method, $pathSegments) {
                 'GET /columns' => '컬럼 목록 조회',
                 'POST /columns' => '새 컬럼 생성',
                 'PUT /columns/{id}' => '컬럼 정보 업데이트',
-                'DELETE /columns/{id}' => '컬럼 삭제'
+                'DELETE /columns/{id}' => '컬럼 삭제',
+                'GET /user-column-settings' => '사용자 컬럼 설정 조회',
+                'POST /user-column-settings' => '사용자 컬럼 설정 저장',
+                'PUT /user-column-settings' => '사용자 컬럼 설정 업데이트'
             ]
         ];
     }
@@ -95,6 +98,9 @@ function routeRequest($method, $pathSegments) {
 
         case 'columns':
             return handleColumnsEndpoint($method, array_slice($pathSegments, 1));
+
+        case 'user-column-settings':
+            return handleUserColumnSettingsEndpoint($method, array_slice($pathSegments, 1));
 
         default:
             return null;
@@ -235,6 +241,29 @@ function handleColumnsEndpoint($method, $pathSegments) {
                 return requireFunction($functionPath . '/delete.php', ['id' => $columnId]);
             }
             break;
+    }
+
+    return null;
+}
+
+/**
+ * 사용자 컬럼 설정 엔드포인트 처리
+ */
+function handleUserColumnSettingsEndpoint($method, $pathSegments) {
+    $functionPath = __DIR__ . '/functions/user-column-settings';
+
+    switch ($method) {
+        case 'GET':
+            // GET /user-column-settings - 사용자 컬럼 설정 조회
+            return requireFunction($functionPath . '/get.php');
+
+        case 'POST':
+            // POST /user-column-settings - 사용자 컬럼 설정 저장
+            return requireFunction($functionPath . '/save.php');
+
+        case 'PUT':
+            // PUT /user-column-settings - 사용자 컬럼 설정 업데이트
+            return requireFunction($functionPath . '/update.php');
     }
 
     return null;

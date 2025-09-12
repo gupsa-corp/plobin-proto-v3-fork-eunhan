@@ -1,7 +1,7 @@
 <td class="px-6 py-4 whitespace-nowrap">
     <input type="checkbox" class="rounded" value="<?= $project['id'] ?>">
 </td>
-<td class="px-6 py-4 whitespace-nowrap" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="name">
     <div class="flex items-center">
         <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
             <span class="text-gray-600 text-sm"><?= $project['id'] ?></span>
@@ -21,7 +21,7 @@
         </div>
     </div>
 </td>
-<td class="px-6 py-4 whitespace-nowrap" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="status">
     <span class="px-2 py-1 text-xs font-medium rounded-full <?= $statusColors[$project['status']] ?? 'bg-gray-100 text-gray-800' ?> editable-select cursor-pointer hover:opacity-75"
           data-field="status" 
           data-project-id="<?= $project['id'] ?>"
@@ -31,7 +31,7 @@
         <?= $statusLabels[$project['status']] ?? $project['status'] ?>
     </span>
 </td>
-<td class="px-6 py-4 whitespace-nowrap" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="progress">
     <div class="w-full bg-gray-200 rounded-full h-2">
         <div class="bg-blue-500 h-2 rounded-full" style="width: <?= $project['progress'] ?>%"></div>
     </div>
@@ -40,7 +40,7 @@
          data-project-id="<?= $project['id'] ?>"
          @click="startEdit($event)"><?= $project['progress'] ?>%</div>
 </td>
-<td class="px-6 py-4 whitespace-nowrap" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="team_members">
     <div class="flex items-center">
         <div class="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
         <div class="text-sm text-gray-900 editable-field cursor-pointer hover:text-gray-700" 
@@ -49,7 +49,7 @@
              @click="startEdit($event)"><?= $project['team_members'] ?>명</div>
     </div>
 </td>
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-column="start_date">
     <?php if($project['start_date']): ?>
         <?= date('Y-m-d', strtotime($project['start_date'])) ?>
         <?php if($project['end_date']): ?>
@@ -59,7 +59,7 @@
         <?= date('Y-m-d', strtotime($project['created_at'])) ?>
     <?php endif; ?>
 </td>
-<td class="px-6 py-4 whitespace-nowrap" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="priority">
     <span class="px-2 py-1 text-xs font-medium rounded-full <?= $priorityColors[$project['priority']] ?? 'bg-gray-100 text-gray-800' ?> editable-select cursor-pointer hover:opacity-75"
           data-field="priority" 
           data-project-id="<?= $project['id'] ?>"
@@ -76,7 +76,7 @@
         $customValue = $project['custom_data'][$column['column_name']] ?? '';
     }
 ?>
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" @click.stop data-column="custom_<?= $column['column_name'] ?>">
     <?php if ($column['display_type'] === 'checkbox'): ?>
         <input type="checkbox" 
                <?= $customValue ? 'checked' : '' ?> 
@@ -98,7 +98,7 @@
     <?php endif; ?>
 </td>
 <?php endforeach; ?>
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" @click.stop>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" @click.stop data-column="client">
     <div class="editable-field cursor-pointer hover:text-gray-700" 
          data-field="client" 
          data-project-id="<?= $project['id'] ?>"

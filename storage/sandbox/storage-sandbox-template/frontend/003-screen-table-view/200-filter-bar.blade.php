@@ -24,4 +24,9 @@
             <a href="?" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">초기화</a>
         <?php endif; ?>
     </form>
+    
+    <!-- 컬럼 선택 드롭다운 -->
+    <div class="flex-shrink-0">
+        <?php include '201-column-selector.blade.php'; ?>
+    </div>
 </div>

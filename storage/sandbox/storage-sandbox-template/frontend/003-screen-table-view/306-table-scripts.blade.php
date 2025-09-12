@@ -787,5 +787,186 @@ window.deleteProject = async function(projectId, projectName) {
 };
 </script>
 
+<!-- 컬럼 토글 기능 -->
+<script>
+// 컬럼 표시/숨김 기능
+function initColumnToggle() {
+    // 필수 컬럼 목록
+    const requiredColumns = ['name', 'status', 'start_date'];
+    
+    // 체크박스 상태 변경 이벤트
+    document.querySelectorAll('input[type="checkbox"][data-column]:not([disabled])').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const columnName = this.dataset.column;
+            
+            // 필수 컬럼인지 확인
+            if (requiredColumns.includes(columnName)) {
+                this.checked = true; // 필수 컬럼은 항상 체크 상태 유지
+                return;
+            }
+            
+            toggleColumn(columnName, this.checked);
+        });
+    });
+}
+
+// 컬럼 토글 함수
+function toggleColumn(columnName, show) {
+    // 필수 컬럼은 숨길 수 없음
+    const requiredColumns = ['name', 'status', 'start_date'];
+    if (requiredColumns.includes(columnName) && !show) {
+        return;
+    }
+    
+    // 헤더 컬럼 표시/숨김
+    const headerColumns = document.querySelectorAll(`th[data-column="${columnName}"]`);
+    headerColumns.forEach(th => {
+        th.style.display = show ? '' : 'none';
+    });
+    
+    // 데이터 컬럼 표시/숨김
+    const dataColumns = document.querySelectorAll(`td[data-column="${columnName}"]`);
+    dataColumns.forEach(td => {
+        td.style.display = show ? '' : 'none';
+    });
+    
+    // 로컬 스토리지에 상태 저장
+    saveColumnSettings(columnName, show);
+}
+
+// 컬럼 설정 초기화
+async function resetColumns() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-column]:not([disabled])');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+        toggleColumn(checkbox.dataset.column, true);
+    });
+    
+    // DB에 전체 설정 저장
+    await saveAllColumnSettings();
+    
+    // 로컬 스토리지도 초기화
+    localStorage.removeItem('columnSettings');
+}
+
+// 컬럼 설정 저장
+async function saveColumnSettings(columnName, show) {
+    try {
+        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                screen_type: 'table_view',
+                column_name: columnName,
+                is_visible: show
+            })
+        });
+
+        const result = await response.json();
+        
+        if (!result.success) {
+            console.error('컬럼 설정 저장 실패:', result.message);
+            // 실패 시 로컬스토리지 백업 사용
+            let settings = JSON.parse(localStorage.getItem('columnSettings') || '{}');
+            settings[columnName] = show;
+            localStorage.setItem('columnSettings', JSON.stringify(settings));
+        }
+    } catch (error) {
+        console.error('컬럼 설정 저장 오류:', error);
+        // 에러 시 로컬스토리지 백업 사용
+        let settings = JSON.parse(localStorage.getItem('columnSettings') || '{}');
+        settings[columnName] = show;
+        localStorage.setItem('columnSettings', JSON.stringify(settings));
+    }
+}
+
+// 컬럼 설정 로드
+async function loadColumnSettings() {
+    try {
+        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings?screen_type=table_view');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            // API에서 가져온 설정 적용
+            result.data.forEach(setting => {
+                const columnName = setting.column_name;
+                const show = setting.is_visible === 1;
+                const checkbox = document.querySelector(`input[data-column="${columnName}"]`);
+                
+                if (checkbox && !checkbox.disabled) {
+                    checkbox.checked = show;
+                    toggleColumn(columnName, show);
+                }
+            });
+        } else {
+            // API 실패 시 로컬스토리지에서 로드
+            loadLocalColumnSettings();
+        }
+    } catch (error) {
+        console.error('컬럼 설정 로드 오류:', error);
+        // 에러 시 로컬스토리지에서 로드
+        loadLocalColumnSettings();
+    }
+}
+
+// 로컬스토리지에서 컬럼 설정 로드 (백업용)
+function loadLocalColumnSettings() {
+    const settings = JSON.parse(localStorage.getItem('columnSettings') || '{}');
+    
+    Object.keys(settings).forEach(columnName => {
+        const show = settings[columnName];
+        const checkbox = document.querySelector(`input[data-column="${columnName}"]`);
+        
+        if (checkbox && !checkbox.disabled) {
+            checkbox.checked = show;
+            toggleColumn(columnName, show);
+        }
+    });
+}
+
+// 전체 컬럼 설정 저장 (대량 업데이트용)
+async function saveAllColumnSettings() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-column]:not([disabled])');
+    const columnSettings = {};
+    
+    checkboxes.forEach((checkbox, index) => {
+        const columnName = checkbox.dataset.column;
+        columnSettings[columnName] = {
+            is_visible: checkbox.checked,
+            column_order: index + 1
+        };
+    });
+    
+    try {
+        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                screen_type: 'table_view',
+                column_settings: columnSettings
+            })
+        });
+
+        const result = await response.json();
+        
+        if (!result.success) {
+            console.error('전체 컬럼 설정 저장 실패:', result.message);
+        }
+    } catch (error) {
+        console.error('전체 컬럼 설정 저장 오류:', error);
+    }
+}
+
+// DOM 로드 완료 후 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    initColumnToggle();
+    loadColumnSettings();
+});
+</script>
+
 <!-- Alpine.js 스크립트 -->
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
