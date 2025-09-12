@@ -9,7 +9,7 @@
         <input 
             type="checkbox" 
             id="agree_all"
-            wire:model="agree_all"
+            wire:model.live="agree_all"
             class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
         />
         <label for="agree_all" class="flex-1 text-sm font-semibold text-gray-700 cursor-pointer">
@@ -25,7 +25,7 @@
                 <input 
                     type="checkbox" 
                     id="agree_age"
-                    wire:model="agree_age"
+                    wire:model.live="agree_age"
                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
                 <label for="agree_age" class="text-sm text-gray-700 cursor-pointer">
@@ -41,7 +41,7 @@
                 <input 
                     type="checkbox" 
                     id="agree_terms"
-                    wire:model="agree_terms"
+                    wire:model.live="agree_terms"
                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
                 <label for="agree_terms" class="text-sm text-gray-700 cursor-pointer">
@@ -64,7 +64,7 @@
                 <input 
                     type="checkbox" 
                     id="agree_privacy"
-                    wire:model="agree_privacy"
+                    wire:model.live="agree_privacy"
                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
                 <label for="agree_privacy" class="text-sm text-gray-700 cursor-pointer">
@@ -80,6 +80,24 @@
             </button>
         </div>
         @error('agree_privacy') <span class="text-red-500 text-xs ml-7">{{ $message }}</span> @enderror
+
+        <!-- 마케팅 수신동의 -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <input 
+                    type="checkbox" 
+                    id="agree_marketing"
+                    wire:model.live="agree_marketing"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <label for="agree_marketing" class="text-sm text-gray-700 cursor-pointer">
+                    <span class="text-gray-500">(선택)</span> 마케팅 정보 수신에 동의합니다
+                </label>
+            </div>
+        </div>
+        <div class="text-xs text-gray-500 ml-7">
+            이벤트, 프로모션, 새로운 기능 소식을 이메일과 SMS로 받으실 수 있습니다.
+        </div>
     </div>
 
     <!-- 이용약관 모달 -->

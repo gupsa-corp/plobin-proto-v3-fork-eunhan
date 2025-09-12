@@ -22,67 +22,7 @@
     @include('200-page-auth.202-page-auth-signup.500-password-section')
     
     {{-- 회원가입 동의 섹션 --}}
-    <div class="space-y-4">
-        <h3 class="text-sm font-semibold text-gray-600 border-b border-gray-200 pb-2">회원가입 동의</h3>
-        
-        <!-- 전체 동의 -->
-        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
-            <input 
-                type="checkbox" 
-                id="agree_all"
-                wire:model.live="agree_all"
-                class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <label for="agree_all" class="flex-1 text-sm font-semibold text-gray-700 cursor-pointer">
-                전체 동의
-            </label>
-        </div>
-
-        <!-- 개별 동의 항목들 -->
-        <div class="space-y-3 pl-4">
-            <!-- 만 14세 이상 -->
-            <div class="flex items-center space-x-3">
-                <input 
-                    type="checkbox" 
-                    id="agree_age"
-                    wire:model.live="agree_age"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label for="agree_age" class="text-sm text-gray-700 cursor-pointer">
-                    <span class="text-red-500">(필수)</span> 만 14세 이상입니다
-                </label>
-            </div>
-            @error('agree_age') <span class="text-red-500 text-xs ml-7">{{ $message }}</span> @enderror
-
-            <!-- 이용약관 동의 -->
-            <div class="flex items-center space-x-3">
-                <input 
-                    type="checkbox" 
-                    id="agree_terms"
-                    wire:model.live="agree_terms"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label for="agree_terms" class="text-sm text-gray-700 cursor-pointer">
-                    <span class="text-red-500">(필수)</span> 이용약관에 동의합니다
-                </label>
-            </div>
-            @error('agree_terms') <span class="text-red-500 text-xs ml-7">{{ $message }}</span> @enderror
-
-            <!-- 개인정보처리방침 동의 -->
-            <div class="flex items-center space-x-3">
-                <input 
-                    type="checkbox" 
-                    id="agree_privacy"
-                    wire:model.live="agree_privacy"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label for="agree_privacy" class="text-sm text-gray-700 cursor-pointer">
-                    <span class="text-red-500">(필수)</span> 개인정보처리방침에 동의합니다
-                </label>
-            </div>
-            @error('agree_privacy') <span class="text-red-500 text-xs ml-7">{{ $message }}</span> @enderror
-        </div>
-    </div>
+    @include('200-page-auth.202-page-auth-signup.600-agreement-section')
 
     {{-- 회원가입 버튼 --}}
     @include('200-page-auth.202-page-auth-signup.900-submit-button')

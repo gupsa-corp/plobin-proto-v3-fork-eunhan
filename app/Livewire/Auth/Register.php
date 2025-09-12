@@ -41,6 +41,13 @@ class Register extends Component
     public $is_verifying_email = false;
     public $email_verification_attempts = 0;
     public $max_email_attempts = 5;
+    
+    // Agreement properties
+    public $agree_all = false;
+    public $agree_age = false;
+    public $agree_terms = false;
+    public $agree_privacy = false;
+    public $agree_marketing = false;
 
     /**
      * 동적 검증 규칙 반환
@@ -64,6 +71,11 @@ class Register extends Component
         if ($this->email_verification_sent && !$this->email_verified) {
             $rules['email_verification_code'] = 'required|digits:6';
         }
+
+        // 약관 동의 검증 (필수)
+        $rules['agree_age'] = 'accepted';
+        $rules['agree_terms'] = 'accepted';
+        $rules['agree_privacy'] = 'accepted';
 
         return $rules;
     }
@@ -92,6 +104,9 @@ class Register extends Component
         'verification_code.digits' => '인증번호는 6자리 숫자입니다.',
         'email_verification_code.required_if' => '이메일 인증번호를 입력해주세요.',
         'email_verification_code.digits' => '이메일 인증번호는 6자리 숫자입니다.',
+        'agree_age.accepted' => '만 14세 이상임에 동의해주세요.',
+        'agree_terms.accepted' => '이용약관에 동의해주세요.',
+        'agree_privacy.accepted' => '개인정보처리방침에 동의해주세요.',
     ];
 
 
@@ -523,6 +538,47 @@ class Register extends Component
             ]);
             session()->flash('error', '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
         }
+    }
+
+    /**
+     * 전체 동의 체크박스 업데이트 시
+     */
+    public function updatedAgreeAll()
+    {
+        $this->agree_age = $this->agree_all;
+        $this->agree_terms = $this->agree_all;
+        $this->agree_privacy = $this->agree_all;
+    }
+
+    /**
+     * 개별 동의 체크박스 업데이트 시 전체 동의 상태 확인
+     */
+    public function updatedAgreeAge()
+    {
+        $this->checkAgreeAll();
+    }
+
+    public function updatedAgreeTerms()
+    {
+        $this->checkAgreeAll();
+    }
+
+    public function updatedAgreePrivacy()
+    {
+        $this->checkAgreeAll();
+    }
+
+    public function updatedAgreeMarketing()
+    {
+        // 마케팅 수신동의는 선택사항이므로 전체 동의에 영향을 주지 않음
+    }
+
+    /**
+     * 모든 개별 동의가 체크되었는지 확인하고 전체 동의 업데이트 (필수 항목만)
+     */
+    private function checkAgreeAll()
+    {
+        $this->agree_all = $this->agree_age && $this->agree_terms && $this->agree_privacy;
     }
 
     public function render()
