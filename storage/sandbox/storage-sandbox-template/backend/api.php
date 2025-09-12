@@ -72,7 +72,11 @@ function routeRequest($method, $pathSegments) {
                 'GET /projects/{id}' => '프로젝트 정보 조회',
                 'POST /projects' => '새 프로젝트 생성',
                 'PUT /projects/{id}' => '프로젝트 정보 업데이트',
-                'DELETE /projects/{id}' => '프로젝트 삭제'
+                'DELETE /projects/{id}' => '프로젝트 삭제',
+                'GET /columns' => '컬럼 목록 조회',
+                'POST /columns' => '새 컬럼 생성',
+                'PUT /columns/{id}' => '컬럼 정보 업데이트',
+                'DELETE /columns/{id}' => '컬럼 삭제'
             ]
         ];
     }
@@ -88,6 +92,9 @@ function routeRequest($method, $pathSegments) {
 
         case 'projects':
             return handleProjectsEndpoint($method, array_slice($pathSegments, 1));
+
+        case 'columns':
+            return handleColumnsEndpoint($method, array_slice($pathSegments, 1));
 
         default:
             return null;
@@ -185,6 +192,47 @@ function handleProjectsEndpoint($method, $pathSegments) {
                 // DELETE /projects/{id} - 프로젝트 삭제
                 $projectId = $pathSegments[0];
                 return requireFunction($functionPath . '/delete.php', ['id' => $projectId]);
+            }
+            break;
+    }
+
+    return null;
+}
+
+/**
+ * 컬럼 관련 엔드포인트 처리
+ */
+function handleColumnsEndpoint($method, $pathSegments) {
+    $functionPath = __DIR__ . '/functions/columns';
+
+    switch ($method) {
+        case 'GET':
+            if (empty($pathSegments)) {
+                // GET /columns - 컬럼 목록 조회
+                return requireFunction($functionPath . '/list.php');
+            }
+            break;
+
+        case 'POST':
+            if (empty($pathSegments)) {
+                // POST /columns - 새 컬럼 생성
+                return requireFunction($functionPath . '/create.php');
+            }
+            break;
+
+        case 'PUT':
+            if (count($pathSegments) === 1) {
+                // PUT /columns/{id} - 컬럼 정보 업데이트
+                $columnId = $pathSegments[0];
+                return requireFunction($functionPath . '/update.php', ['id' => $columnId]);
+            }
+            break;
+
+        case 'DELETE':
+            if (count($pathSegments) === 1) {
+                // DELETE /columns/{id} - 컬럼 삭제
+                $columnId = $pathSegments[0];
+                return requireFunction($functionPath . '/delete.php', ['id' => $columnId]);
             }
             break;
     }

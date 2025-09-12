@@ -24,6 +24,14 @@
                         우선순위 <?= $sortBy === 'priority' ? ($sortOrder === 'ASC' ? '↑' : '↓') : '↕️' ?>
                     </a>
                 </th>
+                <?php foreach ($dynamicColumns ?? [] as $column): ?>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <?= htmlspecialchars($column['column_label']) ?>
+                        <?php if ($column['is_required']): ?>
+                            <span class="text-red-500">*</span>
+                        <?php endif; ?>
+                    </th>
+                <?php endforeach; ?>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">클라이언트</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">액션</th>
             </tr>

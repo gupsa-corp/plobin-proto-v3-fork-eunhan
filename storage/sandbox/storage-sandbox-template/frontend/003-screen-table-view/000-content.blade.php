@@ -10,19 +10,33 @@
     $screenInfo = getCurrentScreenInfo();
     $uploadPaths = getUploadPaths();
 
+    // 전역 변수 초기화 (include된 파일들이 사용할 수 있도록)
+    $search = $_GET['search'] ?? '';
+    $status = $_GET['status'] ?? '';
+    $priority = $_GET['priority'] ?? '';
+    $sortBy = $_GET['sort'] ?? 'created_at';
+    $sortOrder = $_GET['order'] ?? 'desc';
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $dynamicColumns = []; // 초기화
+
     try {
         // SQLite 데이터베이스 연결 - common.php 설정 사용
         $config = getSandboxConfig();
         $pdo = new PDO("sqlite:" . $config['database']['path']);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // 검색 및 필터 파라미터 처리
-        $search = $_GET['search'] ?? '';
-        $status = $_GET['status'] ?? '';
-        $priority = $_GET['priority'] ?? '';
-        $sortBy = $_GET['sort'] ?? 'created_at';
-        $sortOrder = $_GET['order'] ?? 'desc';
-        $page = max(1, (int)($_GET['page'] ?? 1));
+        // 동적 컬럼 정보 로드
+        $columnsStmt = $pdo->query("
+            SELECT
+                id, column_name, column_type, column_label, display_type,
+                is_required, sort_order, options
+            FROM project_columns
+            WHERE is_active = 1
+            ORDER BY sort_order ASC, column_label ASC
+        ");
+        $dynamicColumns = $columnsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 페이징 설정
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
 
@@ -78,6 +92,31 @@
 
         $projectsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // 프로젝트 ID 목록 추출
+        $projectIds = array_column($projectsData, 'id');
+
+        // 커스텀 데이터 로드 (있는 경우에만)
+        $customDataMap = [];
+        if (!empty($projectIds) && !empty($dynamicColumns)) {
+            $placeholders = str_repeat('?,', count($projectIds) - 1) . '?';
+            $customSql = "SELECT project_id, column_name, column_value
+                         FROM project_custom_data
+                         WHERE project_id IN ($placeholders)";
+            $customStmt = $pdo->prepare($customSql);
+            $customStmt->execute($projectIds);
+            $customData = $customStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 커스텀 데이터를 프로젝트별로 그룹화
+            foreach ($customData as $data) {
+                $customDataMap[$data['project_id']][$data['column_name']] = $data['column_value'];
+            }
+        }
+
+        // 프로젝트 데이터에 커스텀 데이터 추가
+        foreach ($projectsData as &$project) {
+            $project['custom_data'] = $customDataMap[$project['id']] ?? [];
+        }
+
         // 페이지네이션 계산
         $totalPages = ceil($totalProjects / $perPage);
 
@@ -99,6 +138,7 @@
         $totalProjects = 0;
         $totalPages = 1;
         $stats = ['total' => 0, 'in_progress' => 0, 'completed' => 0, 'high_priority' => 0, 'avg_progress' => 0];
+        $dynamicColumns = []; // 오류 시에도 초기화
     }
 ?>
 <div class="min-h-screen bg-gray-50 p-6">

@@ -47,6 +47,23 @@
         <?= $priorityLabels[$project['priority']] ?? $project['priority'] ?>
     </span>
 </td>
+<?php foreach ($dynamicColumns ?? [] as $column):
+    // 해당 프로젝트의 커스텀 데이터 조회
+    $customValue = '';
+    if (isset($project['custom_data']) && is_array($project['custom_data'])) {
+        $customValue = $project['custom_data'][$column['column_name']] ?? '';
+    }
+?>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    <?php if ($column['display_type'] === 'checkbox'): ?>
+        <input type="checkbox" <?= $customValue ? 'checked' : '' ?> disabled class="rounded">
+    <?php elseif ($column['display_type'] === 'date' && !empty($customValue)): ?>
+        <?= date('Y-m-d', strtotime($customValue)) ?>
+    <?php else: ?>
+        <?= htmlspecialchars($customValue ?: '-') ?>
+    <?php endif; ?>
+</td>
+<?php endforeach; ?>
 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
     <?= htmlspecialchars($project['client']) ?: '-' ?>
     <?php if($project['budget'] > 0): ?>

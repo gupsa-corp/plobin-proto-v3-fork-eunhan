@@ -11,6 +11,10 @@
             </div>
         </div>
         <div class="flex items-center space-x-3">
+            <button onclick="openColumnManager()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2">
+                <span>⚙️</span>
+                <span>컬럼 관리</span>
+            </button>
             <button onclick="openCreateModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2">
                 <span>+</span>
                 <span>새 프로젝트 생성</span>
