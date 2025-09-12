@@ -71,7 +71,8 @@ function routeRequest($method, $pathSegments) {
                 'GET /files/{id}/download' => '파일 다운로드',
                 'GET /projects/{id}' => '프로젝트 정보 조회',
                 'POST /projects' => '새 프로젝트 생성',
-                'PUT /projects/{id}' => '프로젝트 정보 업데이트'
+                'PUT /projects/{id}' => '프로젝트 정보 업데이트',
+                'DELETE /projects/{id}' => '프로젝트 삭제'
             ]
         ];
     }
@@ -176,6 +177,14 @@ function handleProjectsEndpoint($method, $pathSegments) {
                 // PUT /projects/{id} - 프로젝트 정보 업데이트
                 $projectId = $pathSegments[0];
                 return requireFunction($functionPath . '/update.php', ['id' => $projectId]);
+            }
+            break;
+
+        case 'DELETE':
+            if (count($pathSegments) === 1) {
+                // DELETE /projects/{id} - 프로젝트 삭제
+                $projectId = $pathSegments[0];
+                return requireFunction($functionPath . '/delete.php', ['id' => $projectId]);
             }
             break;
     }

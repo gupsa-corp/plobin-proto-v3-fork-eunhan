@@ -86,6 +86,39 @@ class SandboxTableView extends Component
         $this->loadData();
     }
 
+    public function deleteProject($projectId)
+    {
+        try {
+            $dbPath = storage_path('sandbox/storage-sandbox-template/backend/database/release.sqlite');
+            $pdo = new PDO('sqlite:' . $dbPath);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // 삭제할 프로젝트가 존재하는지 확인
+            $checkStmt = $pdo->prepare("SELECT id, name FROM projects WHERE id = ?");
+            $checkStmt->execute([$projectId]);
+            $project = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$project) {
+                $this->error = '삭제할 프로젝트를 찾을 수 없습니다.';
+                return;
+            }
+
+            // 프로젝트 삭제 실행
+            $deleteStmt = $pdo->prepare("DELETE FROM projects WHERE id = ?");
+            $result = $deleteStmt->execute([$projectId]);
+
+            if ($result && $deleteStmt->rowCount() > 0) {
+                $this->error = null;
+                $this->loadData(); // 데이터 다시 로드
+            } else {
+                $this->error = '프로젝트 삭제에 실패했습니다.';
+            }
+
+        } catch (PDOException $e) {
+            $this->error = "데이터베이스 오류: " . $e->getMessage();
+        }
+    }
+
     private function loadData()
     {
         try {

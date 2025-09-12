@@ -118,7 +118,6 @@ async function createProject(event) {
         const result = await response.json();
 
         if (result.success) {
-            alert('프로젝트가 성공적으로 생성되었습니다: ' + projectData.name);
             closeCreateModal();
             window.location.reload();
         } else {
@@ -174,7 +173,6 @@ window.saveProject = async function(selectedProject, alpineComponent) {
         const result = await response.json();
 
         if (result.success) {
-            alert('프로젝트가 성공적으로 업데이트되었습니다: ' + selectedProject.name);
             alpineComponent.closeSidebar();
             // 페이지 새로고침으로 업데이트된 데이터 표시
             window.location.reload();
@@ -191,6 +189,34 @@ window.saveProject = async function(selectedProject, alpineComponent) {
             saveButton.textContent = originalText;
             saveButton.disabled = false;
         }
+    }
+};
+
+// 프로젝트 삭제 함수
+window.deleteProject = async function(projectId, projectName) {
+    if (!confirm(`"${projectName}" 프로젝트를 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects/' + projectId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // 페이지 새로고침으로 업데이트된 데이터 표시
+            window.location.reload();
+        } else {
+            alert('프로젝트 삭제 실패: ' + (result.message || '알 수 없는 오류'));
+        }
+    } catch (error) {
+        console.error('삭제 에러:', error);
+        alert('네트워크 오류가 발생했습니다: ' + error.message);
     }
 };
 </script>

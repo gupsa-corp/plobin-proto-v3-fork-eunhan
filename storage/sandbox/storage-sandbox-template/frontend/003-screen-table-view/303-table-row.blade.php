@@ -69,22 +69,7 @@
                     start_date: '<?= $project['start_date'] ?>',
                     end_date: '<?= $project['end_date'] ?>',
                     category: '<?= $project['category'] ?>'
-                })">상세</button>
-        <button class="text-green-600 hover:text-green-900"
-                @click="openSidebar({
-                    id: <?= $project['id'] ?>,
-                    name: '<?= addslashes($project['name']) ?>',
-                    description: '<?= addslashes($project['description']) ?>',
-                    status: '<?= $project['status'] ?>',
-                    progress: <?= $project['progress'] ?>,
-                    team_members: <?= $project['team_members'] ?>,
-                    priority: '<?= $project['priority'] ?>',
-                    client: '<?= addslashes($project['client']) ?>',
-                    budget: <?= $project['budget'] ?>,
-                    start_date: '<?= $project['start_date'] ?>',
-                    end_date: '<?= $project['end_date'] ?>',
-                    category: '<?= $project['category'] ?>'
                 })">편집</button>
-        <button class="text-red-600 hover:text-red-900" onclick="confirm('정말 삭제하시겠습니까?')">삭제</button>
+        <button class="text-red-600 hover:text-red-900" onclick="deleteProject(<?= $project['id'] ?>, '<?= addslashes($project['name']) ?>')">삭제</button>
     </div>
 </td>
