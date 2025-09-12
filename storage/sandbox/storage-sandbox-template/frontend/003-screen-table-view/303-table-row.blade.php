@@ -39,7 +39,7 @@
             <br><small>~ <?= date('Y-m-d', strtotime($project['end_date'])) ?></small>
         <?php endif; ?>
     <?php else: ?>
-        <?= $project['created_date'] ?>
+        <?= date('Y-m-d', strtotime($project['created_at'])) ?>
     <?php endif; ?>
 </td>
 <td class="px-6 py-4 whitespace-nowrap">
@@ -55,7 +55,7 @@
 </td>
 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" @click.stop>
     <div class="flex space-x-2">
-        <button class="text-blue-600 hover:text-blue-900" 
+        <button class="text-blue-600 hover:text-blue-900"
                 @click="openSidebar({
                     id: <?= $project['id'] ?>,
                     name: '<?= addslashes($project['name']) ?>',

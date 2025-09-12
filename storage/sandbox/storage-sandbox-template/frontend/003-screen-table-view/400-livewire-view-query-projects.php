@@ -11,11 +11,11 @@ class SandboxTableView extends Component
     public $search = '';
     public $status = '';
     public $priority = '';
-    public $sortBy = 'created_date';
+    public $sortBy = 'created_at';
     public $sortOrder = 'desc';
     public $page = 1;
     public $perPage = 10;
-    
+
     public $projectsData = [];
     public $totalProjects = 0;
     public $totalPages = 1;
@@ -26,7 +26,7 @@ class SandboxTableView extends Component
         'search' => ['except' => ''],
         'status' => ['except' => ''],
         'priority' => ['except' => ''],
-        'sortBy' => ['except' => 'created_date'],
+        'sortBy' => ['except' => 'created_at'],
         'sortOrder' => ['except' => 'desc'],
         'page' => ['except' => 1],
     ];
@@ -92,50 +92,50 @@ class SandboxTableView extends Component
             $dbPath = storage_path('sandbox/storage-sandbox-template/backend/database/release.sqlite');
             $pdo = new PDO('sqlite:' . $dbPath);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
+
             // WHERE 조건 구성
             $whereConditions = [];
             $params = [];
-            
+
             if (!empty($this->search)) {
                 $whereConditions[] = "(name LIKE :search OR description LIKE :search OR client LIKE :search)";
                 $params[':search'] = '%' . $this->search . '%';
             }
-            
+
             if (!empty($this->status)) {
                 $whereConditions[] = "status = :status";
                 $params[':status'] = $this->status;
             }
-            
+
             if (!empty($this->priority)) {
                 $whereConditions[] = "priority = :priority";
                 $params[':priority'] = $this->priority;
             }
-            
+
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
-            
+
             // 정렬 컬럼 검증
-            $allowedSortColumns = ['name', 'status', 'priority', 'created_date', 'progress', 'start_date', 'end_date'];
-            $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_date';
+            $allowedSortColumns = ['name', 'status', 'priority', 'created_at', 'progress', 'start_date', 'end_date'];
+            $sortBy = in_array($this->sortBy, $allowedSortColumns) ? $this->sortBy : 'created_at';
             $sortOrder = strtolower($this->sortOrder) === 'asc' ? 'ASC' : 'DESC';
-            
+
             // 전체 개수 조회
             $countSql = "SELECT COUNT(*) FROM projects $whereClause";
             $countStmt = $pdo->prepare($countSql);
             $countStmt->execute($params);
             $this->totalProjects = $countStmt->fetchColumn();
-            
+
             // 프로젝트 데이터 조회
             $offset = ($this->page - 1) * $this->perPage;
-            $sql = "SELECT 
-                        id, name, description, status, progress, team_members, priority, 
-                        start_date, end_date, client, category, budget, 
-                        created_date, estimated_hours, actual_hours
-                    FROM projects 
-                    $whereClause 
-                    ORDER BY $sortBy $sortOrder 
+            $sql = "SELECT
+                        id, name, description, status, progress, team_members, priority,
+                        start_date, end_date, client, category, budget,
+                        created_at
+                    FROM projects
+                    $whereClause
+                    ORDER BY $sortBy $sortOrder
                     LIMIT :limit OFFSET :offset";
-                    
+
             $stmt = $pdo->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
@@ -143,15 +143,15 @@ class SandboxTableView extends Component
             $stmt->bindValue(':limit', $this->perPage, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
-            
+
             $this->projectsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             // 페이지네이션 계산
             $this->totalPages = ceil($this->totalProjects / $this->perPage);
-            
+
             // 통계 데이터 조회
             $statsStmt = $pdo->query("
-                SELECT 
+                SELECT
                     COUNT(*) as total,
                     COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
                     COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
@@ -160,9 +160,9 @@ class SandboxTableView extends Component
                 FROM projects
             ");
             $this->stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
-            
+
             $this->error = null;
-            
+
         } catch (PDOException $e) {
             $this->error = "데이터베이스 연결 오류: " . $e->getMessage();
             $this->projectsData = [];

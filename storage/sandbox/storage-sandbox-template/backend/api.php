@@ -27,26 +27,26 @@ try {
     // URL 파싱
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    
+
     // API 경로 추출 (backend/api.php 이후의 경로)
     $apiPath = '';
     if (preg_match('#/backend/api\.php(/.*)?$#', $requestUri, $matches)) {
         $apiPath = $matches[1] ?? '';
     }
-    
+
     // 경로를 / 로 분할
     $pathSegments = array_filter(explode('/', trim($apiPath, '/')));
-    
+
     // 라우팅
     $response = routeRequest($method, $pathSegments);
-    
+
     if ($response === null) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'API 엔드포인트를 찾을 수 없습니다.']);
     } else {
         echo json_encode($response);
     }
-    
+
 } catch (Exception $e) {
     error_log('API Error: ' . $e->getMessage());
     http_response_code(500);
@@ -69,23 +69,25 @@ function routeRequest($method, $pathSegments) {
                 'GET /files/{id}' => '파일 상세 조회',
                 'DELETE /files/{id}' => '파일 삭제',
                 'GET /files/{id}/download' => '파일 다운로드',
+                'GET /projects/{id}' => '프로젝트 정보 조회',
+                'POST /projects' => '새 프로젝트 생성',
                 'PUT /projects/{id}' => '프로젝트 정보 업데이트'
             ]
         ];
     }
-    
+
     $endpoint = $pathSegments[0];
-    
+
     switch ($endpoint) {
         case 'files':
             return handleFilesEndpoint($method, array_slice($pathSegments, 1));
-            
+
         case 'upload':
             return handleUploadEndpoint($method, array_slice($pathSegments, 1));
-            
+
         case 'projects':
             return handleProjectsEndpoint($method, array_slice($pathSegments, 1));
-            
+
         default:
             return null;
     }
@@ -96,7 +98,7 @@ function routeRequest($method, $pathSegments) {
  */
 function handleFilesEndpoint($method, $pathSegments) {
     $functionPath = __DIR__ . '/functions/files';
-    
+
     switch ($method) {
         case 'GET':
             if (empty($pathSegments)) {
@@ -112,7 +114,7 @@ function handleFilesEndpoint($method, $pathSegments) {
                 return requireFunction($functionPath . '/download.php', ['id' => $fileId]);
             }
             break;
-            
+
         case 'DELETE':
             if (count($pathSegments) === 1) {
                 // DELETE /files/{id} - 파일 삭제
@@ -120,7 +122,7 @@ function handleFilesEndpoint($method, $pathSegments) {
                 return requireFunction($functionPath . '/delete.php', ['id' => $fileId]);
             }
             break;
-            
+
         case 'PUT':
             if (count($pathSegments) === 1) {
                 // PUT /files/{id} - 파일 정보 수정
@@ -129,7 +131,7 @@ function handleFilesEndpoint($method, $pathSegments) {
             }
             break;
     }
-    
+
     return null;
 }
 
@@ -138,12 +140,12 @@ function handleFilesEndpoint($method, $pathSegments) {
  */
 function handleUploadEndpoint($method, $pathSegments) {
     $functionPath = __DIR__ . '/functions/upload';
-    
+
     if ($method === 'POST' && empty($pathSegments)) {
         // POST /upload - 파일 업로드
         return requireFunction($functionPath . '/upload.php');
     }
-    
+
     return null;
 }
 
@@ -152,7 +154,7 @@ function handleUploadEndpoint($method, $pathSegments) {
  */
 function handleProjectsEndpoint($method, $pathSegments) {
     $functionPath = __DIR__ . '/functions/projects';
-    
+
     switch ($method) {
         case 'GET':
             if (count($pathSegments) === 1) {
@@ -161,7 +163,14 @@ function handleProjectsEndpoint($method, $pathSegments) {
                 return requireFunction($functionPath . '/show.php', ['id' => $projectId]);
             }
             break;
-            
+
+        case 'POST':
+            if (empty($pathSegments)) {
+                // POST /projects - 새 프로젝트 생성
+                return requireFunction($functionPath . '/create.php');
+            }
+            break;
+
         case 'PUT':
             if (count($pathSegments) === 1) {
                 // PUT /projects/{id} - 프로젝트 정보 업데이트
@@ -170,7 +179,7 @@ function handleProjectsEndpoint($method, $pathSegments) {
             }
             break;
     }
-    
+
     return null;
 }
 
@@ -181,17 +190,17 @@ function requireFunction($filePath, $params = []) {
     if (!file_exists($filePath)) {
         throw new Exception("함수 파일을 찾을 수 없습니다: {$filePath}");
     }
-    
+
     // 파라미터를 글로벌 스코프에 설정
     foreach ($params as $key => $value) {
         $GLOBALS[$key] = $value;
     }
-    
+
     // 함수 파일 실행 및 결과 반환
     ob_start();
     $result = require $filePath;
     $output = ob_get_clean();
-    
+
     // require 파일에서 배열을 반환했다면 그것을 사용, 아니면 출력 사용
     if (is_array($result)) {
         return $result;
