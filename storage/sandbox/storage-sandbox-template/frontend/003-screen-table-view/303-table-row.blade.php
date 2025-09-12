@@ -52,18 +52,30 @@
     </div>
 </td>
 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-column="start_date">
-    <?php if($project['start_date']): ?>
-        <?= date('Y-m-d', strtotime($project['start_date'])) ?>
-    <?php else: ?>
-        <?= date('Y-m-d', strtotime($project['created_at'])) ?>
-    <?php endif; ?>
+    <span class="editable-field cursor-pointer hover:text-gray-700"
+          data-field="start_date" 
+          data-project-id="<?= $project['id'] ?>"
+          data-type="date"
+          @click="startEdit($event)">
+        <?php if($project['start_date']): ?>
+            <?= date('Y-m-d', strtotime($project['start_date'])) ?>
+        <?php else: ?>
+            <?= date('Y-m-d', strtotime($project['created_at'])) ?>
+        <?php endif; ?>
+    </span>
 </td>
 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-column="end_date">
-    <?php if($project['end_date']): ?>
-        <?= date('Y-m-d', strtotime($project['end_date'])) ?>
-    <?php else: ?>
-        -
-    <?php endif; ?>
+    <span class="editable-field cursor-pointer hover:text-gray-700"
+          data-field="end_date" 
+          data-project-id="<?= $project['id'] ?>"
+          data-type="date"
+          @click="startEdit($event)">
+        <?php if($project['end_date']): ?>
+            <?= date('Y-m-d', strtotime($project['end_date'])) ?>
+        <?php else: ?>
+            -
+        <?php endif; ?>
+    </span>
 </td>
 <td class="px-6 py-4 whitespace-nowrap" @click.stop data-column="priority">
     <span class="px-2 py-1 text-xs font-medium rounded-full <?= $priorityColors[$project['priority']] ?? 'bg-gray-100 text-gray-800' ?> editable-select cursor-pointer hover:opacity-75"
