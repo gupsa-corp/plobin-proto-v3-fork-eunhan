@@ -51,7 +51,9 @@ try {
         'team_members',
         'priority',
         'client',
-        'budget'
+        'budget',
+        'start_date',
+        'end_date'
     ];
 
     $hasCustomFields = false;
