@@ -538,6 +538,9 @@ Route::get('/platform/admin/sandboxes/list', [\App\Http\Controllers\PlatformAdmi
 Route::get('/platform/admin/sandboxes/templates', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'templates'])->name('platform.admin.sandboxes.templates');
 Route::get('/platform/admin/sandboxes/usage', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'usage'])->name('platform.admin.sandboxes.usage');
 Route::get('/platform/admin/sandboxes/settings', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'settings'])->name('platform.admin.sandboxes.settings');
+Route::get('/platform/admin/sandboxes/cron', function () {
+    return view('900-page-platform-admin.907-sandboxes.400-cron.000-index');
+})->name('platform.admin.sandboxes.cron');
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
 Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {
@@ -691,6 +694,16 @@ Route::get('/sandbox/downloads', function () {
 // 자료 다운로드 API
 Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
 Route::get('/sandbox/downloads/stats', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
+
+// Cron 관리자
+Route::get('/sandbox/cron-manager', function () {
+    return view('700-page-sandbox.719-page-cron-manager.000-index');
+})->name('sandbox.cron-manager');
+
+// Callback 관리자
+Route::get('/sandbox/callback-manager', function () {
+    return view('700-page-sandbox.720-page-callback-manager.000-index');
+})->name('sandbox.callback-manager');
 
 
 

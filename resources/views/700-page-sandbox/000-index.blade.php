@@ -97,6 +97,16 @@
                     <h3 class="text-lg font-semibold text-green-900 mb-2">📥 자료 다운로드</h3>
                     <p class="text-green-700">E2E 테스트용 자료와 샘플 파일을 다운로드할 수 있습니다</p>
                 </a>
+
+                <a href="/sandbox/cron-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-orange-200 bg-orange-50">
+                    <h3 class="text-lg font-semibold text-orange-900 mb-2">⏰ Cron 관리자</h3>
+                    <p class="text-orange-700">스케줄 작업 생성, 관리 및 모니터링</p>
+                </a>
+
+                <a href="/sandbox/callback-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-purple-200 bg-purple-50">
+                    <h3 class="text-lg font-semibold text-purple-900 mb-2">🔗 Callback 관리자</h3>
+                    <p class="text-purple-700">웹훅과 콜백 URL 관리 및 테스트</p>
+                </a>
             </div>
         </div>
     </div>

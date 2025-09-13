@@ -107,4 +107,7 @@ return [
     '/sandbox/projects-list' => ['view' => '700-page-sandbox.715-page-projects-list.000-index', 'name' => 'sandbox.projects-list'],
 
     '/sandbox/custom-screen-1757421612' => ['view' => '700-page-sandbox.717-page-custom-screen-1757421612.000-index', 'name' => 'sandbox.custom-screen-1757421612'],
+    '/sandbox/downloads' => ['view' => '700-page-sandbox.718-page-downloads.000-index', 'name' => 'sandbox.downloads'],
+    '/sandbox/cron-manager' => ['view' => '700-page-sandbox.719-page-cron-manager.000-index', 'name' => 'sandbox.cron-manager'],
+    '/sandbox/callback-manager' => ['view' => '700-page-sandbox.720-page-callback-manager.000-index', 'name' => 'sandbox.callback-manager'],
 ];

@@ -77,6 +77,7 @@
                     <li><a href="{{ route('platform.admin.sandboxes.list') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.list') || request()->routeIs('platform.admin.sandboxes') ? 'bg-blue-50 text-blue-700' : '' }}">🛠️ 샌드박스 목록</a></li>
                     <li><a href="{{ route('platform.admin.sandboxes.templates') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.templates') ? 'bg-blue-50 text-blue-700' : '' }}">📄 템플릿 관리</a></li>
                     <li><a href="{{ route('platform.admin.sandboxes.usage') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.usage') ? 'bg-blue-50 text-blue-700' : '' }}">📊 사용량 분석</a></li>
+                    <li><a href="{{ route('platform.admin.sandboxes.cron') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.cron') ? 'bg-blue-50 text-blue-700' : '' }}">⏰ Cron 관리</a></li>
                     <li><a href="{{ route('platform.admin.sandboxes.settings') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.sandboxes.settings') ? 'bg-blue-50 text-blue-700' : '' }}">⚙️ 설정</a></li>
                 </ul>
             </li>
