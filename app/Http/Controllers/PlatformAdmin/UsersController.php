@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PlatformAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class UsersController extends Controller
 {
@@ -47,8 +48,62 @@ class UsersController extends Controller
 
     public function activityLogs(Request $request)
     {
+        $query = Activity::with(['causer', 'subject'])
+            ->orderBy('created_at', 'desc');
+
+        // 사용자 필터
+        if ($request->filled('user_id')) {
+            $query->where('causer_id', $request->user_id)
+                  ->where('causer_type', User::class);
+        }
+
+        // 액션 타입 필터
+        if ($request->filled('event')) {
+            $query->where('event', $request->event);
+        }
+
+        // 날짜 필터
+        if ($request->filled('date_from')) {
+            $query->where('created_at', '>=', $request->date_from . ' 00:00:00');
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('created_at', '<=', $request->date_to . ' 23:59:59');
+        }
+
+        // 검색
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('description', 'LIKE', "%{$search}%")
+                  ->orWhere('log_name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $activities = $query->paginate($request->get('per_page', 20));
+
+        // 사용자 목록 (필터용)
+        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
+
+        // 이벤트 타입 목록
+        $eventTypes = Activity::distinct('event')
+            ->whereNotNull('event')
+            ->pluck('event')
+            ->filter()
+            ->sort()
+            ->values();
+
         return view('900-page-platform-admin.903-users.200-activity-logs.000-index', [
-            'activities' => []
+            'activities' => $activities,
+            'users' => $users,
+            'eventTypes' => $eventTypes,
+            'filters' => [
+                'user_id' => $request->get('user_id', ''),
+                'event' => $request->get('event', ''),
+                'date_from' => $request->get('date_from', ''),
+                'date_to' => $request->get('date_to', ''),
+                'search' => $request->get('search', ''),
+            ]
         ]);
     }
 
