@@ -65,7 +65,6 @@
                 <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">요금제 관리</div>
                 <ul class="space-y-1 ml-2">
                     <li><a href="{{ route('platform.admin.pricing.overview') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.overview') || request()->routeIs('platform.admin.pricing') ? 'bg-blue-50 text-blue-700' : '' }}">💰 요금제 개요</a></li>
-                    <li><a href="{{ route('platform.admin.pricing.plans') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.plans') ? 'bg-blue-50 text-blue-700' : '' }}">📋 플랜 관리</a></li>
                     <li><a href="{{ route('platform.admin.pricing.subscriptions') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.subscriptions') ? 'bg-blue-50 text-blue-700' : '' }}">🔄 구독 관리</a></li>
                     <li><a href="{{ route('platform.admin.pricing.analytics') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.pricing.analytics') ? 'bg-blue-50 text-blue-700' : '' }}">📈 분석</a></li>
                 </ul>

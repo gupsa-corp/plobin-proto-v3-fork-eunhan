@@ -56,7 +56,6 @@ return [
     // 요금제 관리
     '/platform/admin/pricing' => ['view' => '900-page-platform-admin.906-pricing.000-overview.000-index', 'name' => 'platform.admin.pricing'],
     '/platform/admin/pricing/overview' => ['view' => '900-page-platform-admin.906-pricing.000-overview.000-index', 'name' => 'platform.admin.pricing.overview'],
-    '/platform/admin/pricing/plans' => ['view' => '900-page-platform-admin.906-pricing.100-plans.000-index', 'name' => 'platform.admin.pricing.plans'],
     '/platform/admin/pricing/subscriptions' => ['view' => '900-page-platform-admin.906-pricing.200-subscriptions.000-index', 'name' => 'platform.admin.pricing.subscriptions'],
     '/platform/admin/pricing/analytics' => ['view' => '900-page-platform-admin.906-pricing.300-analytics.000-index', 'name' => 'platform.admin.pricing.analytics'],
     

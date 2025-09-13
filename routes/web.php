@@ -529,7 +529,6 @@ Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App
 // ========== 요금제 관리 ==========
 Route::get('/platform/admin/pricing', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing');
 Route::get('/platform/admin/pricing/overview', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing.overview');
-Route::get('/platform/admin/pricing/plans', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'plans'])->name('platform.admin.pricing.plans');
 Route::get('/platform/admin/pricing/subscriptions', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'subscriptions'])->name('platform.admin.pricing.subscriptions');
 Route::get('/platform/admin/pricing/analytics', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'analytics'])->name('platform.admin.pricing.analytics');
 
