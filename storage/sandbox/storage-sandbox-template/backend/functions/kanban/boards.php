@@ -44,13 +44,13 @@ try {
         $status = '';
         switch ($column['id']) {
             case 'todo':
-                $status = 'planning';
+                $status = 'planned';
                 break;
             case 'in-progress':
-                $status = 'in-progress';
+                $status = 'in_progress';
                 break;
             case 'review':
-                $status = 'pending'; // DB에는 pending 상태를 review로 매핑
+                $status = 'on_hold'; // DB에는 on_hold 상태를 review로 매핑
                 break;
             case 'done':
                 $status = 'completed';

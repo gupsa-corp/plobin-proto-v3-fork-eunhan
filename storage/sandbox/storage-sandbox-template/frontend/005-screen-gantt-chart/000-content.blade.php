@@ -217,118 +217,151 @@
         </div>
     </div>
 
-    {{-- 프로젝트 상세 사이드바 --}}
+    {{-- 프로젝트 편집 사이드바 --}}
+    <div x-show="sidebarOpen" 
+         class="fixed inset-0 bg-black bg-opacity-50 z-40" 
+         @click="closeSidebar()"></div>
+
     <div x-show="sidebarOpen"
-         class="fixed inset-y-0 right-0 w-96 bg-white shadow-2xl transform transition-transform duration-300 z-50"
+         class="fixed inset-y-0 right-0 z-50 w-96 bg-white shadow-xl transform transition-transform duration-300"
          :class="{ 'translate-x-0': sidebarOpen, 'translate-x-full': !sidebarOpen }"
-         @click.outside="closeSidebar()">
-        <div class="flex flex-col h-full">
+        <div class="h-full flex flex-col" x-show="selectedProject">
             {{-- 사이드바 헤더 --}}
-            <div class="p-6 border-b border-gray-200">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">프로젝트 상세</h3>
-                    <button @click="closeSidebar()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
-                        <span class="text-xl">×</span>
+                    <h3 class="text-lg font-semibold text-gray-900">프로젝트 편집</h3>
+                    <button @click="closeSidebar()" 
+                            class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            {{-- 사이드바 내용 --}}
-            <div x-show="selectedProject" class="flex-1 overflow-y-auto p-6 space-y-6">
+            {{-- 사이드바 콘텐츠 --}}
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
                 {{-- 프로젝트 기본 정보 --}}
                 <div>
-                    <h4 class="text-lg font-medium text-gray-900 mb-3" x-text="selectedProject?.name"></h4>
-                    <p class="text-sm text-gray-600 mb-4" x-text="selectedProject?.description || '설명 없음'"></p>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide">상태</label>
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1"
-                                  :class="getStatusBadgeClass(selectedProject?.status)"
-                                  x-text="getStatusText(selectedProject?.status)"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide">우선순위</label>
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1"
-                                  :class="getPriorityBadgeClass(selectedProject?.priority)"
-                                  x-text="getPriorityText(selectedProject?.priority)"></span>
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">프로젝트명</label>
+                    <input type="text"
+                           :value="selectedProject?.name || ''"
+                           @input="selectedProject ? selectedProject.name = $event.target.value : null"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
                 </div>
 
-                {{-- 진행률 --}}
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-sm font-medium text-gray-700">진행률</label>
-                        <span class="text-sm text-gray-600" x-text="(selectedProject?.progress || 0) + '%'"></span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3">
-                        <div class="h-3 rounded-full transition-all duration-300"
-                             :class="getStatusColor(selectedProject?.status)"
-                             :style="`width: ${selectedProject?.progress || 0}%`"></div>
-                    </div>
-                    <input type="range" min="0" max="100" step="5"
+                    <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+                    <textarea :value="selectedProject?.description || ''"
+                              @input="selectedProject ? selectedProject.description = $event.target.value : null"
+                              rows="4"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
+                    <select :value="selectedProject?.status || 'planned'"
+                            @change="selectedProject ? selectedProject.status = $event.target.value : null"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                        <option value="planned">계획</option>
+                        <option value="in-progress">진행 중</option>
+                        <option value="completed">완료</option>
+                        <option value="on-hold">보류</option>
+                        <option value="cancelled">취소</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">진행률 (%)</label>
+                    <input type="range"
                            :value="selectedProject?.progress || 0"
-                           @input="updateProgress($event.target.value)"
-                           class="w-full mt-2 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                           @input="selectedProject ? selectedProject.progress = $event.target.value : null"
+                           min="0" max="100"
+                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-sm text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span x-text="(selectedProject?.progress || 0) + '%'" class="font-medium text-orange-600"></span>
+                        <span>100%</span>
+                    </div>
                 </div>
 
-                {{-- 일정 정보 --}}
                 <div>
-                    <h5 class="text-sm font-medium text-gray-700 mb-3">일정</h5>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500">시작일</label>
-                            <input type="date"
-                                   :value="selectedProject?.start_date || ''"
-                                   @change="updateStartDate($event.target.value)"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500">종료일</label>
-                            <input type="date"
-                                   :value="selectedProject?.end_date || ''"
-                                   @change="updateEndDate($event.target.value)"
-                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500">기간</label>
-                            <p class="mt-1 text-sm text-gray-600" x-text="calculateDuration(selectedProject?.start_date, selectedProject?.end_date)"></p>
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">우선순위</label>
+                    <select :value="selectedProject?.priority || 'medium'"
+                            @change="selectedProject ? selectedProject.priority = $event.target.value : null"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                        <option value="low">낮음</option>
+                        <option value="medium">보통</option>
+                        <option value="high">높음</option>
+                    </select>
                 </div>
 
-                {{-- 팀 정보 --}}
                 <div>
-                    <h5 class="text-sm font-medium text-gray-700 mb-3">팀 정보</h5>
-                    <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">클라이언트</label>
+                    <input type="text"
+                           :value="selectedProject?.client || ''"
+                           @input="selectedProject ? selectedProject.client = $event.target.value : null"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">팀원 수</label>
+                    <input type="number"
+                           :value="selectedProject?.team_members || 1"
+                           @input="selectedProject ? selectedProject.team_members = $event.target.value : null"
+                           min="1"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                {{-- 필수 컬럼들 --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">시작일</label>
+                    <input type="date"
+                           :value="selectedProject?.start_date || ''"
+                           @input="selectedProject ? selectedProject.start_date = $event.target.value : null"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">종료일</label>
+                    <input type="date"
+                           :value="selectedProject?.end_date || ''"
+                           @input="selectedProject ? selectedProject.end_date = $event.target.value : null"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500">
+                </div>
+
+                {{-- 추가 정보 --}}
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">프로젝트 정보</h4>
+                    <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500">팀 멤버 수</span>
-                            <span class="text-sm text-gray-900" x-text="(selectedProject?.team_members || 0) + '명'"></span>
+                            <span class="text-gray-500">프로젝트 ID:</span>
+                            <span class="text-gray-900" x-text="selectedProject?.id || '-'"></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500">클라이언트</span>
-                            <span class="text-sm text-gray-900" x-text="selectedProject?.client || '미지정'"></span>
+                            <span class="text-gray-500">카테고리:</span>
+                            <span class="text-gray-900" x-text="selectedProject?.category || '-'"></span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-gray-500">카테고리</span>
-                            <span class="text-sm text-gray-900" x-text="selectedProject?.category || '일반'"></span>
+                            <span class="text-gray-500">기간:</span>
+                            <span class="text-gray-900" x-text="calculateDuration(selectedProject?.start_date, selectedProject?.end_date)"></span>
                         </div>
                     </div>
                 </div>
 
-                {{-- 액션 버튼 --}}
-                <div class="pt-4 border-t border-gray-200">
-                    <div class="flex space-x-3">
-                        <button @click="saveChanges()"
-                                class="flex-1 bg-orange-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors">
-                            변경사항 저장
-                        </button>
-                        <button @click="closeSidebar()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors">
-                            닫기
-                        </button>
-                    </div>
+            </div>
+
+            {{-- 사이드바 푸터 --}}
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                <div class="flex space-x-3">
+                    <button @click="saveChanges()" 
+                            class="flex-1 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 focus:ring-2 focus:ring-orange-500">
+                        저장
+                    </button>
+                    <button @click="closeSidebar()" 
+                            class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:ring-2 focus:ring-gray-500">
+                        취소
+                    </button>
                 </div>
             </div>
         </div>
