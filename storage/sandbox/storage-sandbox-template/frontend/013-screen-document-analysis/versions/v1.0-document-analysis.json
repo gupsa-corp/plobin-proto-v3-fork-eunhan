@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "version": "v1.0",
+    "fileName": "AI 기술 동향 보고서 분석",
+    "fileId": 1,
+    "createdAt": "2024-01-15T09:30:00Z",
+    "description": "AI 기술 동향 보고서의 기본 분석 버전"
+  },
+  "documentVersion": "v1.0",
+  "documentMajorVersion": 1,
+  "documentMinorVersion": 0,
+  "file": {
+    "id": 1,
+    "original_name": "AI 기술 동향 보고서 2024.pdf",
+    "file_path": "/uploads/1.pdf",
+    "mime_type": "application/pdf",
+    "is_analysis_completed": true,
+    "analysis_status": "completed"
+  },
+  "assets": [
+    {
+      "id": 1,
+      "asset_type": "introduction",
+      "asset_type_name": "서론/개요",
+      "asset_type_icon": "🎯",
+      "asset_type_color": "bg-blue-100 text-blue-800",
+      "section_title": "AI 기술 개요",
+      "order_index": 1,
+      "content": "2024년 인공지능 기술은 생성형 AI의 급속한 발전으로 전 산업에 혁신을 가져오고 있습니다.",
+      "summary": {
+        "id": 1,
+        "ai_summary": "AI 기술이 2024년 생성형 AI 중심으로 급속 발전하며 전 산업에 혁신을 가져오고 있습니다.",
+        "helpful_content": "우리 회사도 생성형 AI를 활용한 업무 자동화를 즉시 도입할 수 있습니다.",
+        "versions": [
+          { "id": 1, "version_number": 1, "version_display_name": "v1 (AI 생성)", "edit_type": "ai_generated", "is_current": true }
+        ],
+        "versions_count": 1,
+        "analysis_status": "completed",
+        "status_icon": "✅"
+      }
+    }
+  ]
+}

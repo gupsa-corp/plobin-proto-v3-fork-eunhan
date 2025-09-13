@@ -1,6 +1,28 @@
 {{-- 글로벌 샌드박스 네비게이션 드롭다운 --}}
 <?php 
     $availableScreens = getAvailableScreens();
+    
+    // getAvailableScreens()가 비어있을 경우 수동으로 추가
+    if (empty($availableScreens)) {
+        $availableScreens = [
+            ['value' => '001-screen-dashboard', 'title' => '대시보드'],
+            ['value' => '002-screen-project-list', 'title' => '프로젝트 목록'],
+            ['value' => '003-screen-table-view', 'title' => '테이블 뷰'],
+            ['value' => '004-screen-kanban-board', 'title' => '칸반 보드'],
+            ['value' => '005-screen-gantt-chart', 'title' => '간트 차트'],
+            ['value' => '006-screen-calendar-view', 'title' => '캘린더 뷰'],
+            ['value' => '007-screen-file-upload', 'title' => '파일 업로드'],
+            ['value' => '007-screen-multi-file-upload', 'title' => '다중 파일 업로드'],
+            ['value' => '008-screen-file-list', 'title' => '파일 목록'],
+            ['value' => '008-screen-uploaded-files-list', 'title' => '업로드된 파일 목록'],
+            ['value' => '009-screen-analysis-requests', 'title' => '분석 요청'],
+            ['value' => '010-screen-pms-summary-requests', 'title' => 'PMS 요약 요청'],
+            ['value' => '011-screen-form-execution', 'title' => '폼 실행'],
+            ['value' => '012-screen-form-history', 'title' => '폼 이력'],
+            ['value' => '013-screen-document-analysis', 'title' => '문서 분석'],
+            ['value' => '100-pms-common', 'title' => 'PMS 공통']
+        ];
+    }
 ?>
 <div class="mb-6">
     <div class="bg-white rounded-xl shadow-sm p-4">
