@@ -22,7 +22,10 @@
                         <span class="text-white text-xl">🧠</span>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">AI 문서 분석 결과</h1>
+                        <div class="flex items-center space-x-4">
+                            <h1 class="text-2xl font-bold text-gray-900">AI 문서 분석 결과</h1>
+                            <div class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm font-medium rounded-full" x-text="documentVersion"></div>
+                        </div>
                         <p class="text-gray-600">팔란티어 온톨로지 기반 에셋 분류 및 분석</p>
                         <div class="flex items-center space-x-3 mt-2">
                             <p x-show="documentData.file" class="text-sm text-indigo-600" x-text="documentData.file?.original_name"></p>
@@ -131,7 +134,8 @@
                             </button>
                         </div>
                         <p class="text-sm text-gray-600">
-                            현재 버전: <span class="font-medium text-green-700" x-text="currentJsonVersion"></span> | 
+                            JSON 버전: <span class="font-medium text-green-700" x-text="currentJsonVersion"></span> | 
+                            문서 버전: <span class="font-medium text-green-700" x-text="documentVersion"></span> | 
                             파일: <span class="font-medium text-green-700" x-text="fileNames[fileId]"></span> |
                             섹션 수: <span class="font-medium text-green-700" x-text="documentData.assets?.length || 0"></span>개
                         </p>
@@ -159,6 +163,7 @@
                                             <div class="font-medium text-gray-900" x-text="file.fileName"></div>
                                             <div class="text-sm text-gray-500">
                                                 <span x-text="file.version"></span> | 
+                                                <span x-text="file.documentVersion || 'v1.0'"></span> | 
                                                 <span x-text="file.originalFileName"></span> | 
                                                 <span x-text="file.sectionsCount"></span>개 섹션 |
                                                 <span x-text="new Date(file.createdAt).toLocaleString('ko-KR')"></span>
@@ -295,12 +300,38 @@
                     
                     {{-- AI 요약 --}}
                     <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <span class="text-green-500 mr-2">🤖</span>
-                            AI 요약
+                        <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-green-500 mr-2">🤖</span>
+                                AI 요약
+                            </div>
+                            <button @click="toggleEditMode(index, 'ai_summary')" 
+                                    class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    x-text="isEditing(index, 'ai_summary') ? '취소' : '편집'">
+                            </button>
                         </h4>
                         <div class="bg-green-50 p-3 rounded-lg">
-                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" x-text="asset.summary?.ai_summary"></p>
+                            {{-- 읽기 모드 --}}
+                            <p x-show="!isEditing(index, 'ai_summary')" 
+                               class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" 
+                               x-text="asset.summary?.ai_summary"></p>
+                            
+                            {{-- 편집 모드 --}}
+                            <div x-show="isEditing(index, 'ai_summary')" class="space-y-3">
+                                <textarea x-model="editingContent[index] && editingContent[index]['ai_summary']"
+                                          class="w-full p-2 border border-gray-300 rounded resize-vertical min-h-[100px] text-sm"
+                                          placeholder="AI 요약을 입력하세요..."></textarea>
+                                <div class="flex space-x-2">
+                                    <button @click="saveEdit(index, 'ai_summary')" 
+                                            class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
+                                        💾 저장 (새 버전)
+                                    </button>
+                                    <button @click="cancelEdit(index, 'ai_summary')" 
+                                            class="px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors">
+                                        ❌ 취소
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -371,6 +402,16 @@ function documentAnalysisData(fileId) {
         showJsonManager: false,
         saveFileName: '',
         savedJsonFiles: [],
+        
+        // 편집 상태 관리 데이터
+        editingStates: {},     // 각 섹션별 편집 상태 (예: {"0_ai_summary": true})
+        editingContent: {},    // 편집 중인 임시 내용 (예: {0: {ai_summary: "편집 중인 내용"}})
+        
+        // 문서 버전 관리
+        documentVersion: 'v1.0',
+        documentVersionHistory: [],    // 문서 전체 버전 기록
+        documentMajorVersion: 1,       // 주 버전 (파일 자체의 큰 변화)
+        documentMinorVersion: 0,       // 부 버전 (섹션 편집으로 증가)
 
         // 초기화
         async init() {
@@ -932,49 +973,69 @@ function documentAnalysisData(fileId) {
             }
         },
 
-        // 버전 전환 (Mock)
+        // 버전 전환 (실제 동작)
         async switchVersion(versionNumber) {
             if (!this.selectedAsset?.summary) {
                 return;
             }
 
             try {
-                // Mock 버전 전환 시뮬레이션
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
                 // 선택한 버전 찾기
                 const selectedVersion = this.selectedAsset.summary.versions.find(v => v.version_number == versionNumber);
                 if (!selectedVersion) {
-                    throw new Error('버전을 찾을 수 없습니다.');
+                    this.showNotification('해당 버전을 찾을 수 없습니다.', 'error');
+                    return;
                 }
                 
-                // Mock 버전 데이터 생성 (버전별로 약간 다른 내용)
-                let mockAiSummary = this.selectedAsset.summary.ai_summary;
-                let mockHelpfulContent = this.selectedAsset.summary.helpful_content;
-                
-                if (selectedVersion.edit_type === 'user_edit') {
-                    mockAiSummary = '[사용자 편집 버전] ' + mockAiSummary;
-                    mockHelpfulContent = '[사용자 편집 버전] ' + mockHelpfulContent;
-                } else if (selectedVersion.version_number > 1) {
-                    mockAiSummary = '[개선된 버전] ' + mockAiSummary;
-                    mockHelpfulContent = '[개선된 버전] ' + mockHelpfulContent;
-                }
-                
-                // 로컬 데이터 업데이트
-                this.selectedAsset.summary.ai_summary = mockAiSummary;
-                this.selectedAsset.summary.helpful_content = mockHelpfulContent;
-                this.documentData.assets[this.selectedAssetIndex].summary.ai_summary = mockAiSummary;
-                this.documentData.assets[this.selectedAssetIndex].summary.helpful_content = mockHelpfulContent;
-                
-                // 버전 활성화 상태 업데이트
+                // 모든 버전의 is_current를 false로 변경
                 this.selectedAsset.summary.versions.forEach(version => {
                     version.is_current = version.version_number == versionNumber;
                 });
+                
+                // 선택된 버전의 내용으로 현재 표시 내용 업데이트
+                if (selectedVersion.content) {
+                    this.selectedAsset.summary.ai_summary = selectedVersion.content.ai_summary;
+                    this.selectedAsset.summary.helpful_content = selectedVersion.content.helpful_content;
+                    
+                    // documentData.assets에도 반영
+                    this.documentData.assets[this.selectedAssetIndex].summary.ai_summary = selectedVersion.content.ai_summary;
+                    this.documentData.assets[this.selectedAssetIndex].summary.helpful_content = selectedVersion.content.helpful_content;
+                }
                 
                 this.showNotification(`버전 ${versionNumber}로 성공적으로 전환되었습니다!`, 'success');
                 
             } catch (error) {
                 console.error('Error switching version:', error);
+                this.showNotification('버전 전환에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 섹션별 버전 전환 (연속 뷰용)
+        async switchSectionVersion(sectionIndex, versionNumber) {
+            try {
+                const asset = this.documentData.assets[sectionIndex];
+                const selectedVersion = asset.summary.versions?.find(v => v.version_number == versionNumber);
+                
+                if (!selectedVersion) {
+                    this.showNotification('해당 버전을 찾을 수 없습니다.', 'error');
+                    return;
+                }
+                
+                // 모든 버전의 is_current를 false로 변경
+                asset.summary.versions.forEach(version => {
+                    version.is_current = version.version_number == versionNumber;
+                });
+                
+                // 선택된 버전의 내용으로 현재 표시 내용 업데이트
+                if (selectedVersion.content) {
+                    asset.summary.ai_summary = selectedVersion.content.ai_summary;
+                    asset.summary.helpful_content = selectedVersion.content.helpful_content;
+                }
+                
+                this.showNotification(`섹션 ${sectionIndex + 1}의 버전 ${versionNumber}로 전환되었습니다!`, 'success');
+                
+            } catch (error) {
+                console.error('Error switching section version:', error);
                 this.showNotification('버전 전환에 실패했습니다: ' + error.message, 'error');
             }
         },
@@ -1065,9 +1126,34 @@ function documentAnalysisData(fileId) {
                     version: this.currentJsonVersion,
                     fileId: this.fileId,
                     originalFileName: this.fileNames[this.fileId],
-                    assets: this.documentData.assets,
+                    
+                    // 문서 버전 정보
+                    documentVersion: this.documentVersion,
+                    documentMajorVersion: this.documentMajorVersion,
+                    documentMinorVersion: this.documentMinorVersion,
+                    documentVersionHistory: this.documentVersionHistory,
+                    
+                    // 섹션별 완전한 버전 정보 포함
+                    assets: this.documentData.assets.map(asset => ({
+                        ...asset,
+                        summary: {
+                            ...asset.summary,
+                            // 모든 버전의 완전한 내용 저장
+                            versions: asset.summary?.versions?.map(version => ({
+                                ...version,
+                                content: {
+                                    ai_summary: version.content?.ai_summary || '',
+                                    helpful_content: version.content?.helpful_content || ''
+                                }
+                            })) || []
+                        }
+                    })),
+                    
                     sectionsCount: this.documentData.assets?.length || 0,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    
+                    // 현재 문서 스냅샷
+                    currentSnapshot: this.createSectionsSnapshot()
                 };
 
                 // 기존 저장된 파일 목록에 추가
@@ -1076,7 +1162,7 @@ function documentAnalysisData(fileId) {
                 // 로컬스토리지에 저장
                 localStorage.setItem('documentAnalysis_savedFiles', JSON.stringify(this.savedJsonFiles));
                 
-                this.showNotification(`'${this.saveFileName}' 파일이 로컬 저장소에 저장되었습니다!`, 'success');
+                this.showNotification(`'${this.saveFileName}' 파일이 ${this.documentVersion}으로 로컬 저장소에 저장되었습니다!`, 'success');
                 this.saveFileName = '';
                 this.generateDefaultFileName();
             } catch (error) {
@@ -1092,23 +1178,48 @@ function documentAnalysisData(fileId) {
                     version: this.currentJsonVersion,
                     fileId: this.fileId,
                     fileName: this.fileNames[this.fileId],
-                    assets: this.documentData.assets,
+                    
+                    // 문서 버전 정보
+                    documentVersion: this.documentVersion,
+                    documentMajorVersion: this.documentMajorVersion,
+                    documentMinorVersion: this.documentMinorVersion,
+                    documentVersionHistory: this.documentVersionHistory,
+                    
+                    // 섹션별 완전한 버전 정보 포함
+                    assets: this.documentData.assets.map(asset => ({
+                        ...asset,
+                        summary: {
+                            ...asset.summary,
+                            // 모든 버전의 완전한 내용 저장
+                            versions: asset.summary?.versions?.map(version => ({
+                                ...version,
+                                content: {
+                                    ai_summary: version.content?.ai_summary || '',
+                                    helpful_content: version.content?.helpful_content || ''
+                                }
+                            })) || []
+                        }
+                    })),
+                    
                     sectionsCount: this.documentData.assets?.length || 0,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    
+                    // 현재 문서 스냅샷
+                    currentSnapshot: this.createSectionsSnapshot()
                 };
                 
                 const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                const downloadFileName = this.saveFileName.trim() || `document-analysis-${this.currentJsonVersion}-file${this.fileId}-${Date.now()}`;
+                const downloadFileName = this.saveFileName.trim() || `document-analysis-${this.documentVersion}-file${this.fileId}-${Date.now()}`;
                 a.download = `${downloadFileName}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
 
-                this.showNotification(`JSON 파일이 성공적으로 다운로드되었습니다!`, 'success');
+                this.showNotification(`JSON 파일이 ${this.documentVersion}으로 성공적으로 다운로드되었습니다!`, 'success');
             } catch (error) {
                 console.error('Error downloading JSON:', error);
                 this.showNotification('JSON 다운로드에 실패했습니다: ' + error.message, 'error');
@@ -1131,6 +1242,12 @@ function documentAnalysisData(fileId) {
                 this.currentJsonVersion = savedFile.version;
                 this.fileId = savedFile.fileId;
                 
+                // 문서 버전 정보 복원 (기존 파일 호환성 고려)
+                this.documentVersion = savedFile.documentVersion || 'v1.0';
+                this.documentMajorVersion = savedFile.documentMajorVersion || 1;
+                this.documentMinorVersion = savedFile.documentMinorVersion || 0;
+                this.documentVersionHistory = savedFile.documentVersionHistory || [];
+                
                 // URL 업데이트
                 const url = new URL(window.location);
                 url.searchParams.set('file_id', this.fileId.toString());
@@ -1138,7 +1255,7 @@ function documentAnalysisData(fileId) {
                 
                 this.isLoading = false;
                 this.showJsonManager = false;
-                this.showNotification(`'${savedFile.fileName}' 파일을 성공적으로 불러왔습니다!`, 'success');
+                this.showNotification(`'${savedFile.fileName}' (${this.documentVersion}) 파일을 성공적으로 불러왔습니다!`, 'success');
             } catch (error) {
                 this.isLoading = false;
                 console.error('Error loading from localStorage:', error);
@@ -1243,6 +1360,174 @@ function documentAnalysisData(fileId) {
         getUniqueVersionsCount() {
             const versions = new Set(this.savedJsonFiles.map(file => file.version));
             return versions.size;
+        },
+
+        // 편집 모드 토글
+        toggleEditMode(sectionIndex, field) {
+            const key = `${sectionIndex}_${field}`;
+            
+            if (this.editingStates[key]) {
+                // 편집 모드 종료 (취소)
+                this.cancelEdit(sectionIndex, field);
+            } else {
+                // 편집 모드 시작
+                this.editingStates[key] = true;
+                
+                // 편집용 임시 데이터 초기화
+                if (!this.editingContent[sectionIndex]) {
+                    this.editingContent[sectionIndex] = {};
+                }
+                
+                // 현재 내용을 편집 임시 저장소에 복사
+                this.editingContent[sectionIndex][field] = this.documentData.assets[sectionIndex].summary[field] || '';
+            }
+        },
+
+        // 편집 상태 확인
+        isEditing(sectionIndex, field) {
+            const key = `${sectionIndex}_${field}`;
+            return this.editingStates[key] || false;
+        },
+
+        // 편집 취소
+        cancelEdit(sectionIndex, field) {
+            const key = `${sectionIndex}_${field}`;
+            delete this.editingStates[key];
+            
+            if (this.editingContent[sectionIndex]) {
+                delete this.editingContent[sectionIndex][field];
+                
+                // 해당 섹션에 편집 중인 필드가 없으면 객체 자체 삭제
+                if (Object.keys(this.editingContent[sectionIndex]).length === 0) {
+                    delete this.editingContent[sectionIndex];
+                }
+            }
+        },
+
+        // 편집 저장 (새 버전 생성)
+        async saveEdit(sectionIndex, field) {
+            try {
+                const newContent = this.editingContent[sectionIndex][field];
+                
+                if (!newContent || !newContent.trim()) {
+                    this.showNotification('내용을 입력해주세요.', 'error');
+                    return;
+                }
+                
+                // 새 버전 생성
+                this.createNewVersion(sectionIndex, field, newContent.trim());
+                
+                // 편집 모드 종료
+                this.cancelEdit(sectionIndex, field);
+                
+                // 성공 알림
+                this.showNotification(`AI 요약이 새 버전(v${this.getCurrentVersionNumber(sectionIndex)})으로 저장되었습니다!`, 'success');
+                
+            } catch (error) {
+                console.error('Error saving edit:', error);
+                this.showNotification('저장에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 새 버전 생성 함수
+        createNewVersion(sectionIndex, field, newContent) {
+            const asset = this.documentData.assets[sectionIndex];
+            
+            // 현재 버전 찾기
+            const currentVersion = asset.summary.versions?.find(v => v.is_current);
+            const newVersionNumber = Math.max(...(asset.summary.versions?.map(v => v.version_number) || [1])) + 1;
+            
+            // versions 배열이 없으면 초기화
+            if (!asset.summary.versions) {
+                asset.summary.versions = [];
+                // 기존 데이터를 첫 번째 버전으로 생성
+                asset.summary.versions.push({
+                    id: Date.now() - 1000,
+                    version_number: 1,
+                    version_display_name: 'v1 (AI 생성)',
+                    edit_type: 'ai_generated',
+                    is_current: false,
+                    content: {
+                        ai_summary: asset.summary.ai_summary || '',
+                        helpful_content: asset.summary.helpful_content || ''
+                    },
+                    created_at: new Date(Date.now() - 1000).toISOString()
+                });
+            }
+            
+            // 기존 버전들을 current false로 변경
+            asset.summary.versions.forEach(v => v.is_current = false);
+            
+            // 새 버전 생성
+            const newVersion = {
+                id: Date.now(),
+                version_number: newVersionNumber,
+                version_display_name: `v${newVersionNumber} (사용자 편집)`,
+                edit_type: 'user_edit',
+                is_current: true,
+                content: {
+                    ai_summary: field === 'ai_summary' ? newContent : (currentVersion?.content?.ai_summary || asset.summary.ai_summary),
+                    helpful_content: field === 'helpful_content' ? newContent : (currentVersion?.content?.helpful_content || asset.summary.helpful_content)
+                },
+                created_at: new Date().toISOString()
+            };
+            
+            // 새 버전 추가
+            asset.summary.versions.push(newVersion);
+            
+            // 현재 표시되는 내용 업데이트
+            asset.summary[field] = newContent;
+            
+            // 버전 카운트 업데이트
+            asset.summary.versions_count = asset.summary.versions.length;
+            
+            // 문서 버전 증가 및 스냅샷 생성
+            this.incrementDocumentVersion(sectionIndex, field, newContent);
+        },
+
+        // 현재 버전 번호 조회
+        getCurrentVersionNumber(sectionIndex) {
+            const asset = this.documentData.assets[sectionIndex];
+            const currentVersion = asset.summary.versions?.find(v => v.is_current);
+            return currentVersion?.version_number || 1;
+        },
+
+        // 문서 버전 증가 및 스냅샷 생성
+        incrementDocumentVersion(sectionIndex, field, newContent) {
+            // 부 버전 증가
+            this.documentMinorVersion++;
+            this.documentVersion = `v${this.documentMajorVersion}.${this.documentMinorVersion}`;
+            
+            // 문서 버전 스냅샷 생성
+            const documentSnapshot = {
+                id: Date.now(),
+                document_version: this.documentVersion,
+                major_version: this.documentMajorVersion,
+                minor_version: this.documentMinorVersion,
+                change_description: `섹션 ${sectionIndex + 1} - ${field} 편집`,
+                changed_section_index: sectionIndex,
+                changed_field: field,
+                changed_content: newContent,
+                created_at: new Date().toISOString(),
+                sections_snapshot: this.createSectionsSnapshot()
+            };
+            
+            // 문서 버전 히스토리에 추가
+            this.documentVersionHistory.push(documentSnapshot);
+        },
+
+        // 모든 섹션의 현재 상태 스냅샷 생성
+        createSectionsSnapshot() {
+            return this.documentData.assets.map((asset, index) => ({
+                section_index: index,
+                section_title: asset.section_title,
+                asset_type: asset.asset_type,
+                current_version: this.getCurrentVersionNumber(index),
+                ai_summary: asset.summary?.ai_summary || '',
+                helpful_content: asset.summary?.helpful_content || '',
+                versions_count: asset.summary?.versions_count || 1,
+                last_modified: asset.summary?.versions?.find(v => v.is_current)?.created_at || new Date().toISOString()
+            }));
         },
 
         // 파일 변경
