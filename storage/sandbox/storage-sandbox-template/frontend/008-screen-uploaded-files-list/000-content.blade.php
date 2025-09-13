@@ -1,6 +1,6 @@
 {{-- 샌드박스 업로드 파일 리스트 템플릿 --}}
 <?php
-    $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
+    $commonPath = dirname(__DIR__, 2) . '/common.php';
     require_once $commonPath;
     $screenInfo = getCurrentScreenInfo();
     $uploadPaths = getUploadPaths();
@@ -241,25 +241,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadFiles() {
     try {
-        // API를 통해 실제 파일 목록 가져오기
-        const response = await fetch('/api/sandbox/sandbox-files', {
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        // Mock 데이터 로딩 시뮬레이션
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Mock 파일 데이터
+        let sampleFiles = [
+            {
+                id: 1,
+                file_name: 'ai_tech_report_2024.pdf',
+                original_name: 'AI 기술 동향 보고서 2024.pdf',
+                file_path: '/uploads/ai_tech_report_2024.pdf',
+                file_size: 2048576,
+                mime_type: 'application/pdf',
+                is_analysis_requested: 0,
+                is_analysis_completed: 0,
+                analysis_status: 'pending',
+                uploaded_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 2,
+                file_name: 'smart_city_proposal.docx',
+                original_name: '프로젝트 제안서 - 스마트 시티 플랫폼.docx',
+                file_path: '/uploads/smart_city_proposal.docx',
+                file_size: 1536000,
+                mime_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                is_analysis_requested: 0,
+                is_analysis_completed: 0,
+                analysis_status: 'pending',
+                uploaded_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                id: 3,
+                file_name: 'market_analysis_ai.pdf',
+                original_name: '시장 분석 리포트 - AI 솔루션 트렌드.pdf',
+                file_path: '/uploads/market_analysis_ai.pdf',
+                file_size: 3145728,
+                mime_type: 'application/pdf',
+                is_analysis_requested: 0,
+                is_analysis_completed: 0,
+                analysis_status: 'pending',
+                uploaded_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+                created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
             }
-        });
-
-        if (!response.ok) {
-            throw new Error('파일 목록을 불러오는데 실패했습니다.');
-        }
-
-        const result = await response.json();
-        let sampleFiles = result.success ? result.data : [];
-
-        // API가 실패하거나 데이터가 없으면 로컬 파일 시스템을 확인하는 백업 데이터
-        if (!sampleFiles || sampleFiles.length === 0) {
-            // downloads 디렉토리의 실제 파일 정보를 표시하기 위한 백업 데이터
-            sampleFiles = <?= json_encode(getLocalFilesList()) ?>;
-        }
+        ];
 
         // 검색 및 필터 적용
         let filteredFiles = sampleFiles;
@@ -358,11 +384,21 @@ function renderFiles() {
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button type="button" onclick="requestAnalysis(${file.id})"
-                            class="text-purple-600 hover:text-purple-800 p-1"
-                            title="분석 요청">
+                    <button type="button" onclick="requestDocumentAnalysis(${file.id})"
+                            class="inline-flex items-center px-2 py-1 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                            title="AI 문서 분석">
+                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        분석
+                    </button>
+                    <button type="button" onclick="viewDocumentAssets(${file.id})"
+                            class="text-indigo-600 hover:text-indigo-800 p-1"
+                            title="분석 결과 보기" 
+                            id="view-assets-${file.id}" style="display: none;">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                         </svg>
                     </button>
                     <button type="button" onclick="downloadFile(${file.id})"
@@ -644,45 +680,136 @@ async function deleteFile(fileId) {
     }
 }
 
-async function requestAnalysis(fileId) {
+async function requestDocumentAnalysis(fileId) {
     const file = currentFiles.find(f => f.id == fileId);
     if (!file) {
         showNotification('파일을 찾을 수 없습니다.', 'error');
         return;
     }
 
-    if (!confirm(`${file.original_name} 파일의 분석을 요청하시겠습니까?`)) return;
+    // 분석 가능한 파일 타입 체크
+    const analyzableTypes = [
+        'application/pdf',
+        'application/msword', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain',
+        'text/markdown'
+    ];
+    
+    if (!analyzableTypes.includes(file.mime_type)) {
+        showNotification('분석 가능한 파일 형식이 아닙니다. (PDF, DOC, DOCX, TXT, MD만 지원)', 'warning');
+        return;
+    }
 
+    if (!confirm(`📝 ${file.original_name} 파일을 AI로 분석하시겠습니까?\n\n팔란티어 온톨로지 기반으로 에셋을 분류하고\n원문/요약/도움내용으로 구분하여 분석합니다.`)) return;
+
+    const analysisBtn = document.querySelector(`button[onclick="requestDocumentAnalysis(${fileId})"]`);
+    const originalText = analysisBtn.innerHTML;
+    
     try {
-        const response = await fetch('/api/sandbox/analysis-request', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-            },
-            body: JSON.stringify({
-                file_id: fileId,
-                file_name: file.original_name,
-                file_path: file.file_path,
-                mime_type: file.mime_type,
-                file_size: file.file_size
-            })
-        });
+        // 버튼 상태를 로딩으로 변경
+        analysisBtn.innerHTML = `
+            <svg class="h-4 w-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            분석중...
+        `;
+        analysisBtn.disabled = true;
 
+        // Mock API - 실제 API 대신 목업 데이터 사용
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2초 대기로 분석 시뮬레이션
+        
+        showNotification('🎉 AI 문서 분석이 완료되었습니다!', 'success');
+        
+        // 파일의 분석 상태를 완료로 변경
+        const file = currentFiles.find(f => f.id == fileId);
+        if (file) {
+            file.is_analysis_completed = true;
+            file.analysis_status = 'completed';
+        }
+        
+        // 분석 결과 보기 버튼 표시
+        const viewAssetsBtn = document.getElementById(`view-assets-${fileId}`);
+        if (viewAssetsBtn) {
+            viewAssetsBtn.style.display = 'inline-block';
+        }
+        
+        // 분석 버튼 숨기기
+        analysisBtn.style.display = 'none';
+        
+        // 자동으로 결과 보기로 이동 (1초 후)
+        setTimeout(() => {
+            showNotification('💡 분석 결과를 확인해보세요!', 'info');
+        }, 1000);
+    } catch (error) {
+        console.error('Error requesting document analysis:', error);
+        showNotification('❌ 분석 요청에 실패했습니다: ' + error.message, 'error');
+    } finally {
+        // 버튼 상태 복원
+        analysisBtn.innerHTML = originalText;
+        analysisBtn.disabled = false;
+    }
+}
+
+// 분석 상태 폴링
+async function startAnalysisPolling(fileId) {
+    const maxAttempts = 30; // 최대 30번 시도 (5분)
+    let attempts = 0;
+    
+    const checkStatus = async () => {
+        try {
+            attempts++;
+            const response = await fetch(`backend/api/document_analysis.php/api/document/assets/${fileId}`);
+            
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success && result.data.analysis_progress === 100) {
+                    showNotification('✅ AI 문서 분석이 완료되었습니다!', 'success');
+                    return; // 폴링 중지
+                }
+                
+                // 분석이 아직 진행 중이면 계속 폴링
+                if (attempts < maxAttempts) {
+                    setTimeout(checkStatus, 10000); // 10초 후 재시도
+                }
+            } else if (attempts < maxAttempts) {
+                setTimeout(checkStatus, 10000); // 10초 후 재시도
+            }
+        } catch (error) {
+            console.error('Analysis polling error:', error);
+            if (attempts < maxAttempts) {
+                setTimeout(checkStatus, 10000); // 10초 후 재시도
+            }
+        }
+    };
+    
+    // 처음 체크는 5초 후 시작
+    setTimeout(checkStatus, 5000);
+}
+
+// 문서 에셋 보기
+async function viewDocumentAssets(fileId) {
+    try {
+        const response = await fetch(`/api/document/${fileId}/assets`);
+        
         if (!response.ok) {
-            throw new Error('분석 요청에 실패했습니다.');
+            throw new Error('에셋 정보를 불러오는데 실패했습니다.');
         }
 
         const result = await response.json();
         
         if (result.success) {
-            showNotification('분석 요청이 등록되었습니다.', 'success');
+            // 에셋 분석 결과 페이지로 이동
+            const url = `/sandbox/storage-sandbox-template/013-screen-document-analysis?file_id=${fileId}`;
+            window.open(url, '_blank');
         } else {
-            throw new Error(result.message || '분석 요청에 실패했습니다.');
+            throw new Error(result.message || '에셋 정보를 불러오는데 실패했습니다.');
         }
     } catch (error) {
-        console.error('Error requesting analysis:', error);
-        showNotification('분석 요청에 실패했습니다: ' + error.message, 'error');
+        console.error('Error viewing document assets:', error);
+        showNotification('에셋 정보를 불러오는데 실패했습니다: ' + error.message, 'error');
     }
 }
 

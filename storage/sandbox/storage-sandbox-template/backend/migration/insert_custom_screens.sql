@@ -39,6 +39,16 @@ INSERT INTO sandbox_custom_screens (title, description, type, folder_name, file_
     'template',
     datetime('now'),
     datetime('now')
+),
+(
+    'AI 문서 분석',
+    '팔란티어 온톨로지 기반으로 문서를 에셋별로 분류하고 AI 요약/도움내용을 제공하는 화면입니다.',
+    'analysis',
+    '013-screen-document-analysis',
+    'custom-screens/013-screen-document-analysis/000-content.blade.php',
+    'template',
+    datetime('now'),
+    datetime('now')
 );
 
 -- 기존 샘플 화면 업데이트 (있는 경우)
