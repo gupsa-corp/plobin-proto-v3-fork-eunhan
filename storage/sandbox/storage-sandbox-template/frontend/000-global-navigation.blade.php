@@ -1,4 +1,7 @@
 {{-- 글로벌 샌드박스 네비게이션 드롭다운 --}}
+<?php 
+    $availableScreens = getAvailableScreens();
+?>
 <div class="mb-6">
     <div class="bg-white rounded-xl shadow-sm p-4">
         <div class="flex items-center space-x-4">
@@ -13,24 +16,15 @@
             {{-- 구분선 --}}
             <div class="h-8 w-px bg-gray-300"></div>
 
-            {{-- 뷰 선택 드롭다운 --}}
+            {{-- 뷰 선택 드롭다운 (동적 생성) --}}
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">화면 뷰</label>
                 <select id="view-selector" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[220px]">
-                    <option value="001-screen-dashboard">001-screen-dashboard</option>
-                    <option value="002-screen-project-list">002-screen-project-list</option>
-                    <option value="003-screen-table-view">003-screen-table-view</option>
-                    <option value="004-screen-kanban-board">004-screen-kanban-board</option>
-                    <option value="005-screen-gantt-chart">005-screen-gantt-chart</option>
-                    <option value="006-screen-calendar-view">006-screen-calendar-view</option>
-                    <option value="007-screen-file-upload">007-screen-file-upload</option>
-                    <option value="007-screen-multi-file-upload">007-screen-multi-file-upload</option>
-                    <option value="008-screen-file-list">008-screen-file-list</option>
-                    <option value="008-screen-uploaded-files-list">008-screen-uploaded-files-list</option>
-                    <option value="009-screen-analysis-requests">009-screen-analysis-requests</option>
-                    <option value="010-screen-pms-summary-requests">010-screen-pms-summary-requests</option>
-                    <option value="011-screen-form-execution">011-screen-form-execution</option>
-                    <option value="100-pms-common">100-pms-common</option>
+                    @foreach($availableScreens as $screen)
+                        <option value="{{ $screen['value'] }}" title="{{ $screen['title'] }}">
+                            {{ $screen['value'] }} - {{ $screen['title'] }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 

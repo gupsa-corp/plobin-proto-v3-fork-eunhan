@@ -233,6 +233,102 @@ function getDownloadUrl($relativePath) {
 }
 
 /**
+ * 동적으로 사용 가능한 화면 목록을 스캔
+ */
+function getAvailableScreens() {
+    $templateRoot = __DIR__;
+    $frontendDir = $templateRoot . '/frontend';
+    $screens = [];
+    
+    try {
+        if (!is_dir($frontendDir)) {
+            return $screens;
+        }
+        
+        // frontend 디렉토리의 모든 하위 디렉토리 스캔
+        $directories = glob($frontendDir . '/*', GLOB_ONLYDIR);
+        
+        foreach ($directories as $dir) {
+            $screenName = basename($dir);
+            
+            // 숫자로 시작하는 screen 디렉토리만 포함 (예: 001-screen-dashboard)
+            // 또는 100-pms-common 같은 공통 폴더도 포함
+            if (preg_match('/^\d{3}-/', $screenName)) {
+                // 실제 content 파일이 있는지 확인
+                $contentFile = $dir . '/000-content.blade.php';
+                if (file_exists($contentFile)) {
+                    // 화면 제목 추출 시도 (blade 파일에서 댓글 추출)
+                    $title = getScreenTitle($contentFile, $screenName);
+                    
+                    $screens[] = [
+                        'value' => $screenName,
+                        'title' => $title,
+                        'path' => $dir,
+                        'url' => "/sandbox/storage-sandbox-template/{$screenName}"
+                    ];
+                }
+            }
+        }
+        
+        // 화면 이름으로 정렬
+        usort($screens, function($a, $b) {
+            return strcmp($a['value'], $b['value']);
+        });
+        
+    } catch (Exception $e) {
+        error_log("getAvailableScreens error: " . $e->getMessage());
+    }
+    
+    return $screens;
+}
+
+/**
+ * blade 파일에서 화면 제목 추출
+ */
+function getScreenTitle($filePath, $defaultName) {
+    try {
+        $content = file_get_contents($filePath);
+        
+        // 첫 번째 줄의 댓글에서 제목 추출 시도
+        if (preg_match('/^{{--\s*(.+?)\s*--}}/m', $content, $matches)) {
+            $title = trim($matches[1]);
+            // "템플릿", "화면" 같은 단어 제거하고 정리
+            $title = preg_replace('/(샌드박스|템플릿|화면)\s*/u', '', $title);
+            if (!empty($title)) {
+                return $title;
+            }
+        }
+        
+        // h1 태그에서 제목 추출 시도
+        if (preg_match('/<h1[^>]*>(.*?)<\/h1>/s', $content, $matches)) {
+            $title = strip_tags($matches[1]);
+            $title = trim($title);
+            if (!empty($title)) {
+                return $title;
+            }
+        }
+        
+        // Alpine.js 데이터에서 제목 추출 시도 (x-text 등)
+        if (preg_match('/text-2xl[^>]*>([^<]+)</s', $content, $matches)) {
+            $title = trim($matches[1]);
+            if (!empty($title)) {
+                return $title;
+            }
+        }
+        
+    } catch (Exception $e) {
+        error_log("getScreenTitle error: " . $e->getMessage());
+    }
+    
+    // 기본 이름으로 폴백 (숫자 제거하고 하이픈을 공백으로)
+    $cleanName = preg_replace('/^\d{3}-/', '', $defaultName);
+    $cleanName = str_replace(['-', '_'], ' ', $cleanName);
+    $cleanName = ucwords($cleanName);
+    
+    return $cleanName;
+}
+
+/**
  * 현재 화면에 대한 디버그 정보 출력
  */
 function debugCurrentLocation() {
