@@ -83,6 +83,7 @@ return [
     '/sandbox/api-list' => ['view' => '700-page-sandbox.704-page-api-list.000-index', 'name' => 'sandbox.api-list'],
     '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
     '/sandbox/custom-screens' => ['view' => '700-page-sandbox.706-page-custom-screens.000-index', 'name' => 'sandbox.custom-screens'],
+    '/sandbox/live-kanban-board' => ['view' => '700-page-sandbox.706-page-custom-screens.103-live-kanban-board', 'name' => 'sandbox.live-kanban-board'],
     '/sandbox/custom-screen-creator' => ['view' => '700-page-sandbox.707-page-custom-screen-creator.000-index', 'name' => 'sandbox.custom-screen-creator'],
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
     '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],

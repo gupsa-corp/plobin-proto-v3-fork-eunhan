@@ -1,4 +1,13 @@
 <div class="space-y-6">
+    <!-- 알림 메시지 -->
+    <div x-data="{ show: false, message: '' }" 
+         x-on:project-added.window="show = true; message = $event.detail.message; setTimeout(() => show = false, 3000)"
+         x-show="show" 
+         x-transition
+         class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50"
+         style="display: none;">
+        <span x-text="message"></span>
+    </div>
     <!-- 헤더 통계 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div class="bg-white p-4 rounded-lg border border-gray-200">
@@ -139,7 +148,8 @@
                         @endif
 
                         <!-- 새 카드 추가 버튼 -->
-                        <button class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-600 text-sm">
+                        <button wire:click="openAddProjectModal('{{ $column['id'] }}')" 
+                                class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-600 text-sm">
                             + 새 프로젝트 추가
                         </button>
                     </div>
@@ -164,4 +174,81 @@
             </div>
         </div>
     </div>
+
+    <!-- 새 프로젝트 추가 모달 -->
+    @if($showAddModal)
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" wire:click.self="closeAddProjectModal">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <!-- 모달 헤더 -->
+                    <div class="flex items-center justify-between pb-3 border-b">
+                        <h3 class="text-lg font-medium text-gray-900">새 프로젝트 추가</h3>
+                        <button wire:click="closeAddProjectModal" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 모달 내용 -->
+                    <div class="py-4 space-y-4">
+                        <!-- 프로젝트 이름 -->
+                        <div>
+                            <label for="project_name" class="block text-sm font-medium text-gray-700 mb-1">프로젝트 이름 *</label>
+                            <input type="text" 
+                                   wire:model="newProject.name" 
+                                   id="project_name"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="프로젝트 이름을 입력하세요">
+                            @error('newProject.name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- 프로젝트 설명 -->
+                        <div>
+                            <label for="project_description" class="block text-sm font-medium text-gray-700 mb-1">프로젝트 설명</label>
+                            <textarea wire:model="newProject.description" 
+                                      id="project_description"
+                                      rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="프로젝트에 대한 간단한 설명을 입력하세요"></textarea>
+                        </div>
+
+                        <!-- 상태 선택 -->
+                        <div>
+                            <label for="project_status" class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                            <select wire:model="newProject.status" 
+                                    id="project_status"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @foreach($columns as $column)
+                                    <option value="{{ $column['id'] }}">{{ $column['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- 조직 선택 -->
+                        <div>
+                            <label for="project_organization" class="block text-sm font-medium text-gray-700 mb-1">조직</label>
+                            <input type="text" 
+                                   wire:model="newProject.organization_name" 
+                                   id="project_organization"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="조직명을 입력하세요">
+                        </div>
+                    </div>
+
+                    <!-- 모달 푸터 -->
+                    <div class="flex items-center justify-end pt-3 border-t space-x-2">
+                        <button wire:click="closeAddProjectModal" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            취소
+                        </button>
+                        <button wire:click="addProject" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            추가
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

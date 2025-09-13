@@ -10,8 +10,31 @@ class KanbanBoardComponent extends Component
     public $columns = [];
     public $projects = [];
     public $stats = [];
+    public $showAddModal = false;
+    public $selectedColumn = '';
+    public $newProject = [
+        'name' => '',
+        'description' => '',
+        'status' => '',
+        'organization_name' => ''
+    ];
 
     protected $listeners = ['projectMoved' => 'handleProjectMove'];
+
+    protected $rules = [
+        'newProject.name' => 'required|string|max:255',
+        'newProject.description' => 'nullable|string|max:1000',
+        'newProject.status' => 'required|string',
+        'newProject.organization_name' => 'nullable|string|max:255'
+    ];
+
+    protected $messages = [
+        'newProject.name.required' => '프로젝트 이름은 필수입니다.',
+        'newProject.name.max' => '프로젝트 이름은 최대 255자까지 입력 가능합니다.',
+        'newProject.description.max' => '설명은 최대 1000자까지 입력 가능합니다.',
+        'newProject.status.required' => '상태를 선택해주세요.',
+        'newProject.organization_name.max' => '조직명은 최대 255자까지 입력 가능합니다.'
+    ];
 
     public function mount()
     {
@@ -162,5 +185,104 @@ class KanbanBoardComponent extends Component
     {
         $this->loadData();
         $this->dispatch('data-refreshed');
+    }
+
+    public function openAddProjectModal($columnId)
+    {
+        $this->selectedColumn = $columnId;
+        $this->newProject['status'] = $columnId;
+        $this->showAddModal = true;
+        $this->resetErrorBag();
+    }
+
+    public function closeAddProjectModal()
+    {
+        $this->showAddModal = false;
+        $this->selectedColumn = '';
+        $this->newProject = [
+            'name' => '',
+            'description' => '',
+            'status' => '',
+            'organization_name' => ''
+        ];
+        $this->resetErrorBag();
+    }
+
+    public function addProject()
+    {
+        $this->validate();
+
+        try {
+            $sandboxConnection = 'sandbox';
+            
+            // 데이터베이스에 프로젝트 추가
+            $projectData = [
+                'name' => $this->newProject['name'],
+                'description' => $this->newProject['description'],
+                'status' => $this->mapColumnToStatus($this->newProject['status']),
+                'created_by' => 1, // 임시 사용자 ID (실제로는 Auth::id() 사용)
+                'organization_id' => null, // 조직 연결 로직은 필요시 구현
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            DB::connection($sandboxConnection)
+                ->table('projects')
+                ->insert($projectData);
+
+            $this->dispatch('project-added', [
+                'message' => '프로젝트가 성공적으로 추가되었습니다.',
+                'column' => $this->selectedColumn
+            ]);
+
+            // 데이터 새로고침
+            $this->loadData();
+            
+            // 모달 닫기
+            $this->closeAddProjectModal();
+            
+        } catch (\Exception $e) {
+            // 샘플 데이터로 임시 추가 (실제 DB 연결 실패시)
+            $newProjectObj = (object)[
+                'id' => rand(1000, 9999),
+                'name' => $this->newProject['name'],
+                'description' => $this->newProject['description'],
+                'status' => $this->newProject['status'],
+                'created_by_name' => '현재 사용자',
+                'organization_name' => $this->newProject['organization_name'] ?: '기본 조직',
+                'created_at' => now()
+            ];
+
+            // 해당 컬럼에 프로젝트 추가
+            if (!isset($this->projects[$this->selectedColumn])) {
+                $this->projects[$this->selectedColumn] = [];
+            }
+            
+            $this->projects[$this->selectedColumn][] = $newProjectObj;
+
+            // 통계 업데이트
+            $this->stats['total_projects']++;
+
+            $this->dispatch('project-added', [
+                'message' => '프로젝트가 임시로 추가되었습니다. (샘플 데이터)',
+                'column' => $this->selectedColumn
+            ]);
+
+            // 모달 닫기
+            $this->closeAddProjectModal();
+        }
+    }
+
+    private function mapColumnToStatus($columnId)
+    {
+        $mapping = [
+            'backlog' => 'backlog',
+            'todo' => 'todo',
+            'in_progress' => 'in_progress',
+            'review' => 'review',
+            'done' => 'completed'
+        ];
+
+        return $mapping[$columnId] ?? 'backlog';
     }
 }
