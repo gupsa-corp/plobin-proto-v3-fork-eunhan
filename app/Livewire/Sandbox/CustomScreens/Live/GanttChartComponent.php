@@ -175,7 +175,35 @@ class GanttChartComponent extends Component
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
-        $this->generateMonthDays();
+        if ($mode === 'month') {
+            $this->generateMonthDays();
+        } elseif ($mode === 'quarter') {
+            $this->generateQuarterDays();
+        } elseif ($mode === 'year') {
+            $this->generateYearDays();
+        }
+    }
+
+    private function generateQuarterDays()
+    {
+        $startOfQuarter = Carbon::create($this->currentYear, (ceil($this->currentMonth / 3) - 1) * 3 + 1, 1);
+        $endOfQuarter = $startOfQuarter->copy()->addMonths(2)->endOfMonth();
+        
+        $this->monthDays = [];
+        for ($date = $startOfQuarter->copy(); $date->lte($endOfQuarter); $date->addWeek()) {
+            $this->monthDays[] = $date->copy();
+        }
+    }
+
+    private function generateYearDays()
+    {
+        $startOfYear = Carbon::create($this->currentYear, 1, 1);
+        $endOfYear = $startOfYear->copy()->endOfYear();
+        
+        $this->monthDays = [];
+        for ($date = $startOfYear->copy(); $date->lte($endOfYear); $date->addMonth()) {
+            $this->monthDays[] = $date->copy();
+        }
     }
 
     public function refreshData()
