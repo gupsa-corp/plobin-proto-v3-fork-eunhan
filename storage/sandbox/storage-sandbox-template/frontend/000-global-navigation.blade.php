@@ -1,7 +1,7 @@
 {{-- 글로벌 샌드박스 네비게이션 드롭다운 --}}
-<?php 
+<?php
     $availableScreens = getAvailableScreens();
-    
+
     // getAvailableScreens()가 비어있을 경우 수동으로 추가
     if (empty($availableScreens)) {
         $availableScreens = [
