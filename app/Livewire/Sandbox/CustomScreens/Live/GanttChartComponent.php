@@ -9,16 +9,27 @@ use Carbon\Carbon;
 class GanttChartComponent extends Component
 {
     public $projects = [];
+    public $allProjects = []; // 필터링 전 전체 프로젝트
     public $stats = [];
-    public $currentMonth;
-    public $currentYear;
+    public $currentMonth = 3;
+    public $currentYear = 2024;
     public $monthDays = [];
     public $viewMode = 'month'; // month, quarter, year
+    public $searchTerm = '';
+    public $statusFilter = '';
+    public $showProjectModal = false;
 
     public function mount()
     {
-        $this->currentMonth = now()->month;
-        $this->currentYear = now()->year;
+        // 강제 초기화 - 샘플 데이터가 2024년이므로 초기값을 2024년 3월로 설정
+        $this->reset(['viewMode', 'currentMonth', 'currentYear', 'searchTerm', 'statusFilter', 'showProjectModal']);
+        
+        $this->viewMode = 'month';
+        $this->currentMonth = 3;
+        $this->currentYear = 2024;
+        $this->searchTerm = '';
+        $this->statusFilter = '';
+        $this->showProjectModal = false;
         $this->generateMonthDays();
         $this->loadData();
     }
@@ -45,7 +56,7 @@ class GanttChartComponent extends Component
                 )
                 ->get();
 
-            $this->projects = $allProjects->map(function ($project) {
+            $projectsArray = $allProjects->map(function ($project) {
                 return [
                     'id' => $project->id,
                     'name' => $project->name,
@@ -59,6 +70,9 @@ class GanttChartComponent extends Component
                     'created_at' => $project->created_at
                 ];
             })->toArray();
+            
+            $this->allProjects = $projectsArray;
+            $this->projects = $projectsArray;
 
             // 통계 데이터
             $this->stats = [
@@ -70,7 +84,7 @@ class GanttChartComponent extends Component
             
         } catch (\Exception $e) {
             // 기본값 설정
-            $this->projects = [
+            $defaultProjects = [
                 [
                     'id' => 1,
                     'name' => '웹사이트 리뉴얼 프로젝트',
@@ -121,6 +135,9 @@ class GanttChartComponent extends Component
                 ]
             ];
 
+            $this->allProjects = $defaultProjects;
+            $this->projects = $defaultProjects;
+
             $this->stats = [
                 'total_projects' => 8,
                 'on_track' => 4,
@@ -158,23 +175,48 @@ class GanttChartComponent extends Component
 
     public function previousMonth()
     {
-        $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->subMonth();
-        $this->currentMonth = $date->month;
-        $this->currentYear = $date->year;
-        $this->generateMonthDays();
+        if ($this->viewMode === 'month') {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->subMonth();
+            $this->currentMonth = $date->month;
+            $this->currentYear = $date->year;
+            $this->generateMonthDays();
+        } elseif ($this->viewMode === 'quarter') {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->subMonths(3);
+            $this->currentMonth = $date->month;
+            $this->currentYear = $date->year;
+            $this->generateQuarterDays();
+        } else { // year
+            $this->currentYear--;
+            $this->generateYearDays();
+        }
     }
 
     public function nextMonth()
     {
-        $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->addMonth();
-        $this->currentMonth = $date->month;
-        $this->currentYear = $date->year;
-        $this->generateMonthDays();
+        if ($this->viewMode === 'month') {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->addMonth();
+            $this->currentMonth = $date->month;
+            $this->currentYear = $date->year;
+            $this->generateMonthDays();
+        } elseif ($this->viewMode === 'quarter') {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->addMonths(3);
+            $this->currentMonth = $date->month;
+            $this->currentYear = $date->year;
+            $this->generateQuarterDays();
+        } else { // year
+            $this->currentYear++;
+            $this->generateYearDays();
+        }
     }
 
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
+        
+        // 뷰 모드 변경 시 현재 날짜로 설정 (2025년 9월)
+        $this->currentYear = 2025;
+        $this->currentMonth = 9;
+        
         if ($mode === 'month') {
             $this->generateMonthDays();
         } elseif ($mode === 'quarter') {
@@ -182,33 +224,82 @@ class GanttChartComponent extends Component
         } elseif ($mode === 'year') {
             $this->generateYearDays();
         }
+        
+        // Livewire 강제 리프레시 - 컴포넌트 전체 재렌더링
+        $this->dispatch('$refresh');
+        $this->dispatch('view-mode-changed', mode: $mode);
+        
+        // 로그 추가
+        \Log::info("ViewMode changed to: {$mode}, monthDays count: " . count($this->monthDays));
     }
 
     private function generateQuarterDays()
     {
-        $startOfQuarter = Carbon::create($this->currentYear, (ceil($this->currentMonth / 3) - 1) * 3 + 1, 1);
-        $endOfQuarter = $startOfQuarter->copy()->addMonths(2)->endOfMonth();
-        
+        // 분기 뷰를 위한 주별 데이터는 Blade에서 직접 생성
+        // 여기서는 monthDays를 빈 배열로 설정
         $this->monthDays = [];
-        for ($date = $startOfQuarter->copy(); $date->lte($endOfQuarter); $date->addWeek()) {
-            $this->monthDays[] = $date->copy();
-        }
     }
 
     private function generateYearDays()
     {
-        $startOfYear = Carbon::create($this->currentYear, 1, 1);
-        $endOfYear = $startOfYear->copy()->endOfYear();
-        
+        // 년 뷰를 위한 월별 데이터는 Blade에서 직접 생성
+        // 여기서는 monthDays를 빈 배열로 설정
         $this->monthDays = [];
-        for ($date = $startOfYear->copy(); $date->lte($endOfYear); $date->addMonth()) {
-            $this->monthDays[] = $date->copy();
-        }
     }
 
     public function refreshData()
     {
         $this->loadData();
         $this->dispatch('data-refreshed');
+    }
+
+    public function updatedSearchTerm()
+    {
+        $this->applyFilters();
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->applyFilters();
+    }
+
+    private function applyFilters()
+    {
+        $filtered = $this->allProjects;
+
+        // 검색어 필터
+        if (!empty($this->searchTerm)) {
+            $filtered = array_filter($filtered, function($project) {
+                return stripos($project['name'], $this->searchTerm) !== false ||
+                       stripos($project['description'], $this->searchTerm) !== false ||
+                       stripos($project['created_by_name'], $this->searchTerm) !== false;
+            });
+        }
+
+        // 상태 필터
+        if (!empty($this->statusFilter)) {
+            $filtered = array_filter($filtered, function($project) {
+                return $project['status'] === $this->statusFilter;
+            });
+        }
+
+        $this->projects = array_values($filtered);
+    }
+
+    public function openProjectModal()
+    {
+        $this->showProjectModal = true;
+    }
+
+    public function closeProjectModal()
+    {
+        $this->showProjectModal = false;
+    }
+
+    public function clearFilters()
+    {
+        $this->searchTerm = '';
+        $this->statusFilter = '';
+        $this->projects = $this->allProjects;
     }
 }

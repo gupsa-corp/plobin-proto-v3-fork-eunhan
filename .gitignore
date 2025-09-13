@@ -524,3 +524,7 @@ storage/storage-sandbox-1/Backend/vendor/zircote/swagger-php/src/Processors/Conc
 storage/storage-sandbox-1/Backend/vendor/zircote/swagger-php/src/Processors/Concerns/MergePropertiesTrait.php
 storage/storage-sandbox-1/Backend/vendor/zircote/swagger-php/src/Processors/Concerns/RefTrait.php
 storage/storage-sandbox-1/Backend/vendor/zircote/swagger-php/src/Processors/Concerns/TypesTrait.php
+storage/sandbox/storage-sandbox-template/.playwright-mcp/gantt-debug-info.png
+storage/sandbox/storage-sandbox-template/.playwright-mcp/gantt-quarter-active-debug.png
+storage/sandbox/storage-sandbox-template/.playwright-mcp/gantt-quarter-debug.png
+storage/sandbox/storage-sandbox-template/.playwright-mcp/gantt-quarter-view-debug.png

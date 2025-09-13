@@ -23,11 +23,71 @@
             </div>
             <div class="flex items-center space-x-3">
                 <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button class="px-3 py-1 text-sm bg-white shadow-sm rounded-md">월</button>
-                    <button class="px-3 py-1 text-sm text-gray-600">분기</button>
-                    <button class="px-3 py-1 text-sm text-gray-600">년</button>
+                    <button @click="setViewMode('month')" 
+                            :class="viewMode === 'month' ? 'px-3 py-1 text-sm bg-white shadow-sm rounded-md' : 'px-3 py-1 text-sm text-gray-600'">월</button>
+                    <button @click="setViewMode('quarter')" 
+                            :class="viewMode === 'quarter' ? 'px-3 py-1 text-sm bg-white shadow-sm rounded-md' : 'px-3 py-1 text-sm text-gray-600'">분기</button>
+                    <button @click="setViewMode('year')" 
+                            :class="viewMode === 'year' ? 'px-3 py-1 text-sm bg-white shadow-sm rounded-md' : 'px-3 py-1 text-sm text-gray-600'">년</button>
                 </div>
+                <button @click="openCreateModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ 프로젝트 추가</button>
                 <button class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">내보내기</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- 필터 및 검색 --}}
+    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-4">
+            {{-- 검색 --}}
+            <div class="flex-1 min-w-64">
+                <div class="relative">
+                    <input type="text" 
+                           x-model="searchTerm"
+                           @input="applyFilters()"
+                           placeholder="프로젝트명, 설명, 클라이언트로 검색..."
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        🔍
+                    </div>
+                </div>
+            </div>
+            
+            {{-- 상태 필터 --}}
+            <div class="min-w-40">
+                <select x-model="statusFilter" 
+                        @change="applyFilters()"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <option value="">모든 상태</option>
+                    <option value="planned">계획</option>
+                    <option value="in-progress">진행 중</option>
+                    <option value="completed">완료</option>
+                    <option value="on-hold">보류</option>
+                    <option value="cancelled">취소</option>
+                </select>
+            </div>
+            
+            {{-- 우선순위 필터 --}}
+            <div class="min-w-32">
+                <select x-model="priorityFilter" 
+                        @change="applyFilters()"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <option value="">모든 우선순위</option>
+                    <option value="high">높음</option>
+                    <option value="medium">보통</option>
+                    <option value="low">낮음</option>
+                </select>
+            </div>
+            
+            {{-- 필터 초기화 --}}
+            <button @click="clearFilters()" 
+                    class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                초기화
+            </button>
+            
+            {{-- 필터된 결과 개수 --}}
+            <div class="text-sm text-gray-500">
+                <span x-text="filteredProjects.length"></span>개 프로젝트 표시
             </div>
         </div>
     </div>
@@ -47,7 +107,9 @@
             {{-- 날짜 헤더 --}}
             <div class="flex border-b">
                 <div class="w-64 p-4 bg-gray-50 border-r font-semibold text-gray-900">프로젝트</div>
-                <div class="flex-1 flex bg-gray-50">
+                
+                {{-- 월 뷰 --}}
+                <div x-show="viewMode === 'month'" class="flex-1 flex bg-gray-50">
                     <template x-for="day in monthDays" :key="day.date">
                         <div class="w-8 p-2 text-center border-r border-gray-200">
                             <div class="text-xs text-gray-600" x-text="day.day"></div>
@@ -55,13 +117,36 @@
                         </div>
                     </template>
                 </div>
+                
+                {{-- 분기 뷰 --}}
+                <div x-show="viewMode === 'quarter'" class="flex-1 flex bg-gray-50">
+                    <template x-for="week in 12">
+                        <div class="flex-1 p-2 text-center border-r border-gray-200 bg-blue-50">
+                            <div class="text-xs text-blue-600 font-medium" x-text="week + '주'"></div>
+                            <div class="text-xs text-blue-400" x-text="'Q' + Math.ceil(currentDate.getMonth()/3 + 1)"></div>
+                        </div>
+                    </template>
+                </div>
+                
+                {{-- 년 뷰 --}}
+                <div x-show="viewMode === 'year'" class="flex-1 flex bg-gray-50">
+                    <template x-for="month in 12">
+                        <div class="flex-1 p-2 text-center border-r border-gray-200 bg-green-50">
+                            <div class="text-xs text-green-600 font-medium" x-text="month + '월'"></div>
+                            <div class="text-xs text-green-400" x-text="currentDate.getFullYear()"></div>
+                        </div>
+                    </template>
+                </div>
             </div>
 
             {{-- 프로젝트 행들 --}}
-            <div x-show="projects.length === 0" class="p-8 text-center text-gray-500">
+            <div x-show="filteredProjects.length === 0 && projects.length === 0" class="p-8 text-center text-gray-500">
                 데이터를 로딩 중...
             </div>
-            <template x-for="(project, index) in projects" :key="project.id">
+            <div x-show="filteredProjects.length === 0 && projects.length > 0" class="p-8 text-center text-gray-500">
+                필터 조건에 맞는 프로젝트가 없습니다.
+            </div>
+            <template x-for="(project, index) in filteredProjects" :key="project.id">
                 <div class="flex border-b hover:bg-gray-50">
                     <div class="w-64 p-4 border-r cursor-pointer" @click="openSidebar(project)">
                         <div class="font-medium text-gray-900" x-text="project.name"></div>
@@ -296,12 +381,120 @@
     <div x-show="sidebarOpen" 
          class="fixed inset-0 bg-black bg-opacity-25 z-40"
          @click="closeSidebar()"></div>
+
+    {{-- 프로젝트 생성 모달 --}}
+    <div x-show="createModalOpen" 
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+         @click.self="closeCreateModal()">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">새 프로젝트 추가</h3>
+                    <button @click="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-xl">×</span>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="createProject()">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">프로젝트명 *</label>
+                            <input type="text" 
+                                   x-model="newProject.name"
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                   placeholder="프로젝트명을 입력하세요">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                            <textarea x-model="newProject.description"
+                                      rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                      placeholder="프로젝트 설명을 입력하세요"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">시작일 *</label>
+                                <input type="date" 
+                                       x-model="newProject.start_date"
+                                       required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">종료일</label>
+                                <input type="date" 
+                                       x-model="newProject.end_date"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                                <select x-model="newProject.status"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value="planned">계획</option>
+                                    <option value="in-progress">진행 중</option>
+                                    <option value="completed">완료</option>
+                                    <option value="on-hold">보류</option>
+                                    <option value="cancelled">취소</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">우선순위</label>
+                                <select x-model="newProject.priority"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                    <option value="low">낮음</option>
+                                    <option value="medium">보통</option>
+                                    <option value="high">높음</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">클라이언트</label>
+                            <input type="text" 
+                                   x-model="newProject.client"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                   placeholder="클라이언트명을 입력하세요">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">진행률 (%)</label>
+                            <input type="number" 
+                                   x-model="newProject.progress"
+                                   min="0" max="100"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                   placeholder="0">
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3 mt-6 pt-4 border-t border-gray-200">
+                        <button type="submit" 
+                                class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md font-medium hover:bg-green-700 transition-colors">
+                            프로젝트 생성
+                        </button>
+                        <button type="button" 
+                                @click="closeCreateModal()"
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 function ganttData() {
     return {
         projects: [],
+        filteredProjects: [],
         stats: {
             total: 0,
             onTrack: 0,
@@ -310,10 +503,29 @@ function ganttData() {
         },
         currentDate: new Date(),
         monthDays: [],
+        viewMode: 'month', // 'month', 'quarter', 'year'
+        
+        // 필터링 상태
+        searchTerm: '',
+        statusFilter: '',
+        priorityFilter: '',
         
         // 사이드바 상태
         sidebarOpen: false,
         selectedProject: null,
+        
+        // 프로젝트 생성 모달 상태
+        createModalOpen: false,
+        newProject: {
+            name: '',
+            description: '',
+            start_date: '',
+            end_date: '',
+            status: 'planned',
+            priority: 'medium',
+            client: '',
+            progress: 0
+        },
         
         // 드래그 관련 상태
         isDragging: false,
@@ -354,6 +566,7 @@ function ganttData() {
                 
                 if (result.success && result.data) {
                     this.projects = result.data.projects || [];
+                    this.applyFilters();
                     this.calculateStats();
                     this.generateMonthDays();
                 } else {
@@ -385,6 +598,110 @@ function ganttData() {
         navigateMonth(direction) {
             this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + direction, 1);
             this.generateMonthDays();
+        },
+        
+        setViewMode(mode) {
+            this.viewMode = mode;
+            console.log('View mode changed to:', mode);
+        },
+        
+        // 필터링 기능
+        applyFilters() {
+            let filtered = [...this.projects];
+            
+            // 검색어 필터
+            if (this.searchTerm.trim()) {
+                const searchLower = this.searchTerm.toLowerCase();
+                filtered = filtered.filter(project => 
+                    (project.name && project.name.toLowerCase().includes(searchLower)) ||
+                    (project.description && project.description.toLowerCase().includes(searchLower)) ||
+                    (project.client && project.client.toLowerCase().includes(searchLower))
+                );
+            }
+            
+            // 상태 필터
+            if (this.statusFilter) {
+                filtered = filtered.filter(project => project.status === this.statusFilter);
+            }
+            
+            // 우선순위 필터
+            if (this.priorityFilter) {
+                filtered = filtered.filter(project => project.priority === this.priorityFilter);
+            }
+            
+            this.filteredProjects = filtered;
+        },
+        
+        clearFilters() {
+            this.searchTerm = '';
+            this.statusFilter = '';
+            this.priorityFilter = '';
+            this.applyFilters();
+        },
+        
+        // 프로젝트 생성 모달 관리
+        openCreateModal() {
+            this.createModalOpen = true;
+            // 기본값 설정
+            const today = new Date().toISOString().split('T')[0];
+            this.newProject = {
+                name: '',
+                description: '',
+                start_date: today,
+                end_date: '',
+                status: 'planned',
+                priority: 'medium',
+                client: '',
+                progress: 0
+            };
+        },
+        
+        closeCreateModal() {
+            this.createModalOpen = false;
+            this.newProject = {
+                name: '',
+                description: '',
+                start_date: '',
+                end_date: '',
+                status: 'planned',
+                priority: 'medium',
+                client: '',
+                progress: 0
+            };
+        },
+        
+        async createProject() {
+            if (!this.newProject.name.trim()) {
+                alert('프로젝트명을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.newProject)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // 새 프로젝트를 리스트에 추가
+                    this.projects.push(result.data);
+                    this.applyFilters();
+                    this.calculateStats();
+                    this.closeCreateModal();
+                    
+                    alert('프로젝트가 성공적으로 생성되었습니다.');
+                } else {
+                    alert('프로젝트 생성에 실패했습니다: ' + (result.message || '알 수 없는 오류'));
+                }
+            } catch (error) {
+                console.error('프로젝트 생성 오류:', error);
+                alert('프로젝트 생성 중 오류가 발생했습니다.');
+            }
         },
         
         // 사이드바 관리
@@ -569,6 +886,19 @@ function ganttData() {
             if (!project.start_date) return 'display: none;';
             
             const startDate = new Date(project.start_date);
+            
+            if (this.viewMode === 'month') {
+                return this.getMonthViewBarStyle(project, startDate);
+            } else if (this.viewMode === 'quarter') {
+                return this.getQuarterViewBarStyle(project, startDate);
+            } else if (this.viewMode === 'year') {
+                return this.getYearViewBarStyle(project, startDate);
+            }
+            
+            return 'display: none;';
+        },
+        
+        getMonthViewBarStyle(project, startDate) {
             const monthStart = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
             const monthEnd = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
             
@@ -587,7 +917,7 @@ function ganttData() {
                     return 'display: none;'; // 현재 월에 포함되지 않음
                 }
                 
-                // 시작 위치 계산
+                // 시작 위치 계산 (일별 32px)
                 if (startDate >= monthStart) {
                     leftPosition = (startDate.getDate() - 1) * 32;
                 } else {
@@ -609,6 +939,95 @@ function ganttData() {
             }
             
             return `left: ${leftPosition}px; width: ${width}px;`;
+        },
+        
+        getQuarterViewBarStyle(project, startDate) {
+            const currentYear = this.currentDate.getFullYear();
+            const currentQuarter = Math.floor(this.currentDate.getMonth() / 3) + 1;
+            const quarterStart = new Date(currentYear, (currentQuarter - 1) * 3, 1);
+            const quarterEnd = new Date(currentYear, currentQuarter * 3, 0);
+            
+            let leftPosition = 0;
+            let width = '8.333%'; // 1주당 100% / 12 = 8.333%
+            
+            if (project.end_date) {
+                const endDate = new Date(project.end_date);
+                
+                // 프로젝트가 현재 분기에 포함되는지 확인
+                if (endDate < quarterStart || startDate > quarterEnd) {
+                    return 'display: none;';
+                }
+                
+                // 효과적인 시작일과 종료일 계산
+                const effectiveStart = startDate < quarterStart ? quarterStart : startDate;
+                const effectiveEnd = endDate > quarterEnd ? quarterEnd : endDate;
+                
+                // 시작 위치 계산 (주별, 퍼센트)
+                const startWeek = Math.floor((effectiveStart - quarterStart) / (7 * 24 * 60 * 60 * 1000));
+                leftPosition = (startWeek / 12) * 100;
+                
+                // 너비 계산 (주 단위, 퍼센트)
+                const diffTime = Math.abs(effectiveEnd - effectiveStart);
+                const diffWeeks = Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000));
+                const widthPercent = Math.max(diffWeeks / 12 * 100, 8.333);
+                width = `${widthPercent}%`;
+                
+            } else {
+                // 종료일이 없는 경우
+                if (startDate < quarterStart || startDate > quarterEnd) {
+                    return 'display: none;';
+                }
+                
+                const startWeek = Math.floor((startDate - quarterStart) / (7 * 24 * 60 * 60 * 1000));
+                leftPosition = (startWeek / 12) * 100;
+                width = '8.333%';
+            }
+            
+            return `left: ${leftPosition}%; width: ${width};`;
+        },
+        
+        getYearViewBarStyle(project, startDate) {
+            const currentYear = this.currentDate.getFullYear();
+            const yearStart = new Date(currentYear, 0, 1);
+            const yearEnd = new Date(currentYear, 11, 31);
+            
+            let leftPosition = 0;
+            let width = '8.333%'; // 1월당 100% / 12 = 8.333%
+            
+            if (project.end_date) {
+                const endDate = new Date(project.end_date);
+                
+                // 프로젝트가 현재 년도에 포함되는지 확인
+                if (endDate < yearStart || startDate > yearEnd) {
+                    return 'display: none;';
+                }
+                
+                // 효과적인 시작일과 종료일 계산
+                const effectiveStart = startDate < yearStart ? yearStart : startDate;
+                const effectiveEnd = endDate > yearEnd ? yearEnd : endDate;
+                
+                // 시작 위치 계산 (월별, 퍼센트)
+                const startMonth = effectiveStart.getMonth();
+                leftPosition = (startMonth / 12) * 100;
+                
+                // 너비 계산 (월 단위, 퍼센트)
+                const endMonth = effectiveEnd.getMonth();
+                const diffMonths = endMonth - startMonth + 1;
+                const widthPercent = Math.max(diffMonths / 12 * 100, 8.333);
+                width = `${widthPercent}%`;
+                
+            } else {
+                // 종료일이 없는 경우
+                if (startDate < yearStart || startDate > yearEnd) {
+                    return 'display: none;';
+                }
+                
+                const startMonth = startDate.getMonth();
+                leftPosition = (startMonth / 12) * 100;
+                width = '8.333%';
+            }
+            
+            return `left: ${leftPosition}%; width: ${width};`;
         },
         
         // 이전 함수들 호환성을 위해 유지
