@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Core;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-abstract class ApiController extends Controller
+abstract class Controller extends \App\Http\Controllers\Controller
 {
     protected function success(mixed $data = null, string $message = '성공', int $status = 200): JsonResponse
     {

@@ -40,8 +40,8 @@ use App\Http\Controllers\Sandbox\FileList\Controller as SandboxFileListControlle
 use App\Http\Controllers\Sandbox\FileUpload\Controller as SandboxFileUploadController;
 use App\Http\Controllers\Sandbox\ListSandboxes\Controller as ListSandboxesController;
 use App\Http\Controllers\Sandbox\ListScreens\Controller as ListScreensController;
-use App\Http\Controllers\Sandbox\ProjectSandboxController;
-use App\Http\Controllers\Sandbox\SandboxTemplateController;
+use App\Http\Controllers\Sandbox\ProjectSandbox\Controller as ProjectSandboxController;
+use App\Http\Controllers\Sandbox\SandboxTemplate\Controller as SandboxTemplateController;
 use App\Http\Controllers\PlatformAdmin\Pricing\Controller as PlatformAdminPricingController;
 use Illuminate\Support\Facades\Route;
 
@@ -302,20 +302,20 @@ Route::get('/core/permissions', [\App\Http\Controllers\Core\Permissions\Controll
 // E2E 테스트 API (개발용 - 인증 없음)
 Route::prefix('test/e2e')->group(function () {
     // 시스템 상태 조회
-    Route::get('/status', [\App\Http\Controllers\API\TestController::class, 'status']);
+    Route::get('/status', [\App\Http\Controllers\Api\Test\Controller::class, 'status']);
 
     // 함수 실행 테스트
-    Route::post('/execute-function', [\App\Http\Controllers\API\TestController::class, 'executeFunction']);
+    Route::post('/execute-function', [\App\Http\Controllers\Api\Test\Controller::class, 'executeFunction']);
 
     // 파일 조회/쿼리 테스트
-    Route::get('/query-files', [\App\Http\Controllers\API\TestController::class, 'queryFiles']);
+    Route::get('/query-files', [\App\Http\Controllers\Api\Test\Controller::class, 'queryFiles']);
 
     // 파일 수정 테스트
-    Route::post('/modify-files', [\App\Http\Controllers\API\TestController::class, 'modifyFiles']);
+    Route::post('/modify-files', [\App\Http\Controllers\Api\Test\Controller::class, 'modifyFiles']);
 
     // 함수 정보 조회
-    Route::get('/function-info/{functionName}', [\App\Http\Controllers\API\TestController::class, 'getFunctionInfo']);
+    Route::get('/function-info/{functionName}', [\App\Http\Controllers\Api\Test\Controller::class, 'getFunctionInfo']);
 
     // 테스트 함수 생성
-    Route::post('/create-test-function', [\App\Http\Controllers\API\TestController::class, 'createTestFunction']);
+    Route::post('/create-test-function', [\App\Http\Controllers\Api\Test\Controller::class, 'createTestFunction']);
 });

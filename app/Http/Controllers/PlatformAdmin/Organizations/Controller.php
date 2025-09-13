@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Organizations;
 
-use App\Http\Controllers\Controller;
+
 use App\Models\Organization;
 use App\Services\PointService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class OrganizationsController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     protected $pointService;
 

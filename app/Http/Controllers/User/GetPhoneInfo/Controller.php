@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User\GetPhoneInfo;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Api\Core\Controller as ApiController;
 use App\Services\PhoneNumberHelper;
 
 class Controller extends ApiController

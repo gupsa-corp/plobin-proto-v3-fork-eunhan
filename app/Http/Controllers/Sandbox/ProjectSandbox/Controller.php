@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Sandbox;
+namespace App\Http\Controllers\Sandbox\ProjectSandbox;
 
-use App\Http\Controllers\Controller;
 use App\Models\ProjectSandbox;
 use App\Models\SandboxTemplate;
 use App\Models\SandboxCopyLog;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
-class ProjectSandboxController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     /**
      * 프로젝트별 샌드박스 목록 조회

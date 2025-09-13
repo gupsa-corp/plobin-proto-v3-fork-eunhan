@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Sandboxes;
 
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 
-class SandboxesController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     public function list()
     {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\ProjectPage\GetPages;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Api\Core\Controller as ApiController;
 use App\Models\Project;
 use Illuminate\Http\Request;
 

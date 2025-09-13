@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Permissions;
 
-use App\Http\Controllers\Controller;
+
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class PermissionsController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     public function overview()
     {

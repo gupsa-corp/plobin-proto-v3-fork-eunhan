@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Organization\CreateOrganization;
 
-use App\Http\Controllers\ApiRequest;
+use App\Http\Controllers\Api\Core\Request as ApiRequest;
 use App\Models\Organization;
 
 class Request extends ApiRequest

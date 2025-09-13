@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Organization\CheckUrlPath;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Api\Core\Controller as ApiController;
 use App\Models\Organization;
 
 class Controller extends ApiController

@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Sandbox;
+namespace App\Http\Controllers\Sandbox\SandboxTemplate;
 
-use App\Http\Controllers\Controller;
 use App\Models\SandboxTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class SandboxTemplateController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     /**
      * 샌드박스 템플릿 목록 조회

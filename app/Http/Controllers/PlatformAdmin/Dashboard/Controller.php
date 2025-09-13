@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Dashboard;
 
-use App\Http\Controllers\Controller;
+
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\BillingHistory;
 use App\Models\PointTransaction;
 use Carbon\Carbon;
 
-class DashboardController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
 
     public function statistics()

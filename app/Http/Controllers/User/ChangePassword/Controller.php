@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User\ChangePassword;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Api\Core\Controller as ApiController;
 use App\Exceptions\ApiException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

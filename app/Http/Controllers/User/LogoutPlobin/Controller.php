@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User\LogoutPlobin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Api\Core\Controller as ApiController;
 
 class Controller extends ApiController
 {

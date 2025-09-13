@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User\ValidatePhone;
 
-use App\Http\Controllers\ApiRequest;
+use App\Http\Controllers\Api\Core\Request as ApiRequest;
 
 class Request extends ApiRequest
 {

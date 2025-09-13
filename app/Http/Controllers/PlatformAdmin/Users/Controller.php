@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Users;
 
-use App\Http\Controllers\Controller;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 
-class UsersController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     public function list(Request $request)
     {

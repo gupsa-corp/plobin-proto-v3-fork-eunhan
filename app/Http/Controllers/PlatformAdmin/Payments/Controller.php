@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\PlatformAdmin;
+namespace App\Http\Controllers\PlatformAdmin\Payments;
 
-use App\Http\Controllers\Controller;
 use App\Models\BillingHistory;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class PaymentsController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     public function list(Request $request)
     {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Sandbox;
+namespace App\Http\Controllers\Sandbox\UsingProjects;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 
-class UsingProjectsController
+class Controller
 {
     public function index()
     {

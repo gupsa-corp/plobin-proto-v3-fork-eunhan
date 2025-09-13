@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\User\SignupPlobin;
 
-use App\Http\Controllers\ApiRequest;
+use App\Http\Controllers\Api\Core\Request as ApiRequest;
 use App\Services\PhoneNumberHelper;
 
 class Request extends ApiRequest

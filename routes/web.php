@@ -109,7 +109,7 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
     Route::patch('/organizations/{id}/projects/{projectId}/pages/{pageId}/title', [\App\Http\Controllers\Page\UpdateTitle\Controller::class, '__invoke']);
 
     // 프로젝트 페이지 라우트들
-    Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\Controllers\ProjectPage\ShowController::class, '__invoke'])->name('project.dashboard.page');
+    Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}', [\App\Http\Controllers\ProjectPage\Show\Controller::class, '__invoke'])->name('project.dashboard.page');
 
     // 페이지 설정 라우트들
     Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', function ($id, $projectId, $pageId) {
@@ -484,60 +484,60 @@ Route::get('/organizations/{id}/settings/users', [\App\Http\Controllers\Organiza
 // 추후 배포시 ->middleware(['auth', 'role:platform_admin']) 적용 예정
 
 // ========== 대시보드 ==========
-Route::get('/platform/admin', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard');
-Route::get('/platform/admin/dashboard', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard.full');
-Route::get('/platform/admin/dashboard/statistics', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard.statistics');
-Route::get('/platform/admin/dashboard/recent-activities', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'recentActivities'])->name('platform.admin.dashboard.activities');
+Route::get('/platform/admin', [\App\Http\Controllers\PlatformAdmin\Dashboard\Controller::class, 'statistics'])->name('platform.admin.dashboard');
+Route::get('/platform/admin/dashboard', [\App\Http\Controllers\PlatformAdmin\Dashboard\Controller::class, 'statistics'])->name('platform.admin.dashboard.full');
+Route::get('/platform/admin/dashboard/statistics', [\App\Http\Controllers\PlatformAdmin\Dashboard\Controller::class, 'statistics'])->name('platform.admin.dashboard.statistics');
+Route::get('/platform/admin/dashboard/recent-activities', [\App\Http\Controllers\PlatformAdmin\Dashboard\Controller::class, 'recentActivities'])->name('platform.admin.dashboard.activities');
 
 // ========== 조직 관리 ==========
-Route::get('/platform/admin/organizations', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'list'])->name('platform.admin.organizations');
-Route::get('/platform/admin/organizations/list', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'list'])->name('platform.admin.organizations.list');
-Route::get('/platform/admin/organizations/details/{organization}', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'details'])->name('platform.admin.organizations.details');
-Route::get('/platform/admin/organizations/points', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'points'])->name('platform.admin.organizations.points');
-Route::get('/platform/admin/organizations/points/{organization}', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'pointsDetail'])->name('platform.admin.organizations.points.detail');
-Route::post('/platform/admin/organizations/points/{organization}/adjust', [\App\Http\Controllers\PlatformAdmin\OrganizationsController::class, 'adjustPoints'])->name('platform.admin.organizations.points.adjust');
+Route::get('/platform/admin/organizations', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'list'])->name('platform.admin.organizations');
+Route::get('/platform/admin/organizations/list', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'list'])->name('platform.admin.organizations.list');
+Route::get('/platform/admin/organizations/details/{organization}', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'details'])->name('platform.admin.organizations.details');
+Route::get('/platform/admin/organizations/points', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'points'])->name('platform.admin.organizations.points');
+Route::get('/platform/admin/organizations/points/{organization}', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'pointsDetail'])->name('platform.admin.organizations.points.detail');
+Route::post('/platform/admin/organizations/points/{organization}/adjust', [\App\Http\Controllers\PlatformAdmin\Organizations\Controller::class, 'adjustPoints'])->name('platform.admin.organizations.points.adjust');
 
 // ========== 사용자 관리 ==========
-Route::get('/platform/admin/users', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'list'])->name('platform.admin.users');
-Route::get('/platform/admin/users/list', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'list'])->name('platform.admin.users.list');
-Route::get('/platform/admin/users/details/{user}', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'details'])->name('platform.admin.users.details');
-Route::get('/platform/admin/users/activity-logs', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'activityLogs'])->name('platform.admin.users.activity-logs');
-Route::get('/platform/admin/users/reports', [\App\Http\Controllers\PlatformAdmin\UsersController::class, 'reports'])->name('platform.admin.users.reports');
+Route::get('/platform/admin/users', [\App\Http\Controllers\PlatformAdmin\Users\Controller::class, 'list'])->name('platform.admin.users');
+Route::get('/platform/admin/users/list', [\App\Http\Controllers\PlatformAdmin\Users\Controller::class, 'list'])->name('platform.admin.users.list');
+Route::get('/platform/admin/users/details/{user}', [\App\Http\Controllers\PlatformAdmin\Users\Controller::class, 'details'])->name('platform.admin.users.details');
+Route::get('/platform/admin/users/activity-logs', [\App\Http\Controllers\PlatformAdmin\Users\Controller::class, 'activityLogs'])->name('platform.admin.users.activity-logs');
+Route::get('/platform/admin/users/reports', [\App\Http\Controllers\PlatformAdmin\Users\Controller::class, 'reports'])->name('platform.admin.users.reports');
 
 // ========== 결제 관리 ==========
-Route::get('/platform/admin/payments', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'list'])->name('platform.admin.payments');
-Route::get('/platform/admin/payments/history', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'history'])->name('platform.admin.payments.history');
-Route::get('/platform/admin/payments/details/{billingHistory}', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'details'])->name('platform.admin.payments.details');
-Route::get('/platform/admin/payments/refunds', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'refunds'])->name('platform.admin.payments.refunds');
-Route::post('/platform/admin/payments/{billingHistory}/cancel', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'cancel'])->name('platform.admin.payments.cancel');
-Route::post('/platform/admin/payments/{billingHistory}/refund', [\App\Http\Controllers\PlatformAdmin\PaymentsController::class, 'refund'])->name('platform.admin.payments.refund');
+Route::get('/platform/admin/payments', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'list'])->name('platform.admin.payments');
+Route::get('/platform/admin/payments/history', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'history'])->name('platform.admin.payments.history');
+Route::get('/platform/admin/payments/details/{billingHistory}', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'details'])->name('platform.admin.payments.details');
+Route::get('/platform/admin/payments/refunds', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'refunds'])->name('platform.admin.payments.refunds');
+Route::post('/platform/admin/payments/{billingHistory}/cancel', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'cancel'])->name('platform.admin.payments.cancel');
+Route::post('/platform/admin/payments/{billingHistory}/refund', [\App\Http\Controllers\PlatformAdmin\Payments\Controller::class, 'refund'])->name('platform.admin.payments.refund');
 
 // ========== 권한 관리 ==========
-Route::get('/platform/admin/permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'overview'])->name('platform.admin.permissions');
-Route::get('/platform/admin/permissions/overview', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'overview'])->name('platform.admin.permissions.overview');
-Route::get('/platform/admin/permissions/roles', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'roles'])->name('platform.admin.permissions.roles');
-Route::get('/platform/admin/permissions/permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'permissions'])->name('platform.admin.permissions.permissions');
-Route::get('/platform/admin/permissions/users', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'users'])->name('platform.admin.permissions.users');
-Route::get('/platform/admin/permissions/audit', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'audit'])->name('platform.admin.permissions.audit');
-Route::get('/platform/admin/permissions/audit/details/{id}', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'auditDetails'])->name('platform.admin.permissions.audit.details');
+Route::get('/platform/admin/permissions', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'overview'])->name('platform.admin.permissions');
+Route::get('/platform/admin/permissions/overview', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'overview'])->name('platform.admin.permissions.overview');
+Route::get('/platform/admin/permissions/roles', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'roles'])->name('platform.admin.permissions.roles');
+Route::get('/platform/admin/permissions/permissions', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'permissions'])->name('platform.admin.permissions.permissions');
+Route::get('/platform/admin/permissions/users', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'users'])->name('platform.admin.permissions.users');
+Route::get('/platform/admin/permissions/audit', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'audit'])->name('platform.admin.permissions.audit');
+Route::get('/platform/admin/permissions/audit/details/{id}', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'auditDetails'])->name('platform.admin.permissions.audit.details');
 
 // ========== 권한 관리 API ==========
-Route::post('/platform/admin/permissions/users/change-role', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'changeUserRole'])->name('platform.admin.permissions.users.change-role');
-Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
-Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\Controllers\PlatformAdmin\PermissionsController::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
+Route::post('/platform/admin/permissions/users/change-role', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'changeUserRole'])->name('platform.admin.permissions.users.change-role');
+Route::post('/platform/admin/permissions/users/toggle-status', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'toggleUserStatus'])->name('platform.admin.permissions.users.toggle-status');
+Route::post('/platform/admin/permissions/users/update-tenant-permissions', [\App\Http\Controllers\PlatformAdmin\Permissions\Controller::class, 'updateTenantPermissions'])->name('platform.admin.permissions.users.update-tenant-permissions');
 
 // ========== 요금제 관리 ==========
-Route::get('/platform/admin/pricing', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing');
-Route::get('/platform/admin/pricing/overview', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'overview'])->name('platform.admin.pricing.overview');
-Route::get('/platform/admin/pricing/subscriptions', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'subscriptions'])->name('platform.admin.pricing.subscriptions');
-Route::get('/platform/admin/pricing/analytics', [\App\Http\Controllers\PlatformAdmin\PricingController::class, 'analytics'])->name('platform.admin.pricing.analytics');
+Route::get('/platform/admin/pricing', [\App\Http\Controllers\PlatformAdmin\Pricing\Controller::class, 'overview'])->name('platform.admin.pricing');
+Route::get('/platform/admin/pricing/overview', [\App\Http\Controllers\PlatformAdmin\Pricing\Controller::class, 'overview'])->name('platform.admin.pricing.overview');
+Route::get('/platform/admin/pricing/subscriptions', [\App\Http\Controllers\PlatformAdmin\Pricing\Controller::class, 'subscriptions'])->name('platform.admin.pricing.subscriptions');
+Route::get('/platform/admin/pricing/analytics', [\App\Http\Controllers\PlatformAdmin\Pricing\Controller::class, 'analytics'])->name('platform.admin.pricing.analytics');
 
 // ========== 샌드박스 관리 ==========
-Route::get('/platform/admin/sandboxes', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'list'])->name('platform.admin.sandboxes');
-Route::get('/platform/admin/sandboxes/list', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'list'])->name('platform.admin.sandboxes.list');
-Route::get('/platform/admin/sandboxes/templates', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'templates'])->name('platform.admin.sandboxes.templates');
-Route::get('/platform/admin/sandboxes/usage', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'usage'])->name('platform.admin.sandboxes.usage');
-Route::get('/platform/admin/sandboxes/settings', [\App\Http\Controllers\PlatformAdmin\SandboxesController::class, 'settings'])->name('platform.admin.sandboxes.settings');
+Route::get('/platform/admin/sandboxes', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'list'])->name('platform.admin.sandboxes');
+Route::get('/platform/admin/sandboxes/list', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'list'])->name('platform.admin.sandboxes.list');
+Route::get('/platform/admin/sandboxes/templates', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'templates'])->name('platform.admin.sandboxes.templates');
+Route::get('/platform/admin/sandboxes/usage', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'usage'])->name('platform.admin.sandboxes.usage');
+Route::get('/platform/admin/sandboxes/settings', [\App\Http\Controllers\PlatformAdmin\Sandboxes\Controller::class, 'settings'])->name('platform.admin.sandboxes.settings');
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
 Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {
@@ -681,7 +681,7 @@ Route::get('/sandbox/projects-list', function () {
 })->name('sandbox.projects-list');
 
 // 샌드박스 사용 프로젝트 목록
-Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjectsController::class, 'index'])->name('sandbox.using-projects');
+Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjects\Controller::class, 'index'])->name('sandbox.using-projects');
 
 // 자료 다운로드 페이지
 Route::get('/sandbox/downloads', function () {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Organization\SearchMembers;
 
-use App\Http\Controllers\ApiRequest;
+use App\Http\Controllers\Api\Core\Request as ApiRequest;
 
 class Request extends ApiRequest
 {

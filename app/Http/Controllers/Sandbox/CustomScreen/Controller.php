@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Sandbox\CustomScreen;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Response;
 
-class RawController extends Controller
+class Controller extends \App\Http\Controllers\Controller
 {
     public function show($id)
     {

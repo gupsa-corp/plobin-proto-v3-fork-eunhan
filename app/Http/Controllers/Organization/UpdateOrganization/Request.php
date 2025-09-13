@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Organization\UpdateOrganization;
 
-use App\Http\Controllers\ApiRequest;
+use App\Http\Controllers\Api\Core\Request as ApiRequest;
 use Illuminate\Validation\Rule;
 
 class Request extends ApiRequest
