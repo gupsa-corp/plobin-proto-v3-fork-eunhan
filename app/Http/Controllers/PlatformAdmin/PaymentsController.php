@@ -80,7 +80,7 @@ class PaymentsController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('900-page-platform-admin.904-payments.100-history.000-index', [
+        return view('900-page-platform-admin.904-payments.000-history.000-index', [
             'billingHistories' => $billingHistories,
             'organizations' => $organizations,
             'filters' => [

@@ -13,19 +13,19 @@
                 </div>
                 
                 {{-- 탭 네비게이션 --}}
-                @include('900-page-platform-admin.905-page-permissions.300-tab-navigation')
+                @include('900-page-platform-admin.905-permissions.300-tab-navigation')
                 
                 {{-- 권한 설정 콘텐츠 --}}
                 <div>
-                    @include('900-page-platform-admin.905-page-permissions.902-tab-permissions.100-header')
-                    @include('900-page-platform-admin.905-page-permissions.902-tab-permissions.200-content-main')
+                    @include('900-page-platform-admin.905-permissions.902-tab-permissions.100-header')
+                    @include('900-page-platform-admin.905-permissions.902-tab-permissions.200-content-main')
                 </div>
             </div>
         </div>
     </div>
     
     {{-- JavaScript --}}
-    @include('900-page-platform-admin.905-page-permissions.400-js-permissions')
+    @include('900-page-platform-admin.905-permissions.400-js-permissions')
     
     @livewireScripts
 </body>

@@ -13,21 +13,21 @@
                 </div>
                 
                 {{-- 탭 네비게이션 --}}
-                @include('900-page-platform-admin.905-page-permissions.300-tab-navigation')
+                @include('900-page-platform-admin.905-permissions.300-tab-navigation')
                 
                 {{-- 역할 관리 콘텐츠 --}}
                 <div>
-                    @include('900-page-platform-admin.905-page-permissions.901-tab-roles.100-header')
-                    @include('900-page-platform-admin.905-page-permissions.901-tab-roles.200-content-main')
+                    @include('900-page-platform-admin.905-permissions.901-tab-roles.100-header')
+                    @include('900-page-platform-admin.905-permissions.901-tab-roles.200-content-main')
                 </div>
             </div>
         </div>
     </div>
     
     {{-- 기존 모달과 JavaScript는 Livewire 컴포넌트에서 처리하므로 제거 --}}
-    {{-- @include('900-page-platform-admin.905-page-permissions.310-modal-create-role') --}}
+    {{-- @include('900-page-platform-admin.905-permissions.310-modal-create-role') --}}
     
-    {{-- @include('900-page-platform-admin.905-page-permissions.400-js-permissions') --}}
+    {{-- @include('900-page-platform-admin.905-permissions.400-js-permissions') --}}
     
     @livewireScripts
 </body>

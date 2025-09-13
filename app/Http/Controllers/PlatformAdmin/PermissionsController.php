@@ -3,13 +3,21 @@
 namespace App\Http\Controllers\PlatformAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PermissionsController extends Controller
 {
     public function overview()
     {
-        return view('900-page-platform-admin.905-permissions.000-overview.000-index');
+        $organizations = Organization::orderBy('name')->get();
+        $users = User::with('organizations')->paginate(15);
+        
+        return view('900-page-platform-admin.905-permissions.000-overview.000-index', [
+            'organizations' => $organizations,
+            'users' => $users
+        ]);
     }
 
     public function roles()
