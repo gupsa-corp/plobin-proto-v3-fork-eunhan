@@ -1,5 +1,5 @@
 {{-- 샌드박스 간트 차트 템플릿 --}}
-<?php 
+<?php
     $commonPath = storage_path('sandbox/storage-sandbox-template/common.php');
     require_once $commonPath;
     $screenInfo = getCurrentScreenInfo();
@@ -71,72 +71,25 @@
                     </div>
                     <div class="flex-1 relative flex items-center" style="height: 60px;">
                         {{-- 간트 바 --}}
-                        <div class="absolute inset-y-0 flex items-center" 
+                        <div class="absolute inset-y-0 flex items-center"
                              style="left: {{ ($startDay - 1) * 32 }}px; width: {{ $duration * 32 }}px;">
                             <div class="w-full h-6 {{ $color }} rounded-lg relative overflow-hidden">
-                                <div class="h-full bg-black bg-opacity-20 rounded-lg" 
+                                <div class="h-full bg-black bg-opacity-20 rounded-lg"
                                      style="width: {{ $progress }}%"></div>
                                 <div class="absolute inset-0 flex items-center justify-center">
                                     <span class="text-white text-xs font-medium">{{ $progress }}%</span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         {{-- 날짜 구분선들 --}}
                         @for($day = 1; $day <= 30; $day++)
-                            <div class="absolute inset-y-0 border-r border-gray-100" 
+                            <div class="absolute inset-y-0 border-r border-gray-100"
                                  style="left: {{ $day * 32 }}px;"></div>
                         @endfor
                     </div>
                 </div>
             @endfor
-        </div>
-    </div>
-
-    {{-- 범례 --}}
-    <div class="mt-6 bg-white rounded-lg shadow-sm p-4">
-        <h4 class="text-sm font-semibold text-gray-900 mb-3">범례</h4>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 bg-blue-500 rounded"></div>
-                <span class="text-sm text-gray-600">개발</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 bg-green-500 rounded"></div>
-                <span class="text-sm text-gray-600">디자인</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 bg-purple-500 rounded"></div>
-                <span class="text-sm text-gray-600">기획</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 bg-yellow-500 rounded"></div>
-                <span class="text-sm text-gray-600">테스트</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-4 h-4 bg-red-500 rounded"></div>
-                <span class="text-sm text-gray-600">배포</span>
-            </div>
-        </div>
-    </div>
-
-    {{-- 통계 --}}
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="text-sm text-gray-600">전체 프로젝트</div>
-            <div class="text-2xl font-bold text-gray-900">8</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="text-sm text-gray-600">순조진행</div>
-            <div class="text-2xl font-bold text-green-600">5</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="text-sm text-gray-600">지연</div>
-            <div class="text-2xl font-bold text-red-600">2</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-4">
-            <div class="text-sm text-gray-600">완료</div>
-            <div class="text-2xl font-bold text-blue-600">1</div>
         </div>
     </div>
 </div>
