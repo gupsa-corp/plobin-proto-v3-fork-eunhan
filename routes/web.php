@@ -739,3 +739,4 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mypage/delete', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
     Route::get('/api/user/organization-status', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
 });
+

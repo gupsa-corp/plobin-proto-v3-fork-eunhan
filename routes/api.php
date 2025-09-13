@@ -133,7 +133,7 @@ Route::prefix('organizations')->group(function () {
         Route::get('/licenses/usage', [\App\Http\Controllers\OrganizationBilling\Licenses\Controller::class, 'usage']);
 
         // 토스페이먼츠 결제 검증 API
-        Route::post('/verify-payment', [\App\Http\Controllers\OrganizationBilling\VerifyPayment\VerifyPaymentController::class, 'verify']);
+        Route::post('/verify-payment', [\App\Http\Controllers\OrganizationBilling\VerifyPayment\Controller::class, 'verify']);
         Route::post('/download-receipt', [\App\Http\Controllers\OrganizationBilling\DownloadReceipt\Controller::class, 'download']);
     });
 });
