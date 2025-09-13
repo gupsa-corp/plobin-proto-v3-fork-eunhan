@@ -144,16 +144,16 @@
                             </label>
                             
                             {{-- 입력 필드 타입별 렌더링 --}}
-                            <div x-show="component.type === 'text' || component.type === 'email' || component.type === 'password'">
+                            <template x-if="component.type === 'text' || component.type === 'email' || component.type === 'password'">
                                 <input :type="component.type || 'text'"
                                        :name="component.key"
                                        :placeholder="component.placeholder || ''"
                                        :required="component.required"
                                        x-model="formData[component.key]"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-                            </div>
+                            </template>
                             
-                            <div x-show="component.type === 'textarea'">
+                            <template x-if="component.type === 'textarea'">
                                 <textarea :name="component.key"
                                          :placeholder="component.placeholder || ''"
                                          :required="component.required"
@@ -161,9 +161,9 @@
                                          x-model="formData[component.key]"
                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
                                 </textarea>
-                            </div>
+                            </template>
                             
-                            <div x-show="component.type === 'select'">
+                            <template x-if="component.type === 'select'">
                                 <select :name="component.key"
                                         :required="component.required"
                                         x-model="formData[component.key]"
@@ -173,9 +173,9 @@
                                         <option :value="option.value" x-text="option.label"></option>
                                     </template>
                                 </select>
-                            </div>
+                            </template>
                             
-                            <div x-show="component.type === 'radio'">
+                            <template x-if="component.type === 'radio'">
                                 <div class="space-y-2">
                                     <template x-for="option in component.options" :key="option.value">
                                         <label class="flex items-center">
@@ -189,9 +189,9 @@
                                         </label>
                                     </template>
                                 </div>
-                            </div>
+                            </template>
                             
-                            <div x-show="component.type === 'checkbox'">
+                            <template x-if="component.type === 'checkbox'">
                                 <label class="flex items-center">
                                     <input type="checkbox" 
                                            :name="component.key"
@@ -200,7 +200,7 @@
                                            class="mr-2 text-purple-600 focus:ring-purple-500 rounded">
                                     <span x-text="component.checkboxLabel || component.label"></span>
                                 </label>
-                            </div>
+                            </template>
                             
                             {{-- 도움말 텍스트 --}}
                             <p x-show="component.helpText" 
@@ -338,7 +338,7 @@ function formExecutionData() {
         // 연결 상태 확인
         async checkConnection() {
             try {
-                const response = await fetch('http://localhost:8500/sandbox/form-creator', {
+                const response = await fetch('/sandbox/storage-sandbox-template/backend/form-creator.php?action=status', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
@@ -346,8 +346,15 @@ function formExecutionData() {
                 });
                 
                 if (response.ok) {
-                    this.connectionStatus = 'connected';
-                    this.connectionStatusText = '연결됨';
+                    const result = await response.json();
+                    if (result.success) {
+                        this.connectionStatus = 'connected';
+                        this.connectionStatusText = '연결됨';
+                        console.log('DB 상태:', result.data.database);
+                    } else {
+                        this.connectionStatus = 'disconnected';
+                        this.connectionStatusText = '연결 오류';
+                    }
                 } else {
                     this.connectionStatus = 'disconnected';
                     this.connectionStatusText = '연결 실패';
@@ -546,14 +553,14 @@ function formExecutionData() {
             this.isSubmitting = true;
             
             try {
-                const submitUrl = this.currentForm.settings?.submitUrl || 'http://localhost:8500/sandbox/form-creator';
-                const method = this.currentForm.settings?.method || 'POST';
+                const submitUrl = '/api/sandbox/form-submission/save';
                 
                 const response = await fetch(submitUrl, {
-                    method: method,
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
                     body: JSON.stringify({
                         formName: this.currentForm.name,
@@ -564,13 +571,22 @@ function formExecutionData() {
                 
                 if (response.ok) {
                     const result = await response.json();
-                    this.submitResult = {
-                        success: true,
-                        data: result,
-                        message: '성공적으로 제출되었습니다'
-                    };
+                    if (result.success) {
+                        this.submitResult = {
+                            success: true,
+                            data: result.data,
+                            message: result.message || '성공적으로 제출되었습니다'
+                        };
+                        console.log('폼 제출 완료:', result.data);
+                        
+                        // 폼 리셋
+                        this.resetForm();
+                    } else {
+                        throw new Error(result.message || '서버에서 오류가 발생했습니다');
+                    }
                 } else {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
             } catch (error) {
                 this.submitResult = {
@@ -578,6 +594,7 @@ function formExecutionData() {
                     data: null,
                     message: error.message
                 };
+                console.error('폼 제출 오류:', error);
             }
             
             this.isSubmitting = false;

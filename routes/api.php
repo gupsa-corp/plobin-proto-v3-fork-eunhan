@@ -234,6 +234,12 @@ Route::prefix('sandbox')->group(function () {
         Route::delete('/delete/{filename}', \App\Http\Controllers\Sandbox\FormCreator\Delete\Controller::class);
     });
 
+    // Form Submission API
+    Route::prefix('form-submission')->group(function () {
+        Route::post('/save', \App\Http\Controllers\Sandbox\FormSubmission\Save\Controller::class);
+        Route::get('/list', \App\Http\Controllers\Sandbox\FormSubmission\List\Controller::class);
+        Route::delete('/delete/{id}', \App\Http\Controllers\Sandbox\FormSubmission\Delete\Controller::class);
+    });
 
     // Form Publisher API
     Route::prefix('form-publisher')->group(function () {
