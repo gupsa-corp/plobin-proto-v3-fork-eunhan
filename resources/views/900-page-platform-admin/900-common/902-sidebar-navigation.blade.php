@@ -16,7 +16,6 @@
             <li>
                 <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">대시보드</div>
                 <ul class="space-y-1 ml-2">
-                    <li><a href="{{ route('platform.admin.dashboard.overview') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard*') ? 'bg-blue-50 text-blue-700' : '' }}">📊 개요</a></li>
                     <li><a href="{{ route('platform.admin.dashboard.statistics') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard.statistics') ? 'bg-blue-50 text-blue-700' : '' }}">📈 통계</a></li>
                     <li><a href="{{ route('platform.admin.dashboard.activities') }}" class="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md {{ request()->routeIs('platform.admin.dashboard.activities') ? 'bg-blue-50 text-blue-700' : '' }}">🕒 최근 활동</a></li>
                 </ul>

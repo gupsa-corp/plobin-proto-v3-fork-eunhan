@@ -19,9 +19,8 @@ return [
     // '/organizations/{id}/projects/{projectId}' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard'], // 보호된 라우트에서 처리
     '/organizations/{id}/projects/{projectId}/dashboard' => ['view' => '300-page-service.308-page-project-dashboard.000-index', 'name' => 'project.dashboard.full'],
     // 플랫폼 관리자 라우트들 (platform/admin/{페이지별 경로}) - 새 구조
-    '/platform/admin' => ['view' => '900-page-platform-admin.901-dashboard.000-overview.000-index', 'name' => 'platform.admin.dashboard'],
-    '/platform/admin/dashboard' => ['view' => '900-page-platform-admin.901-dashboard.000-overview.000-index', 'name' => 'platform.admin.dashboard.full'],
-    '/platform/admin/dashboard/overview' => ['view' => '900-page-platform-admin.901-dashboard.000-overview.000-index', 'name' => 'platform.admin.dashboard.overview'],
+    '/platform/admin' => ['view' => '900-page-platform-admin.901-dashboard.100-statistics.000-index', 'name' => 'platform.admin.dashboard'],
+    '/platform/admin/dashboard' => ['view' => '900-page-platform-admin.901-dashboard.100-statistics.000-index', 'name' => 'platform.admin.dashboard.full'],
     '/platform/admin/dashboard/statistics' => ['view' => '900-page-platform-admin.901-dashboard.100-statistics.000-index', 'name' => 'platform.admin.dashboard.statistics'],
     '/platform/admin/dashboard/recent-activities' => ['view' => '900-page-platform-admin.901-dashboard.200-activities.000-index', 'name' => 'platform.admin.dashboard.activities'],
     

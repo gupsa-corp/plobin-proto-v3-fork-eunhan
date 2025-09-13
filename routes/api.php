@@ -282,6 +282,8 @@ Route::prefix('platform/admin/pricing')->group(function () {
     Route::get('/plans/{id}', [PlatformAdminPricingController::class, 'showPlan']);
     Route::put('/plans/{id}', [PlatformAdminPricingController::class, 'updatePlan']);
     Route::delete('/plans/{id}', [PlatformAdminPricingController::class, 'deletePlan']);
+    Route::get('/subscriptions', [PlatformAdminPricingController::class, 'getSubscriptions']);
+    Route::put('/subscriptions/{id}', [PlatformAdminPricingController::class, 'updateSubscription']);
 });
 
 // 플랫폼 관리자 - 권한 관리 API (개발용 - 인증 없음)

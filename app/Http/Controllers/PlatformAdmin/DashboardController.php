@@ -11,34 +11,6 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function overview()
-    {
-        // Simplified version for testing
-        $stats = [
-            'organizations' => [
-                'total' => 0,
-                'active' => 0,
-                'new_this_month' => 0,
-            ],
-            'users' => [
-                'total' => 0,
-                'new_this_month' => 0,
-            ],
-            'revenue' => [
-                'total' => 0,
-                'this_month' => 0,
-            ],
-            'points' => [
-                'total_issued' => 0,
-                'total_used' => 0,
-                'outstanding' => 0,
-            ]
-        ];
-        
-        return view('900-page-platform-admin.901-dashboard.000-overview.000-index', [
-            'stats' => $stats
-        ]);
-    }
 
     public function statistics()
     {

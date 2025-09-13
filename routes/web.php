@@ -484,9 +484,8 @@ Route::get('/organizations/{id}/settings/users', [\App\Http\Controllers\Organiza
 // 추후 배포시 ->middleware(['auth', 'role:platform_admin']) 적용 예정
 
 // ========== 대시보드 ==========
-Route::get('/platform/admin', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard');
-Route::get('/platform/admin/dashboard', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard.full');
-Route::get('/platform/admin/dashboard/overview', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'overview'])->name('platform.admin.dashboard.overview');
+Route::get('/platform/admin', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard');
+Route::get('/platform/admin/dashboard', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard.full');
 Route::get('/platform/admin/dashboard/statistics', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'statistics'])->name('platform.admin.dashboard.statistics');
 Route::get('/platform/admin/dashboard/recent-activities', [\App\Http\Controllers\PlatformAdmin\DashboardController::class, 'recentActivities'])->name('platform.admin.dashboard.activities');
 

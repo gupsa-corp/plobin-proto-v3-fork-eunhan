@@ -36,6 +36,11 @@ class Subscription extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    public function pricingPlan(): BelongsTo
+    {
+        return $this->belongsTo(PricingPlan::class, 'plan_name', 'slug');
+    }
+
     public function billingHistories(): HasMany
     {
         return $this->hasMany(BillingHistory::class);
