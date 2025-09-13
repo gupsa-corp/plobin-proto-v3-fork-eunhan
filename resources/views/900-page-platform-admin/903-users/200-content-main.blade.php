@@ -145,7 +145,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('usersManagement', () => ({
         searchTerm: '',
         statusFilter: '',
-        users: @json($users ?? []),
+        users: @json($users->items() ?? []),
         filteredUsers: [],
 
         init() {

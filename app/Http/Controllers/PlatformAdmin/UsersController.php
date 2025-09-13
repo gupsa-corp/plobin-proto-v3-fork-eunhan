@@ -10,7 +10,7 @@ class UsersController extends Controller
 {
     public function list(Request $request)
     {
-        $query = User::with(['organizations']);
+        $query = User::with(['organizations'])->withCount('organizations');
 
         // 검색
         if ($request->filled('search')) {
@@ -22,6 +22,11 @@ class UsersController extends Controller
         }
 
         $users = $query->latest()->paginate($request->get('per_page', 15));
+        
+        // 각 사용자를 배열 형태로 변환
+        $users->getCollection()->transform(function ($user) {
+            return $user->toArrayWithRole();
+        });
 
         return view('900-page-platform-admin.903-users.000-list.000-index', [
             'users' => $users,
