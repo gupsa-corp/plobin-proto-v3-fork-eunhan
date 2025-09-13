@@ -375,15 +375,18 @@
          @click="closeSidebar()"></div>
 
     {{-- 프로젝트 생성 모달 --}}
-    <div x-show="createModalOpen" 
-         x-transition:enter="transition ease-out duration-300"
+    <div x-show="createModalOpen"
+         x-cloak
+         x-transition:enter="transition-opacity duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave="transition-opacity duration-300"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-         @click.self="closeCreateModal()">
+         @click.self="closeCreateModal()"
+         style="display: none !important;"
+         :style="createModalOpen ? 'display: flex !important;' : 'display: none !important;'">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
