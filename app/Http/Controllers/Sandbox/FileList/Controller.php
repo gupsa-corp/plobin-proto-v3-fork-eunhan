@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 
-class Controller extends \App\Http\Controllers\ApiController
+class Controller extends \App\Http\Controllers\Controller
 {
     /**
      * 현재 선택된 샌드박스의 파일 목록을 반환

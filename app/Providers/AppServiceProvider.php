@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Services\ViewService;
 use App\Services\ComponentService;
+use App\Services\StorageCommonService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ComponentService::class, function ($app) {
             return new ComponentService();
+        });
+
+        // SandboxHelper Facade를 위한 서비스 등록
+        $this->app->singleton('sandbox.helper', function ($app) {
+            return new StorageCommonService();
         });
     }
 

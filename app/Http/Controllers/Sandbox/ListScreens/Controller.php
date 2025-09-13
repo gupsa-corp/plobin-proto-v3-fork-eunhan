@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Sandbox\ListScreens;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
-class Controller extends \App\Http\Controllers\ApiController
+class Controller extends \App\Http\Controllers\Controller
 {
     /**
      * 선택된 샌드박스의 화면(스크린) 목록을 반환

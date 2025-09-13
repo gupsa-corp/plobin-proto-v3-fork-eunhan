@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Sandbox\ListSandboxes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
-class Controller extends \App\Http\Controllers\ApiController
+class Controller extends \App\Http\Controllers\Controller
 {
     /**
      * 샌드박스 디렉토리 목록을 반환

@@ -155,12 +155,6 @@ Route::prefix('projects')->group(function () {
     Route::post('/{project}/sandboxes/{sandbox}/copy', [ProjectSandboxController::class, 'copy']);
 });
 
-// 페이지 커스텀 화면 API (개발용 - 인증 없음)
-Route::prefix('pages')->group(function () {
-    Route::post('/{pageId}/custom-screen', [\App\Http\CoreApi\Page\SetCustomScreen\Controller::class, 'setCustomScreen']);
-});
-
-
 
 // 테스트용 결제 API (인증 없음 - 개발용)
 Route::prefix('test/organizations')->group(function () {
@@ -207,7 +201,7 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/uploaded-files/{id}', [SandboxFileUploadController::class, 'show']);
     Route::get('/uploaded-files/{id}/download', [SandboxFileUploadController::class, 'download']);
     Route::delete('/uploaded-files/{id}', [SandboxFileUploadController::class, 'destroy']);
-    
+
     // 샌드박스 템플릿 downloads 파일 목록 API
     Route::get('/sandbox-files', [SandboxFileUploadController::class, 'getSandboxFiles']);
 
@@ -245,37 +239,37 @@ Route::prefix('sandbox')->group(function () {
     Route::prefix('form-publisher')->group(function () {
         Route::post('/save', \App\Http\Controllers\Sandbox\FormPublisher\Save\Controller::class);
     });
-    
+
     // 샌드박스 템플릿 백엔드 API 프록시
     Route::any('storage-sandbox-template/backend/api.php/{path?}', function ($path = '') {
         $apiFile = storage_path('sandbox/storage-sandbox-template/backend/api.php');
-        
+
         if (!file_exists($apiFile)) {
             return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다.'], 404);
         }
-        
+
         // 원래 URI를 API 파일에 맞게 설정
         $_SERVER['REQUEST_URI'] = '/backend/api.php/' . $path;
-        
+
         // 출력 버퍼링 시작
         ob_start();
-        
+
         // API 파일 실행
         $result = include $apiFile;
-        
+
         // 출력 내용 캡처
         $output = ob_get_clean();
-        
+
         // 결과가 배열이면 JSON으로 반환
         if (is_array($result)) {
             return response()->json($result);
         }
-        
+
         // 출력이 있으면 그대로 반환 (이미 JSON 헤더가 설정되어 있을 것)
         if (!empty($output)) {
             return response($output)->header('Content-Type', 'application/json');
         }
-        
+
         return response()->json(['success' => false, 'message' => '응답이 없습니다.'], 500);
     })->where('path', '.*');
 });
@@ -308,20 +302,20 @@ Route::get('/core/permissions', [\App\Http\Controllers\Core\Permissions\Controll
 // E2E 테스트 API (개발용 - 인증 없음)
 Route::prefix('test/e2e')->group(function () {
     // 시스템 상태 조회
-    Route::get('/status', [\App\Http\Controllers\Api\Test\Controller::class, 'status']);
+    // Route::get('/status', [\App\Http\Controllers\Api\Test\Controller::class, 'status']);
 
     // 함수 실행 테스트
-    Route::post('/execute-function', [\App\Http\Controllers\Api\Test\Controller::class, 'executeFunction']);
+    // Route::post('/execute-function', [\App\Http\Controllers\Api\Test\Controller::class, 'executeFunction']);
 
     // 파일 조회/쿼리 테스트
-    Route::get('/query-files', [\App\Http\Controllers\Api\Test\Controller::class, 'queryFiles']);
+    // Route::get('/query-files', [\App\Http\Controllers\Api\Test\Controller::class, 'queryFiles']);
 
     // 파일 수정 테스트
-    Route::post('/modify-files', [\App\Http\Controllers\Api\Test\Controller::class, 'modifyFiles']);
+    // Route::post('/modify-files', [\App\Http\Controllers\Api\Test\Controller::class, 'modifyFiles']);
 
     // 함수 정보 조회
-    Route::get('/function-info/{functionName}', [\App\Http\Controllers\Api\Test\Controller::class, 'getFunctionInfo']);
+    // Route::get('/function-info/{functionName}', [\App\Http\Controllers\Api\Test\Controller::class, 'getFunctionInfo']);
 
     // 테스트 함수 생성
-    Route::post('/create-test-function', [\App\Http\Controllers\Api\Test\Controller::class, 'createTestFunction']);
+    // Route::post('/create-test-function', [\App\Http\Controllers\Api\Test\Controller::class, 'createTestFunction']);
 });
