@@ -44,6 +44,28 @@ class CronManager extends Component
         $this->resetValidation();
     }
 
+    public function openEditModal($jobId)
+    {
+        $job = SandboxCronJob::findOrFail($jobId);
+        
+        $this->editingJobId = $jobId;
+        $this->name = $job->name;
+        $this->description = $job->description ?? '';
+        $this->schedule = $job->schedule;
+        $this->type = $job->type;
+        $this->target = $job->target;
+        $this->is_active = $job->is_active;
+        
+        $this->showEditModal = true;
+    }
+
+    public function closeEditModal()
+    {
+        $this->showEditModal = false;
+        $this->editingJobId = null;
+        $this->resetValidation();
+    }
+
     public function createJob()
     {
         $this->validate();
@@ -61,6 +83,27 @@ class CronManager extends Component
 
         $this->closeCreateModal();
         session()->flash('message', 'Cron job created successfully.');
+    }
+
+    public function updateJob()
+    {
+        $this->validate();
+
+        $job = SandboxCronJob::findOrFail($this->editingJobId);
+        
+        $job->update([
+            'name' => $this->name,
+            'description' => $this->description,
+            'schedule' => $this->schedule,
+            'type' => $this->type,
+            'target' => $this->target,
+            'is_active' => $this->is_active,
+        ]);
+
+        $job->updateNextRunTime();
+
+        $this->closeEditModal();
+        session()->flash('message', 'Cron job updated successfully.');
     }
 
     public function toggleJob($jobId)

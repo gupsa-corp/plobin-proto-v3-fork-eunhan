@@ -50,13 +50,26 @@ $(document).ready(function() {
             }
         });
         
-        // Make form components sortable
+        // Make form components sortable with enhanced settings
         $('#form-components').sortable({
             handle: '.component-wrapper',
-            placeholder: 'sortable-placeholder',
+            placeholder: 'sortable-placeholder bg-blue-100 border-2 border-dashed border-blue-300 rounded-md mb-4',
             tolerance: 'pointer',
+            axis: 'y',
+            cursor: 'move',
+            opacity: 0.8,
+            revert: 100,
+            start: function(event, ui) {
+                ui.item.addClass('sorting-active');
+                $('.component-wrapper').not(ui.item).addClass('sorting-inactive');
+            },
+            stop: function(event, ui) {
+                ui.item.removeClass('sorting-active');
+                $('.component-wrapper').removeClass('sorting-inactive');
+            },
             update: function(event, ui) {
                 updateComponentOrder();
+                showNotification('컴포넌트 순서가 변경되었습니다', 'success');
             }
         });
     }
@@ -227,8 +240,8 @@ $(document).ready(function() {
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">Text Input</label>
-                    <input type="text" class="component-input w-full border border-gray-300 rounded-md px-3 py-2 text-sm" placeholder="Enter text...">
+                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">텍스트 입력</label>
+                    <input type="text" class="component-input w-full border border-gray-300 rounded-md px-3 py-2 text-sm" placeholder="텍스트를 입력하세요...">
                 </div>
             </div>
         `;
@@ -250,7 +263,7 @@ $(document).ready(function() {
                         </button>
                     </div>
                     <button class="component-button bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-                        Button
+                        버튼
                     </button>
                 </div>
             </div>
@@ -272,7 +285,7 @@ $(document).ready(function() {
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <h2 class="component-header text-xl font-bold text-gray-900">Header Text</h2>
+                    <h2 class="component-header text-xl font-bold text-gray-900">제목 텍스트</h2>
                 </div>
             </div>
         `;
@@ -293,8 +306,8 @@ $(document).ready(function() {
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">Text Area</label>
-                    <textarea class="component-textarea w-full border border-gray-300 rounded-md px-3 py-2 text-sm" rows="4" placeholder="Enter text..."></textarea>
+                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">텍스트 영역</label>
+                    <textarea class="component-textarea w-full border border-gray-300 rounded-md px-3 py-2 text-sm" rows="4" placeholder="텍스트를 입력하세요..."></textarea>
                 </div>
             </div>
         `;
@@ -315,12 +328,12 @@ $(document).ready(function() {
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">Dropdown</label>
+                    <label class="component-label block text-sm font-medium text-gray-700 mb-2">드롭다운</label>
                     <select class="component-select w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                        <option value="">Select an option</option>
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
+                        <option value="">옵션을 선택하세요</option>
+                        <option value="option1">옵션 1</option>
+                        <option value="option2">옵션 2</option>
+                        <option value="option3">옵션 3</option>
                     </select>
                 </div>
             </div>
@@ -344,7 +357,7 @@ $(document).ready(function() {
                     </div>
                     <div class="flex items-center">
                         <input type="checkbox" class="component-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label class="component-label ml-2 text-sm text-gray-700">Checkbox Option</label>
+                        <label class="component-label ml-2 text-sm text-gray-700">체크박스 옵션</label>
                     </div>
                 </div>
             </div>
@@ -367,19 +380,19 @@ $(document).ready(function() {
                         </button>
                     </div>
                     <fieldset>
-                        <legend class="component-label text-sm font-medium text-gray-700 mb-2">Radio Group</legend>
+                        <legend class="component-label text-sm font-medium text-gray-700 mb-2">라디오 그룹</legend>
                         <div class="space-y-2">
                             <div class="flex items-center">
                                 <input type="radio" name="${componentId}_radio" class="h-4 w-4 text-blue-600 border-gray-300" value="option1">
-                                <label class="ml-2 text-sm text-gray-700">Option 1</label>
+                                <label class="ml-2 text-sm text-gray-700">옵션 1</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="radio" name="${componentId}_radio" class="h-4 w-4 text-blue-600 border-gray-300" value="option2">
-                                <label class="ml-2 text-sm text-gray-700">Option 2</label>
+                                <label class="ml-2 text-sm text-gray-700">옵션 2</label>
                             </div>
                             <div class="flex items-center">
                                 <input type="radio" name="${componentId}_radio" class="h-4 w-4 text-blue-600 border-gray-300" value="option3">
-                                <label class="ml-2 text-sm text-gray-700">Option 3</label>
+                                <label class="ml-2 text-sm text-gray-700">옵션 3</label>
                             </div>
                         </div>
                     </fieldset>
@@ -406,7 +419,7 @@ $(document).ready(function() {
                     <div class="text-center py-4 text-gray-500">
                         <i class="fas fa-puzzle-piece text-2xl mb-2"></i>
                         <p class="text-sm font-medium">${componentType.charAt(0).toUpperCase() + componentType.slice(1)}</p>
-                        <p class="text-xs">Component placeholder</p>
+                        <p class="text-xs">컴포넌트 자리표시자</p>
                     </div>
                 </div>
             </div>
@@ -418,13 +431,13 @@ $(document).ready(function() {
      */
     function getDefaultProperties(componentType) {
         const defaults = {
-            input: { label: 'Text Input', name: 'text_input', placeholder: 'Enter text...', required: false },
-            button: { label: 'Button', text: 'Button', type: 'button' },
-            header: { text: 'Header Text', level: 'h2' },
-            textarea: { label: 'Text Area', name: 'text_area', placeholder: 'Enter text...', rows: 4 },
-            dropdown: { label: 'Dropdown', name: 'dropdown', options: ['Option 1', 'Option 2', 'Option 3'] },
-            checkbox: { label: 'Checkbox Option', name: 'checkbox', value: 'option' },
-            radiogroup: { label: 'Radio Group', name: 'radio_group', options: ['Option 1', 'Option 2', 'Option 3'] }
+            input: { label: '텍스트 입력', name: 'text_input', placeholder: '텍스트를 입력하세요...', required: false },
+            button: { label: '버튼', text: '버튼', type: 'button' },
+            header: { text: '제목 텍스트', level: 'h2' },
+            textarea: { label: '텍스트 영역', name: 'text_area', placeholder: '텍스트를 입력하세요...', rows: 4 },
+            dropdown: { label: '드롭다운', name: 'dropdown', options: ['옵션 1', '옵션 2', '옵션 3'] },
+            checkbox: { label: '체크박스 옵션', name: 'checkbox', value: 'option' },
+            radiogroup: { label: '라디오 그룹', name: 'radio_group', options: ['옵션 1', '옵션 2', '옵션 3'] }
         };
         
         return defaults[componentType] || { label: componentType, name: componentType };
@@ -516,7 +529,7 @@ $(document).ready(function() {
         updateFormData();
         
         // Show success message
-        showNotification('Properties applied successfully', 'success');
+        showNotification('속성이 성공적으로 적용되었습니다', 'success');
     }
     
     /**
@@ -534,7 +547,7 @@ $(document).ready(function() {
      * Delete component
      */
     function deleteComponent(componentId) {
-        if (confirm('Are you sure you want to delete this component?')) {
+        if (confirm('이 컴포넌트를 삭제하시겠습니까?')) {
             $(`#${componentId}`).remove();
             
             // Remove from form data
@@ -560,7 +573,7 @@ $(document).ready(function() {
      * Update component count
      */
     function updateComponentCount() {
-        $('#component-count').text(`Components: ${formData.components.length}`);
+        $('#component-count').text(`컴포넌트: ${formData.components.length}개`);
     }
     
     /**
@@ -617,7 +630,7 @@ $(document).ready(function() {
         const description = $('#form-description-input').val().trim();
         
         if (!name) {
-            showNotification('Please enter a form name', 'error');
+            showNotification('폼 이름을 입력해주세요', 'error');
             return;
         }
         
@@ -644,12 +657,12 @@ $(document).ready(function() {
                 data: JSON.stringify(formData)
             },
             success: function(response) {
-                showNotification('Form saved successfully!', 'success');
+                showNotification('폼이 성공적으로 저장되었습니다!', 'success');
                 $('#form-status').text('Saved');
                 loadFormsList(); // Refresh forms list
             },
             error: function(xhr) {
-                showNotification('Error saving form: ' + xhr.responseJSON.message, 'error');
+                showNotification('폼 저장 중 오류가 발생했습니다: ' + (xhr.responseJSON?.message || '알 수 없는 오류'), 'error');
             }
         });
     }
@@ -670,7 +683,7 @@ $(document).ready(function() {
         linkElement.setAttribute('download', exportFileDefaultName);
         linkElement.click();
         
-        showNotification('Form exported successfully!', 'success');
+        showNotification('폼이 성공적으로 내보내졌습니다!', 'success');
     }
     
     /**
@@ -692,9 +705,9 @@ $(document).ready(function() {
             try {
                 const importedData = JSON.parse(e.target.result);
                 loadFormData(importedData);
-                showNotification('Form imported successfully!', 'success');
+                showNotification('폼을 성공적으로 가져왔습니다!', 'success');
             } catch (error) {
-                showNotification('Error importing form: Invalid JSON file', 'error');
+                showNotification('폼 가져오기 오류: 유효하지 않은 JSON 파일입니다', 'error');
             }
         };
         reader.readAsText(file);
@@ -847,7 +860,7 @@ $(document).ready(function() {
      * Clear form
      */
     function clearForm() {
-        if (confirm('Are you sure you want to clear all components?')) {
+        if (confirm('모든 컴포넌트를 초기화하시겠습니까?')) {
             $('#form-components').empty();
             formData = { name: '', description: '', components: [], settings: {} };
             componentCounter = 0;
@@ -858,7 +871,7 @@ $(document).ready(function() {
             showEmptyState();
             updateComponentCount();
             
-            showNotification('Form cleared', 'info');
+            showNotification('폼이 초기화되었습니다', 'info');
         }
     }
     
@@ -955,10 +968,10 @@ $(document).ready(function() {
                 const formData = JSON.parse(response.data);
                 loadFormData(formData);
                 hideFormManager();
-                showNotification('Form loaded successfully!', 'success');
+                showNotification('폼을 성공적으로 불러왔습니다!', 'success');
             },
             error: function(xhr) {
-                showNotification('Error loading form: ' + xhr.responseJSON.message, 'error');
+                showNotification('폼 불러오기 오류: ' + (xhr.responseJSON?.message || '알 수 없는 오류'), 'error');
             }
         });
     }
@@ -967,16 +980,16 @@ $(document).ready(function() {
      * Delete form
      */
     function deleteForm(filename) {
-        if (confirm('Are you sure you want to delete this form?')) {
+        if (confirm('이 폼을 삭제하시겠습니까?')) {
             $.ajax({
                 url: '/api/sandbox/form-creator/delete/' + filename,
                 method: 'DELETE',
                 success: function(response) {
-                    showNotification('Form deleted successfully!', 'success');
+                    showNotification('폼이 성공적으로 삭제되었습니다!', 'success');
                     loadFormsList();
                 },
                 error: function(xhr) {
-                    showNotification('Error deleting form: ' + xhr.responseJSON.message, 'error');
+                    showNotification('폼 삭제 오류: ' + (xhr.responseJSON?.message || '알 수 없는 오류'), 'error');
                 }
             });
         }
@@ -998,7 +1011,7 @@ $(document).ready(function() {
                 linkElement.setAttribute('download', filename);
                 linkElement.click();
                 
-                showNotification('Form exported successfully!', 'success');
+                showNotification('폼이 성공적으로 내보내졌습니다!', 'success');
             },
             error: function(xhr) {
                 showNotification('Error exporting form: ' + xhr.responseJSON.message, 'error');
@@ -1029,13 +1042,13 @@ $(document).ready(function() {
      * New form
      */
     function newForm() {
-        if (formData.components.length > 0 && !confirm('Are you sure you want to create a new form? Unsaved changes will be lost.')) {
+        if (formData.components.length > 0 && !confirm('새 폼을 생성하시겠습니까? 저장되지 않은 변경사항이 손실됩니다.')) {
             return;
         }
         
         clearForm();
         hideFormManager();
-        showNotification('New form created', 'info');
+        showNotification('새 폼이 생성되었습니다', 'info');
     }
     
     /**
@@ -1131,12 +1144,12 @@ $(document).ready(function() {
         
         if (formData.components.length === 0) {
             $treeEmpty.show();
-            $componentCount.text('0 components');
+            $componentCount.text('컴포넌트 0개');
             return;
         }
         
         $treeEmpty.hide();
-        $componentCount.text(`${formData.components.length} component${formData.components.length > 1 ? 's' : ''}`);
+        $componentCount.text(`컴포넌트 ${formData.components.length}개`);
         
         formData.components.forEach((component, index) => {
             const $treeItem = createTreeItem(component, index);
@@ -1254,7 +1267,7 @@ $(document).ready(function() {
     function applyFormSettings() {
         updateFormSettings();
         applyThemeSettings();
-        showNotification('Settings applied successfully!', 'success');
+        showNotification('설정이 성공적으로 적용되었습니다!', 'success');
     }
     
     /**
@@ -1264,7 +1277,7 @@ $(document).ready(function() {
         formData.settings = {};
         loadFormSettings();
         applyThemeSettings();
-        showNotification('Settings reset to defaults', 'info');
+        showNotification('설정이 기본값으로 초기화되었습니다', 'info');
     }
     
     /**
@@ -1343,7 +1356,7 @@ $(document).ready(function() {
                             <span>${date}</span>
                             <span class="mx-2">•</span>
                             <i class="fas fa-puzzle-piece mr-1"></i>
-                            <span>${form.component_count} components</span>
+                            <span>컴포넌트 ${form.component_count}개</span>
                         </div>
                     </div>
                     <div class="flex ml-2">

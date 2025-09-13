@@ -103,6 +103,53 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Enhanced Sortable Styles */
+        .sorting-active {
+            transform: rotate(2deg) scale(1.05);
+            z-index: 1000;
+            opacity: 0.9;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+        
+        .sorting-inactive {
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+        
+        .sortable-placeholder {
+            background: linear-gradient(45deg, #dbeafe 25%, transparent 25%), 
+                        linear-gradient(-45deg, #dbeafe 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #dbeafe 75%), 
+                        linear-gradient(-45deg, transparent 75%, #dbeafe 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+            border: 2px dashed #3b82f6;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sortable-placeholder::before {
+            content: '여기에 놓기';
+            color: #3b82f6;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .component-wrapper {
+            transition: all 0.2s ease;
+            cursor: move;
+        }
+        
+        .component-wrapper:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-100">

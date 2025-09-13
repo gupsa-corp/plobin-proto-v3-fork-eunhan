@@ -69,6 +69,7 @@ class Component extends LivewireComponent
     {
         $this->selectedTable = $tableName;
         $this->sqlQuery = "SELECT * FROM {$tableName} LIMIT 100;";
+        $this->dispatch('queryUpdated');
     }
 
     private function getSandboxConnection()
@@ -229,7 +230,9 @@ class Component extends LivewireComponent
     {
         $this->sqlQuery = '';
         $this->executionResult = null;
+        $this->selectedTable = null;
         $this->resetPage();
+        $this->dispatch('queryCleared');
     }
 
     public function toggleHistory()

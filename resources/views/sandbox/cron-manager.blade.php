@@ -62,6 +62,10 @@
                                         class="text-green-600 hover:text-green-900">
                                     실행
                                 </button>
+                                <button wire:click="openEditModal({{ $job->id }})" 
+                                        class="text-blue-600 hover:text-blue-900">
+                                    편집
+                                </button>
                                 <button wire:click="deleteJob({{ $job->id }})"
                                         class="text-red-600 hover:text-red-900"
                                         onclick="return confirm('정말 삭제하시겠습니까?')">
@@ -165,6 +169,92 @@
                             <button type="submit" 
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 생성
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Edit Modal -->
+    @if($showEditModal)
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Cron Job 편집</h3>
+                    
+                    <form wire:submit.prevent="updateJob">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                Job 이름 *
+                            </label>
+                            <input wire:model="name" 
+                                   type="text" 
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                설명
+                            </label>
+                            <textarea wire:model="description" 
+                                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                스케줄 (Cron 표현식) *
+                            </label>
+                            <input wire:model="schedule" 
+                                   type="text" 
+                                   placeholder="* * * * *"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            @error('schedule') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            <p class="text-xs text-gray-500 mt-1">예: "0 * * * *" (매시간), "0 0 * * *" (매일)</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                타입 *
+                            </label>
+                            <select wire:model="type" 
+                                    class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="url">URL</option>
+                                <option value="command">Command</option>
+                                <option value="class">Class</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                대상 *
+                            </label>
+                            <input wire:model="target" 
+                                   type="text" 
+                                   placeholder="URL, 명령어 또는 클래스명"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            @error('target') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" wire:model="is_active" class="mr-2">
+                                <span class="text-gray-700 text-sm font-bold">활성화</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" 
+                                    wire:click="closeEditModal"
+                                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                취소
+                            </button>
+                            <button type="submit" 
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                수정
                             </button>
                         </div>
                     </form>
