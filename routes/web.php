@@ -634,54 +634,6 @@ Route::get('/sandbox/documentation-manager', function () {
     return view('700-page-sandbox.710-page-documentation-manager.000-index');
 })->name('sandbox.documentation-manager');
 
-// Custom Screens
-Route::get('/sandbox/custom-screens', function () {
-    return view('700-page-sandbox.706-page-custom-screens.000-index');
-})->name('sandbox.custom-screens');
-
-
-// 실시간 템플릿 화면들 - 직접 경로
-Route::get('/sandbox/live-dashboard', function () {
-    return view('700-page-sandbox.706-page-custom-screens.100-live-dashboard');
-})->name('sandbox.live-dashboard');
-
-Route::get('/sandbox/live-project-list', function () {
-    return view('700-page-sandbox.706-page-custom-screens.101-live-project-list');
-})->name('sandbox.live-project-list');
-
-Route::get('/sandbox/live-table-view', function () {
-    return view('700-page-sandbox.706-page-custom-screens.102-live-table-view');
-})->name('sandbox.live-table-view');
-
-Route::get('/sandbox/live-kanban-board', function () {
-    return view('700-page-sandbox.706-page-custom-screens.103-live-kanban-board');
-})->name('sandbox.live-kanban-board');
-
-Route::get('/sandbox/live-gantt-chart', function () {
-    return view('700-page-sandbox.706-page-custom-screens.104-live-gantt-chart');
-})->name('sandbox.live-gantt-chart');
-
-Route::get('/sandbox/live-calendar-view', function () {
-    return view('700-page-sandbox.706-page-custom-screens.105-live-calendar-view');
-})->name('sandbox.live-calendar-view');
-
-// Custom Screen Creator
-Route::get('/sandbox/custom-screen-creator', function () {
-    return view('700-page-sandbox.707-page-custom-screen-creator.000-index');
-})->name('sandbox.custom-screen-creator');
-
-// Organizations List (Generated Custom Screen)
-Route::get('/sandbox/organizations-list', function () {
-    return view('700-page-sandbox.713-page-organizations-list.000-index');
-})->name('sandbox.organizations-list');
-// 화면 (Generated Custom Screen)
-Route::get('/sandbox/custom-screen-1757421612', function () {
-    return view('700-page-sandbox.717-page-custom-screen-1757421612.000-index');
-})->name('sandbox.custom-screen-1757421612');
-// 프로젝트 목록 (Generated Custom Screen)
-Route::get('/sandbox/projects-list', function () {
-    return view('700-page-sandbox.715-page-projects-list.000-index');
-})->name('sandbox.projects-list');
 
 // 샌드박스 사용 프로젝트 목록
 Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjects\Controller::class, 'index'])->name('sandbox.using-projects');

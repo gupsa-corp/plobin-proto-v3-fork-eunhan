@@ -88,22 +88,10 @@
             <div class="mb-2">
                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">개발 도구</div>
                 <div class="flex flex-wrap gap-2">
-                    <!-- API 개발 -->
-                    <a href="/sandbox/api-list" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        📋 API 목록
-                    </a>
                     
                     <!-- 화면 개발 (커스텀 화면) -->
                     <a href="/sandbox/custom-screens" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors font-medium border border-indigo-200">
                         📱 커스텀 화면 관리
-                    </a>
-                    <a href="/sandbox/custom-screen-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors font-medium border border-indigo-200">
-                        ✨ 화면 생성기
-                    </a>
-                    
-                    <!-- 기존 블레이드 도구 -->
-                    <a href="/sandbox/blade-creator" class="inline-flex items-center px-3 py-1 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
-                        🎨 Blade 생성기
                     </a>
                     
                     <!-- 함수 개발 -->

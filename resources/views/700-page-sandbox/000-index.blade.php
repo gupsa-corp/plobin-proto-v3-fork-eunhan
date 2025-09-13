@@ -52,15 +52,6 @@
                 </a>
 
 
-                <a href="/sandbox/api-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">API 목록</h3>
-                    <p class="text-gray-600">생성된 API 목록 관리</p>
-                </a>
-
-                <a href="/sandbox/blade-creator" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Blade 생성기</h3>
-                    <p class="text-gray-600">Blade 템플릿 생성 및 미리보기</p>
-                </a>
 
                 <a href="/sandbox/blade-list" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Blade 목록</h3>

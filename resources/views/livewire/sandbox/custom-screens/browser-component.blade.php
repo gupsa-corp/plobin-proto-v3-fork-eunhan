@@ -7,13 +7,6 @@
             </h1>
             <p class="text-gray-600 mt-1">템플릿 화면들을 관리하고 미리보기할 수 있습니다. 모든 화면은 템플릿 스토리지에 저장됩니다.</p>
         </div>
-
-        <div class="flex space-x-3">
-            <a href="{{ route('sandbox.custom-screen-creator') }}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                ✨ 새 화면 만들기
-            </a>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -105,15 +98,6 @@
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
-                        <div class="text-gray-400 text-6xl mb-4">🎨</div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">템플릿 화면이 없습니다</h3>
-                        <p class="text-gray-500 mb-4">새로운 템플릿 화면을 만들어보세요!</p>
-                        <a href="{{ route('sandbox.custom-screen-creator') }}"
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            ✨ 첫 번째 템플릿 화면 만들기
-                        </a>
-                    </div>
                 @endforelse
             </div>
         </div>

@@ -23,27 +23,27 @@ return [
     '/platform/admin/dashboard' => ['view' => '900-page-platform-admin.901-dashboard.100-statistics.000-index', 'name' => 'platform.admin.dashboard.full'],
     '/platform/admin/dashboard/statistics' => ['view' => '900-page-platform-admin.901-dashboard.100-statistics.000-index', 'name' => 'platform.admin.dashboard.statistics'],
     '/platform/admin/dashboard/recent-activities' => ['view' => '900-page-platform-admin.901-dashboard.200-activities.000-index', 'name' => 'platform.admin.dashboard.activities'],
-    
+
     // 조직 관리
     '/platform/admin/organizations' => ['view' => '900-page-platform-admin.902-organizations.000-list.000-index', 'name' => 'platform.admin.organizations'],
     '/platform/admin/organizations/list' => ['view' => '900-page-platform-admin.902-organizations.000-list.000-index', 'name' => 'platform.admin.organizations.list'],
     '/platform/admin/organizations/details/{organization}' => ['view' => '900-page-platform-admin.902-organizations.100-details.000-index', 'name' => 'platform.admin.organizations.details'],
     '/platform/admin/organizations/points' => ['view' => '900-page-platform-admin.902-organizations.200-points.000-index', 'name' => 'platform.admin.organizations.points'],
     '/platform/admin/organizations/points/{organization}' => ['view' => '900-page-platform-admin.902-organizations.200-points.000-index', 'name' => 'platform.admin.organizations.points.detail'],
-    
+
     // 사용자 관리
     '/platform/admin/users' => ['view' => '900-page-platform-admin.903-users.000-list.000-index', 'name' => 'platform.admin.users'],
     '/platform/admin/users/list' => ['view' => '900-page-platform-admin.903-users.000-list.000-index', 'name' => 'platform.admin.users.list'],
     '/platform/admin/users/details/{user}' => ['view' => '900-page-platform-admin.903-users.100-details.000-index', 'name' => 'platform.admin.users.details'],
     '/platform/admin/users/activity-logs' => ['view' => '900-page-platform-admin.903-users.200-activity-logs.000-index', 'name' => 'platform.admin.users.activity-logs'],
     '/platform/admin/users/reports' => ['view' => '900-page-platform-admin.903-users.300-reports.000-index', 'name' => 'platform.admin.users.reports'],
-    
+
     // 결제 관리
     '/platform/admin/payments' => ['view' => '900-page-platform-admin.904-payments.000-history.000-index', 'name' => 'platform.admin.payments'],
     '/platform/admin/payments/history' => ['view' => '900-page-platform-admin.904-payments.000-history.000-index', 'name' => 'platform.admin.payments.history'],
     '/platform/admin/payments/details/{billingHistory}' => ['view' => '900-page-platform-admin.904-payments.100-details.000-index', 'name' => 'platform.admin.payments.details'],
     '/platform/admin/payments/refunds' => ['view' => '900-page-platform-admin.904-payments.200-refunds.000-index', 'name' => 'platform.admin.payments.refunds'],
-    
+
     // 권한 관리
     '/platform/admin/permissions' => ['view' => '900-page-platform-admin.905-permissions.000-overview.000-index', 'name' => 'platform.admin.permissions'],
     '/platform/admin/permissions/overview' => ['view' => '900-page-platform-admin.905-permissions.000-overview.000-index', 'name' => 'platform.admin.permissions.overview'],
@@ -52,13 +52,13 @@ return [
     '/platform/admin/permissions/users' => ['view' => '900-page-platform-admin.905-permissions.300-users.000-index', 'name' => 'platform.admin.permissions.users'],
     '/platform/admin/permissions/audit' => ['view' => '900-page-platform-admin.905-permissions.400-audit.000-index', 'name' => 'platform.admin.permissions.audit'],
     '/platform/admin/permissions/audit/details/{id}' => ['view' => '900-page-platform-admin.905-permissions.400-audit.100-details.000-index', 'name' => 'platform.admin.permissions.audit.details'],
-    
+
     // 요금제 관리
     '/platform/admin/pricing' => ['view' => '900-page-platform-admin.906-pricing.000-overview.000-index', 'name' => 'platform.admin.pricing'],
     '/platform/admin/pricing/overview' => ['view' => '900-page-platform-admin.906-pricing.000-overview.000-index', 'name' => 'platform.admin.pricing.overview'],
     '/platform/admin/pricing/subscriptions' => ['view' => '900-page-platform-admin.906-pricing.200-subscriptions.000-index', 'name' => 'platform.admin.pricing.subscriptions'],
     '/platform/admin/pricing/analytics' => ['view' => '900-page-platform-admin.906-pricing.300-analytics.000-index', 'name' => 'platform.admin.pricing.analytics'],
-    
+
     // 샌드박스 관리
     '/platform/admin/sandboxes' => ['view' => '900-page-platform-admin.907-sandboxes.000-list.000-index', 'name' => 'platform.admin.sandboxes'],
     '/platform/admin/sandboxes/list' => ['view' => '900-page-platform-admin.907-sandboxes.000-list.000-index', 'name' => 'platform.admin.sandboxes.list'],
@@ -80,11 +80,7 @@ return [
     '/sandbox/file-editor' => ['view' => '700-page-sandbox.704-page-file-editor.000-index', 'name' => 'sandbox.file-editor'],
     '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
     '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-page-git-version-control.000-index', 'name' => 'sandbox.git-version-control'],
-    '/sandbox/api-list' => ['view' => '700-page-sandbox.704-page-api-list.000-index', 'name' => 'sandbox.api-list'],
-    '/sandbox/blade-creator' => ['view' => '700-page-sandbox.705-page-blade-creator.000-index', 'name' => 'sandbox.blade-creator'],
     '/sandbox/custom-screens' => ['view' => '700-page-sandbox.706-page-custom-screens.000-index', 'name' => 'sandbox.custom-screens'],
-    '/sandbox/live-kanban-board' => ['view' => '700-page-sandbox.706-page-custom-screens.103-live-kanban-board', 'name' => 'sandbox.live-kanban-board'],
-    '/sandbox/custom-screen-creator' => ['view' => '700-page-sandbox.707-page-custom-screen-creator.000-index', 'name' => 'sandbox.custom-screen-creator'],
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
     '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],
     '/sandbox/form-creator' => ['view' => '700-page-sandbox.709-page-form-creator.000-index', 'name' => 'sandbox.form-creator'],
@@ -99,14 +95,7 @@ return [
     '/sandbox/function-automation' => ['view' => '700-page-sandbox.711-page-function-automation.000-index', 'name' => 'sandbox.function-automation'],
     '/sandbox/function-templates' => ['view' => '700-page-sandbox.712-page-function-templates.000-index', 'name' => 'sandbox.function-templates'],
     '/sandbox/scenario-manager' => ['view' => '700-page-sandbox.711-page-scenario-manager.000-index', 'name' => 'sandbox.scenario-manager'],
-    '/sandbox/organizations-list' => ['view' => '700-page-sandbox.713-page-organizations-list.000-index', 'name' => 'sandbox.organizations-list'],
-    '/sandbox/custom-screen/preview/{id}' => ['view' => '700-page-sandbox.714-page-custom-screen-preview.000-index', 'name' => 'sandbox.custom-screen-preview'],
-    '/sandbox/custom-screen/raw/{id}' => ['controller' => 'App\Http\Controllers\Sandbox\CustomScreen\RawController@show', 'name' => 'sandbox.custom-screen-raw'],
-    '/sandbox/{storage_name}/{screen_folder_name}' => ['controller' => 'App\Http\Controllers\Sandbox\CustomScreen\RawController@showByPath', 'name' => 'sandbox.custom-screen-by-path'],
     '/sandbox/using-projects' => ['view' => '700-page-sandbox.716-page-using-projects.000-index', 'name' => 'sandbox.using-projects'],
-    '/sandbox/projects-list' => ['view' => '700-page-sandbox.715-page-projects-list.000-index', 'name' => 'sandbox.projects-list'],
-
-    '/sandbox/custom-screen-1757421612' => ['view' => '700-page-sandbox.717-page-custom-screen-1757421612.000-index', 'name' => 'sandbox.custom-screen-1757421612'],
     '/sandbox/downloads' => ['view' => '700-page-sandbox.718-page-downloads.000-index', 'name' => 'sandbox.downloads'],
     '/sandbox/cron-manager' => ['view' => '700-page-sandbox.719-page-cron-manager.000-index', 'name' => 'sandbox.cron-manager'],
     '/sandbox/callback-manager' => ['view' => '700-page-sandbox.720-page-callback-manager.000-index', 'name' => 'sandbox.callback-manager'],
