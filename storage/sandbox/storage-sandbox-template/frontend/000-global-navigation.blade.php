@@ -27,6 +27,8 @@
                     <option value="007-screen-multi-file-upload">007-screen-multi-file-upload</option>
                     <option value="008-screen-file-list">008-screen-file-list</option>
                     <option value="008-screen-uploaded-files-list">008-screen-uploaded-files-list</option>
+                    <option value="009-screen-analysis-requests">009-screen-analysis-requests</option>
+                    <option value="010-screen-pms-summary-requests">010-screen-pms-summary-requests</option>
                     <option value="100-pms-common">100-pms-common</option>
                 </select>
             </div>

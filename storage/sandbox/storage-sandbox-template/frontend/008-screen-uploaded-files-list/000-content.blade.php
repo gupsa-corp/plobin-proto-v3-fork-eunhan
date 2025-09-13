@@ -19,13 +19,6 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button class="px-3 py-1 text-sm bg-white shadow-sm rounded-md text-green-600">파일 목록</button>
-                    <a href="<?= getScreenUrl('frontend', '007-screen-multi-file-upload') ?>"
-                       class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded-md">
-                        파일 업로드
-                    </a>
-                </div>
                 <button onclick="openUploadModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">새 파일 업로드</button>
             </div>
         </div>
@@ -88,17 +81,8 @@
         <div class="bg-white rounded-lg shadow-md">
             <!-- 테이블 헤더 -->
             <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center space-x-4">
-                    <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <span class="text-sm font-medium text-gray-700">전체 선택</span>
-                    <div class="ml-auto space-x-2" id="bulk-actions" style="display: none;">
-                        <button type="button" onclick="bulkDownload()" class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-1 px-3 rounded">
-                            다운로드
-                        </button>
-                        <button type="button" onclick="bulkDelete()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded">
-                            삭제
-                        </button>
-                    </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700">파일 목록</span>
                 </div>
             </div>
 
@@ -251,7 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('type-filter').addEventListener('change', handleFilterChange);
     document.getElementById('sort-select').addEventListener('change', handleSortChange);
     document.getElementById('per-page-select').addEventListener('change', handlePerPageChange);
-    document.getElementById('select-all').addEventListener('change', handleSelectAll);
     document.getElementById('prev-page').addEventListener('click', () => changePage(currentPage - 1));
     document.getElementById('next-page').addEventListener('click', () => changePage(currentPage + 1));
 });
@@ -356,8 +339,6 @@ function renderFiles() {
     const filesHtml = currentFiles.map(file => `
         <div class="px-6 py-4 hover:bg-gray-50">
             <div class="flex items-center space-x-4">
-                <input type="checkbox" class="file-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                       data-file-id="${file.id}">
                 <div class="flex-shrink-0">
                     ${getFileIcon(file.mime_type)}
                 </div>
@@ -377,14 +358,23 @@ function renderFiles() {
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <button type="button" onclick="requestAnalysis(${file.id})"
+                            class="text-purple-600 hover:text-purple-800 p-1"
+                            title="분석 요청">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </button>
                     <button type="button" onclick="downloadFile(${file.id})"
-                            class="text-blue-600 hover:text-blue-800 p-1">
+                            class="text-blue-600 hover:text-blue-800 p-1"
+                            title="다운로드">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </button>
                     <button type="button" onclick="deleteFile(${file.id})"
-                            class="text-red-600 hover:text-red-800 p-1">
+                            class="text-red-600 hover:text-red-800 p-1"
+                            title="삭제">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -400,11 +390,6 @@ function renderFiles() {
 
     // 새로운 파일 목록 추가 (loadingState와 emptyState 뒤에)
     container.insertAdjacentHTML('beforeend', filesHtml);
-
-    // 체크박스 이벤트 리스너 추가
-    document.querySelectorAll('.file-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateBulkActions);
-    });
 }
 
 function getFileIcon(mimeType) {
@@ -506,23 +491,6 @@ function handlePerPageChange() {
     loadFiles();
 }
 
-function handleSelectAll() {
-    const selectAll = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('.file-checkbox');
-
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAll.checked;
-    });
-
-    updateBulkActions();
-}
-
-function updateBulkActions() {
-    const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
-    const bulkActions = document.getElementById('bulk-actions');
-
-    bulkActions.style.display = checkedBoxes.length > 0 ? 'block' : 'none';
-}
 
 function clearFilters() {
     document.getElementById('search-input').value = '';
@@ -676,59 +644,48 @@ async function deleteFile(fileId) {
     }
 }
 
-async function bulkDownload() {
-    const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
-    const fileIds = Array.from(checkedBoxes).map(cb => cb.dataset.fileId);
+async function requestAnalysis(fileId) {
+    const file = currentFiles.find(f => f.id == fileId);
+    if (!file) {
+        showNotification('파일을 찾을 수 없습니다.', 'error');
+        return;
+    }
 
-    if (fileIds.length === 0) return;
+    if (!confirm(`${file.original_name} 파일의 분석을 요청하시겠습니까?`)) return;
 
     try {
-        showNotification('다운로드를 준비하는 중...', 'info');
+        const response = await fetch('/api/sandbox/analysis-request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({
+                file_id: fileId,
+                file_name: file.original_name,
+                file_path: file.file_path,
+                mime_type: file.mime_type,
+                file_size: file.file_size
+            })
+        });
 
-        // 개별 파일 다운로드 (실제로는 ZIP 다운로드 API를 사용할 수 있습니다)
-        for (const fileId of fileIds) {
-            await downloadFile(fileId);
-            await new Promise(resolve => setTimeout(resolve, 500)); // 다운로드 간격
+        if (!response.ok) {
+            throw new Error('분석 요청에 실패했습니다.');
         }
 
-        showNotification(`${fileIds.length}개 파일 다운로드가 완료되었습니다.`, 'success');
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('분석 요청이 등록되었습니다.', 'success');
+        } else {
+            throw new Error(result.message || '분석 요청에 실패했습니다.');
+        }
     } catch (error) {
-        console.error('Error bulk downloading files:', error);
-        showNotification('일부 파일 다운로드에 실패했습니다.', 'error');
+        console.error('Error requesting analysis:', error);
+        showNotification('분석 요청에 실패했습니다: ' + error.message, 'error');
     }
 }
 
-async function bulkDelete() {
-    const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
-    const fileIds = Array.from(checkedBoxes).map(cb => cb.dataset.fileId);
-
-    if (fileIds.length === 0) return;
-
-    if (!confirm(`${fileIds.length}개 파일을 삭제하시겠습니까?`)) return;
-
-    try {
-        showNotification('파일 삭제 중...', 'info');
-
-        for (const fileId of fileIds) {
-            const response = await fetch(`<?= getApiUrl("uploaded-files") ?>/${fileId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`파일 ${fileId} 삭제 실패`);
-            }
-        }
-
-        showNotification(`${fileIds.length}개 파일이 삭제되었습니다.`, 'success');
-        loadFiles();
-    } catch (error) {
-        console.error('Error bulk deleting files:', error);
-        showNotification('일부 파일 삭제에 실패했습니다.', 'error');
-    }
-}
 
 function showFileDetails(fileId) {
     const file = currentFiles.find(f => f.id == fileId);

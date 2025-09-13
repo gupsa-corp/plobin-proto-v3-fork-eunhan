@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * PMS 요약 요청 통계 API 엔드포인트
+ * GET /api/sandbox/pms-summary-statistics
+ */
+
+// CORS 헤더 설정
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-CSRF-TOKEN');
+
+// OPTIONS 요청 처리
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+// GET 요청만 허용
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
+try {
+    // PMS 요약 요청 매니저 로드
+    require_once __DIR__ . '/../200-rfx-common/pms-summary-requests.php';
+    
+    $manager = getPMSSummaryRequestManager();
+    $result = $manager->getStatistics();
+    
+    sendJsonResponse($result);
+    
+} catch (Exception $e) {
+    error_log("PMS summary statistics API error: " . $e->getMessage());
+    sendJsonResponse([
+        'success' => false,
+        'message' => 'PMS 요약 통계 조회 중 오류가 발생했습니다: ' . $e->getMessage()
+    ], 500);
+}
+
+/**
+ * API 응답 헬퍼 함수
+ */
+function sendJsonResponse($data, $statusCode = 200) {
+    http_response_code($statusCode);
+    header('Content-Type: application/json');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    exit;
+}
