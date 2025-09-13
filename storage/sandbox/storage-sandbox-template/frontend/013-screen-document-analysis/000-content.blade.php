@@ -1027,33 +1027,222 @@ function documentAnalysisData(fileId) {
             }
         },
 
-        // 현재 JSON 저장
+        // 기존 저장 기능 (JSON 관리 모달 열기)
         async saveCurrentJson() {
+            this.showJsonManager = true;
+            this.generateDefaultFileName();
+        },
+
+        // 로컬스토리지에서 저장된 파일 목록 로드
+        loadSavedJsonFiles() {
+            try {
+                const saved = localStorage.getItem('documentAnalysis_savedFiles');
+                this.savedJsonFiles = saved ? JSON.parse(saved) : [];
+            } catch (error) {
+                console.error('Error loading saved files:', error);
+                this.savedJsonFiles = [];
+            }
+        },
+
+        // 기본 파일명 생성
+        generateDefaultFileName() {
+            const fileName = this.fileNames[this.fileId] || '알 수 없는 파일';
+            const shortName = fileName.replace(/\.[^/.]+$/, ""); // 확장자 제거
+            this.saveFileName = `${shortName}_${this.currentJsonVersion}_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '-')}`;
+        },
+
+        // 로컬 스토리지에 저장
+        async saveToLocalStorage() {
+            try {
+                if (!this.saveFileName.trim()) {
+                    this.showNotification('파일명을 입력해주세요.', 'error');
+                    return;
+                }
+
+                const jsonData = {
+                    id: Date.now().toString(),
+                    fileName: this.saveFileName.trim(),
+                    version: this.currentJsonVersion,
+                    fileId: this.fileId,
+                    originalFileName: this.fileNames[this.fileId],
+                    assets: this.documentData.assets,
+                    sectionsCount: this.documentData.assets?.length || 0,
+                    createdAt: new Date().toISOString()
+                };
+
+                // 기존 저장된 파일 목록에 추가
+                this.savedJsonFiles.unshift(jsonData);
+                
+                // 로컬스토리지에 저장
+                localStorage.setItem('documentAnalysis_savedFiles', JSON.stringify(this.savedJsonFiles));
+                
+                this.showNotification(`'${this.saveFileName}' 파일이 로컬 저장소에 저장되었습니다!`, 'success');
+                this.saveFileName = '';
+                this.generateDefaultFileName();
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+                this.showNotification('로컬 저장에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 현재 JSON을 파일로 다운로드
+        async downloadCurrentJson() {
             try {
                 const jsonData = {
                     version: this.currentJsonVersion,
                     fileId: this.fileId,
                     fileName: this.fileNames[this.fileId],
                     assets: this.documentData.assets,
+                    sectionsCount: this.documentData.assets?.length || 0,
                     createdAt: new Date().toISOString()
                 };
-
-                // JSON 파일로 다운로드
+                
                 const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `document-analysis-${this.currentJsonVersion}-file${this.fileId}-${Date.now()}.json`;
+                const downloadFileName = this.saveFileName.trim() || `document-analysis-${this.currentJsonVersion}-file${this.fileId}-${Date.now()}`;
+                a.download = `${downloadFileName}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
 
-                this.showNotification(`JSON 파일이 성공적으로 저장되었습니다! (${this.currentJsonVersion})`, 'success');
+                this.showNotification(`JSON 파일이 성공적으로 다운로드되었습니다!`, 'success');
             } catch (error) {
-                console.error('Error saving JSON:', error);
-                this.showNotification('JSON 저장에 실패했습니다: ' + error.message, 'error');
+                console.error('Error downloading JSON:', error);
+                this.showNotification('JSON 다운로드에 실패했습니다: ' + error.message, 'error');
             }
+        },
+
+        // 로컬 스토리지에서 불러오기
+        async loadFromLocalStorage(fileId) {
+            try {
+                const savedFile = this.savedJsonFiles.find(file => file.id === fileId);
+                if (!savedFile) {
+                    this.showNotification('저장된 파일을 찾을 수 없습니다.', 'error');
+                    return;
+                }
+
+                this.isLoading = true;
+                
+                // 데이터 로드
+                this.documentData.assets = savedFile.assets;
+                this.currentJsonVersion = savedFile.version;
+                this.fileId = savedFile.fileId;
+                
+                // URL 업데이트
+                const url = new URL(window.location);
+                url.searchParams.set('file_id', this.fileId.toString());
+                window.history.replaceState({}, '', url);
+                
+                this.isLoading = false;
+                this.showJsonManager = false;
+                this.showNotification(`'${savedFile.fileName}' 파일을 성공적으로 불러왔습니다!`, 'success');
+            } catch (error) {
+                this.isLoading = false;
+                console.error('Error loading from localStorage:', error);
+                this.showNotification('파일 불러오기에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 로컬 스토리지에서 삭제
+        async deleteFromLocalStorage(fileId) {
+            try {
+                if (!confirm('정말로 이 파일을 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                this.savedJsonFiles = this.savedJsonFiles.filter(file => file.id !== fileId);
+                localStorage.setItem('documentAnalysis_savedFiles', JSON.stringify(this.savedJsonFiles));
+                
+                this.showNotification('파일이 성공적으로 삭제되었습니다.', 'success');
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                this.showNotification('파일 삭제에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 모든 로컬 스토리지 데이터 삭제
+        async clearAllLocalStorage() {
+            try {
+                if (!confirm('정말로 모든 저장된 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                    return;
+                }
+
+                localStorage.removeItem('documentAnalysis_savedFiles');
+                this.savedJsonFiles = [];
+                
+                this.showNotification('모든 저장된 데이터가 삭제되었습니다.', 'success');
+            } catch (error) {
+                console.error('Error clearing localStorage:', error);
+                this.showNotification('데이터 삭제에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 파일 업로드 처리
+        async handleFileUpload(event) {
+            try {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const jsonData = JSON.parse(e.target.result);
+                        
+                        // JSON 데이터 검증
+                        if (!jsonData.assets || !Array.isArray(jsonData.assets)) {
+                            this.showNotification('올바른 문서 분석 JSON 파일이 아닙니다.', 'error');
+                            return;
+                        }
+
+                        this.isLoading = true;
+                        
+                        // 데이터 로드
+                        this.documentData.assets = jsonData.assets;
+                        this.currentJsonVersion = jsonData.version || 'v1';
+                        
+                        if (jsonData.fileId && this.fileNames[jsonData.fileId]) {
+                            this.fileId = jsonData.fileId;
+                            const url = new URL(window.location);
+                            url.searchParams.set('file_id', this.fileId.toString());
+                            window.history.replaceState({}, '', url);
+                        }
+                        
+                        this.isLoading = false;
+                        this.showJsonManager = false;
+                        this.showNotification(`JSON 파일을 성공적으로 불러왔습니다! (${jsonData.sectionsCount || jsonData.assets.length}개 섹션)`, 'success');
+                        
+                        // 파일 입력 초기화
+                        event.target.value = '';
+                    } catch (parseError) {
+                        this.isLoading = false;
+                        console.error('Error parsing JSON:', parseError);
+                        this.showNotification('JSON 파일 파싱에 실패했습니다: ' + parseError.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                console.error('Error handling file upload:', error);
+                this.showNotification('파일 업로드 처리에 실패했습니다: ' + error.message, 'error');
+            }
+        },
+
+        // 총 저장 용량 계산 (KB)
+        getTotalStorageSize() {
+            try {
+                const dataString = JSON.stringify(this.savedJsonFiles);
+                return Math.round(new Blob([dataString]).size / 1024);
+            } catch (error) {
+                return 0;
+            }
+        },
+
+        // 고유 버전 수 계산
+        getUniqueVersionsCount() {
+            const versions = new Set(this.savedJsonFiles.map(file => file.version));
+            return versions.size;
         },
 
         // 파일 변경
