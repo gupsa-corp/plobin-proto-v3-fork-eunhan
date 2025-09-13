@@ -60,15 +60,21 @@ class RawController extends \App\Http\Controllers\Controller
         ];
         
         try {
-            // 임시 블레이드 파일 생성
-            $tempViewPath = 'sandbox-raw-' . time() . '-' . rand(1000, 9999);
-            $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
-            
-            File::put($tempViewFile, $templateContent);
-            
+            // 글로벌 네비게이션 템플릿 읽기 (첫 번째 메소드는 고정 경로 사용)
+            $globalNavPath = storage_path('sandbox/storage-sandbox-template/frontend/000-global-navigation.blade.php');
+            $globalNavContent = '';
+            if (File::exists($globalNavPath)) {
+                $globalNavContent = File::get($globalNavPath);
+            }
+
+            // 블레이드 템플릿 직접 렌더링 (임시 파일 없이)
             try {
-                // 블레이드 템플릿 렌더링
-                $renderedContent = view($tempViewPath, $sampleData)->render();
+                // 메인 컨텐츠 렌더링
+                $renderedContent = \Illuminate\Support\Facades\Blade::render($templateContent, $sampleData);
+                
+                // 글로벌 네비게이션 렌더링
+                $globalNavRendered = $globalNavContent ? 
+                    \Illuminate\Support\Facades\Blade::render($globalNavContent, $sampleData) : '';
                 
                 // HTML 문서로 감싸서 반환 (CSRF 토큰 포함)
                 $csrfToken = csrf_token();
@@ -78,14 +84,17 @@ class RawController extends \App\Http\Controllers\Controller
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="' . $csrfToken . '">
-    <title>템플릿 미리보기</title>
+    <title>템플릿 미리보기 - ' . basename($screenName) . '</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: "Malgun Gothic", "맑은 고딕", sans-serif; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="max-w-7xl mx-auto">
+        ' . $globalNavRendered . '
         ' . $renderedContent . '
     </div>
 </body>
@@ -95,11 +104,6 @@ class RawController extends \App\Http\Controllers\Controller
                 
             } catch (\Exception $e) {
                 return response('렌더링 오류: ' . $e->getMessage(), 500);
-            } finally {
-                // 임시 파일 삭제
-                if (File::exists($tempViewFile)) {
-                    File::delete($tempViewFile);
-                }
             }
             
         } catch (\Exception $e) {
@@ -140,15 +144,21 @@ class RawController extends \App\Http\Controllers\Controller
         ];
         
         try {
-            // 임시 블레이드 파일 생성
-            $tempViewPath = 'sandbox-raw-path-' . time() . '-' . rand(1000, 9999);
-            $tempViewFile = resource_path('views/' . $tempViewPath . '.blade.php');
-            
-            File::put($tempViewFile, $templateContent);
-            
+            // 글로벌 네비게이션 템플릿 읽기
+            $globalNavPath = storage_path("sandbox/{$storageName}/frontend/000-global-navigation.blade.php");
+            $globalNavContent = '';
+            if (File::exists($globalNavPath)) {
+                $globalNavContent = File::get($globalNavPath);
+            }
+
+            // 블레이드 템플릿 직접 렌더링 (임시 파일 없이)
             try {
-                // 블레이드 템플릿 렌더링
-                $renderedContent = view($tempViewPath, $sampleData)->render();
+                // 메인 컨텐츠 렌더링
+                $renderedContent = \Illuminate\Support\Facades\Blade::render($templateContent, $sampleData);
+                
+                // 글로벌 네비게이션 렌더링
+                $globalNavRendered = $globalNavContent ? 
+                    \Illuminate\Support\Facades\Blade::render($globalNavContent, $sampleData) : '';
                 
                 // HTML 문서로 감싸서 반환 (CSRF 토큰 포함)
                 $csrfToken = csrf_token();
@@ -160,12 +170,15 @@ class RawController extends \App\Http\Controllers\Controller
     <meta name="csrf-token" content="' . $csrfToken . '">
     <title>템플릿 미리보기 - ' . $screenFolderName . '</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: "Malgun Gothic", "맑은 고딕", sans-serif; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="max-w-7xl mx-auto">
+        ' . $globalNavRendered . '
         ' . $renderedContent . '
     </div>
 </body>
@@ -175,11 +188,6 @@ class RawController extends \App\Http\Controllers\Controller
                 
             } catch (\Exception $e) {
                 return response('렌더링 오류: ' . $e->getMessage(), 500);
-            } finally {
-                // 임시 파일 삭제
-                if (File::exists($tempViewFile)) {
-                    File::delete($tempViewFile);
-                }
             }
             
         } catch (\Exception $e) {

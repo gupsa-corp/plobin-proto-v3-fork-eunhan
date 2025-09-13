@@ -1,5 +1,6 @@
 {{-- 파일 업로드 템플릿 --}}
 <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-6">
+
     {{-- 헤더 --}}
     <div class="mb-8">
         <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -302,6 +303,7 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
+
     });
     </script>
 </div>

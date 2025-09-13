@@ -219,6 +219,7 @@
 
     {{-- 프로젝트 편집 사이드바 --}}
     <div x-show="sidebarOpen" 
+         style="display: none;"
          class="fixed inset-0 bg-black bg-opacity-50 z-40" 
          @click="closeSidebar()"></div>
 
@@ -369,11 +370,18 @@
 
     {{-- 사이드바 오버레이 --}}
     <div x-show="sidebarOpen"
+         style="display: none;"
          class="fixed inset-0 bg-black bg-opacity-25 z-40"
          @click="closeSidebar()"></div>
 
     {{-- 프로젝트 생성 모달 --}}
-    <div x-show="createModalOpen"
+    <div x-show="createModalOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
          @click.self="closeCreateModal()">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
