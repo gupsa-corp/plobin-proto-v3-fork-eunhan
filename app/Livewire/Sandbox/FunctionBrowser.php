@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use App\Http\Sandbox\GlobalFunctions\BaseGlobalFunction;
-use App\Http\Sandbox\GlobalFunctions\PHPExcelGenerator;
+use App\Http\Controllers\Sandbox\GlobalFunctions\BaseGlobalFunction;
+use App\Http\Controllers\Sandbox\GlobalFunctions\PHPExcelGenerator;
 use App\Services\FunctionTemplateService;
 use App\Services\FunctionMetadataService;
 

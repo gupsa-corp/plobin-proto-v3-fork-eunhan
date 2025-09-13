@@ -222,22 +222,22 @@ Route::prefix('sandbox')->group(function () {
 
     // AI Server Callback API
     Route::prefix('storage-sandbox-1/callbacks')->group(function () {
-        Route::post('/ai-server', \App\Http\Sandbox\AIServer\Callback\Controller::class);
+        Route::post('/ai-server', \App\Http\Controllers\Sandbox\AIServer\Callback\Controller::class);
     });
 
 
     // Form Creator API
     Route::prefix('form-creator')->group(function () {
-        Route::post('/save', \App\Http\Sandbox\FormCreator\Save\Controller::class);
-        Route::get('/list', \App\Http\Sandbox\FormCreator\List\Controller::class);
-        Route::get('/load/{filename}', \App\Http\Sandbox\FormCreator\Load\Controller::class);
-        Route::delete('/delete/{filename}', \App\Http\Sandbox\FormCreator\Delete\Controller::class);
+        Route::post('/save', \App\Http\Controllers\Sandbox\FormCreator\Save\Controller::class);
+        Route::get('/list', \App\Http\Controllers\Sandbox\FormCreator\List\Controller::class);
+        Route::get('/load/{filename}', \App\Http\Controllers\Sandbox\FormCreator\Load\Controller::class);
+        Route::delete('/delete/{filename}', \App\Http\Controllers\Sandbox\FormCreator\Delete\Controller::class);
     });
 
 
     // Form Publisher API
     Route::prefix('form-publisher')->group(function () {
-        Route::post('/save', \App\Http\Sandbox\FormPublisher\Save\Controller::class);
+        Route::post('/save', \App\Http\Controllers\Sandbox\FormPublisher\Save\Controller::class);
     });
     
     // 샌드박스 템플릿 백엔드 API 프록시

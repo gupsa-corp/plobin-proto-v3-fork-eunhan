@@ -449,7 +449,7 @@ Route::get('/organizations/{id}/admin/permissions/management', [\App\Http\Contro
 // 동적 규칙 탭
 Route::get('/organizations/{id}/admin/permissions/rules', [\App\Http\Controllers\Organization\Admin\Permissions\Rules\Controller::class, '__invoke'])->name('organization.admin.permissions.rules');
 
-Route::get('/organizations/{organization}/admin/billing', [\App\Http\Billing\PaymentHistory\Controller::class, 'billing'])->name('organization.admin.billing');
+Route::get('/organizations/{organization}/admin/billing', [\App\Http\Controllers\Billing\PaymentHistory\Controller::class, 'billing'])->name('organization.admin.billing');
 
 // 플랜 계산기
 Route::get('/organizations/{organization}/admin/billing/plan-calculator', function ($organization) {
@@ -466,14 +466,14 @@ Route::get('/organizations/{organization}/admin/billing/payment-fail', function 
 })->name('organization.admin.billing.payment-fail');
 
 // 결제 내역 관련 라우트들
-Route::get('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history');
-Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}', [\App\Http\Billing\PaymentDetail\Controller::class, 'show'])->name('organization.admin.billing.payment-detail');
-Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/receipt', [\App\Http\Billing\DownloadReceipt\Controller::class, 'download'])->name('organization.admin.billing.download-receipt');
-Route::post('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/retry', [\App\Http\Billing\RetryPayment\Controller::class, 'retry'])->name('organization.admin.billing.retry-payment');
-Route::get('/organizations/{organization}/admin/billing/export', [\App\Http\Billing\ExportHistory\Controller::class, 'export'])->name('organization.admin.billing.export');
+Route::get('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Controllers\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history');
+Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}', [\App\Http\Controllers\Billing\PaymentDetail\Controller::class, 'show'])->name('organization.admin.billing.payment-detail');
+Route::get('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/receipt', [\App\Http\Controllers\Billing\DownloadReceipt\Controller::class, 'download'])->name('organization.admin.billing.download-receipt');
+Route::post('/organizations/{organization}/admin/billing/payment-history/{billingHistory}/retry', [\App\Http\Controllers\Billing\RetryPayment\Controller::class, 'retry'])->name('organization.admin.billing.retry-payment');
+Route::get('/organizations/{organization}/admin/billing/export', [\App\Http\Controllers\Billing\ExportHistory\Controller::class, 'export'])->name('organization.admin.billing.export');
 
 // AJAX 엔드포인트 (동일한 컨트롤러, AJAX 요청 처리)
-Route::post('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history.ajax');
+Route::post('/organizations/{organization}/admin/billing/payment-history', [\App\Http\Controllers\Billing\PaymentHistory\Controller::class, 'index'])->name('organization.admin.billing.payment-history.ajax');
 
 Route::get('/organizations/{id}/admin/projects', [\App\Http\Controllers\Organization\Admin\Projects\Controller::class, '__invoke'])->name('organization.admin.projects');
 
@@ -689,8 +689,8 @@ Route::get('/sandbox/downloads', function () {
 })->name('sandbox.downloads');
 
 // 자료 다운로드 API
-Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
-Route::get('/sandbox/downloads/stats', [\App\Http\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
+Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
+Route::get('/sandbox/downloads/stats', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
 
 
 
@@ -735,7 +735,7 @@ Route::post('/logout', function () {
 
 // 회원 탈퇴 라우트
 Route::middleware(['auth'])->group(function () {
-    Route::get('/mypage/delete', [\App\Http\UserAccount\Delete\Controller::class, 'show'])->name('mypage.delete');
-    Route::post('/mypage/delete', [\App\Http\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
-    Route::get('/api/user/organization-status', [\App\Http\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
+    Route::get('/mypage/delete', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'show'])->name('mypage.delete');
+    Route::post('/mypage/delete', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
+    Route::get('/api/user/organization-status', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
 });

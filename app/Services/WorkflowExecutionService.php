@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Http\Sandbox\Workflows\BaseWorkflow;
+use App\Http\Controllers\Sandbox\Workflows\BaseWorkflow;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 
