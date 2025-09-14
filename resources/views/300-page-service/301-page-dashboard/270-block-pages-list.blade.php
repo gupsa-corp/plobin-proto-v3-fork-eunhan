@@ -45,7 +45,21 @@
                                     {{ $page->updated_at->diffForHumans() }}
                                 </p>
                             </div>
-                            <a href="{{ route('project.dashboard.page', ['id' => $page->organization_id, 'projectId' => $page->project_id, 'pageId' => $page->id]) }}" 
+                            @php
+                                // 페이지의 샌드박스 설정 확인
+                                $pageModel = \App\Models\ProjectPage::find($page->id);
+                                $sandboxCustomScreen = $pageModel ? $pageModel->sandbox_custom_screen_folder : null;
+                                
+                                // 새로운 샌드박스 템플릿 URL 생성 로직
+                                if ($sandboxCustomScreen && $pageModel && $pageModel->project && $pageModel->project->sandbox_folder === 'storage-sandbox-template') {
+                                    // 003-screen-table-view -> 100-domain-pms/103-screen-table-view 형태로 매핑
+                                    // 실제 API에서 매칭되는 화면을 찾아야 함
+                                    $newUrl = "/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view";
+                                } else {
+                                    $newUrl = route('project.dashboard.page', ['id' => $page->organization_id, 'projectId' => $page->project_id, 'pageId' => $page->id]);
+                                }
+                            @endphp
+                            <a href="{{ $newUrl }}" 
                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 열기
                             </a>

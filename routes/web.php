@@ -712,5 +712,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mypage/delete', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'show'])->name('mypage.delete');
     Route::post('/mypage/delete', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'destroy'])->name('mypage.delete.process');
     Route::get('/api/user/organization-status', [\App\Http\Controllers\UserAccount\Delete\Controller::class, 'checkOrganizationStatus'])->name('user.organization-status');
+    
+    // 샌드박스 템플릿 API
+    Route::get('/api/sandbox/{sandboxName}/domains', function ($sandboxName) {
+        $sandboxTemplateService = app(\App\Services\SandboxTemplateService::class);
+        $domains = $sandboxTemplateService->getDomains($sandboxName);
+        return response()->json($domains);
+    })->name('api.sandbox.domains');
 });
 

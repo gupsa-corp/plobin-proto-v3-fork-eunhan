@@ -20,6 +20,7 @@ class ProjectPage extends Model
         'user_id',
         'sandbox_folder',
         'sandbox_custom_screen_folder',
+        'sandbox_domain',
         'custom_screen_enabled',
         'custom_screen_applied_at',
         'template_path',

@@ -103,9 +103,9 @@ test.describe('커스텀 화면 테스트', () => {
     const currentUrl = page.url();
     console.log(`로그인 후 현재 URL: ${currentUrl}`);
 
-    // 4. 커스텀 화면 URL로 직접 이동 시도
+    // 4. 커스텀 화면 URL로 직접 이동 시도 (새로운 샌드박스 템플릿 구조)
     console.log('커스텀 화면 URL로 이동 중...');
-    await page.goto('/organizations/1/projects/1/pages/3');
+    await page.goto('/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view');
     await page.waitForLoadState('networkidle');
 
     const customScreenUrl = page.url();
@@ -188,7 +188,7 @@ test.describe('커스텀 화면 테스트', () => {
 
     console.log('=== 커스텀 화면 설정 테스트 시작 ===');
 
-    // 페이지 설정 URL로 이동
+    // 페이지 설정 URL로 이동 (기존 설정 페이지는 그대로 유지)
     await page.goto('/organizations/1/projects/1/pages/3/settings/custom-screen');
     await page.waitForLoadState('networkidle');
 

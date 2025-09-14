@@ -1,4 +1,5 @@
-<div class="space-y-3">
+<div class="space-y-6">
+    <!-- 커스텀 화면 사용 안함 옵션 -->
     <div class="flex items-center p-4 border border-gray-200 rounded-lg">
         <input
             type="radio"
@@ -13,6 +14,79 @@
             <div class="font-medium text-gray-900">커스텀 화면 사용 안함</div>
             <div class="text-sm text-gray-500">기본 페이지 레이아웃을 사용합니다.</div>
         </label>
+    </div>
+
+    <!-- 3단계 선택 UI -->
+    <div class="border border-gray-200 rounded-lg p-6 space-y-4">
+        <h3 class="text-lg font-medium text-gray-900">커스텀 화면 선택</h3>
+        
+        <!-- 1단계: 샌드박스 선택 -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">1. 샌드박스 선택</label>
+            <select
+                x-model="selectedSandbox"
+                @change="loadDomains()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+                <option value="">샌드박스를 선택하세요</option>
+                <template x-for="sandbox in sandboxes" :key="sandbox.name">
+                    <option :value="sandbox.name" x-text="sandbox.title"></option>
+                </template>
+            </select>
+        </div>
+
+        <!-- 2단계: 도메인 선택 -->
+        <div x-show="selectedSandbox">
+            <label class="block text-sm font-medium text-gray-700 mb-2">2. 도메인 선택</label>
+            <select
+                x-model="selectedDomain"
+                @change="loadScreens()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+                <option value="">도메인을 선택하세요</option>
+                <template x-for="domain in domains" :key="domain.folder">
+                    <option :value="domain.folder" x-text="domain.title"></option>
+                </template>
+            </select>
+        </div>
+
+        <!-- 3단계: 화면 선택 -->
+        <div x-show="selectedDomain">
+            <label class="block text-sm font-medium text-gray-700 mb-2">3. 화면 선택</label>
+            <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                <template x-for="screen in filteredScreens" :key="screen.id">
+                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <input
+                            type="radio"
+                            :id="'custom_screen_' + screen.id"
+                            name="custom_screen"
+                            :value="screen.id"
+                            class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                            x-model="selectedCustomScreen"
+                        >
+                        <label :for="'custom_screen_' + screen.id" class="ml-3 flex-1">
+                            <div class="font-medium text-gray-900" x-text="screen.title"></div>
+                            <div class="text-sm text-gray-500" x-text="screen.description"></div>
+                            <div class="flex items-center space-x-2 text-xs text-gray-400 mt-1">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                      :class="{
+                                          'bg-blue-100 text-blue-800': screen.type === 'screen'
+                                      }">
+                                    <span x-text="screen.type.toUpperCase()"></span>
+                                </span>
+                                <button
+                                    type="button"
+                                    @click="previewScreen(screen.id)"
+                                    class="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    미리보기
+                                </button>
+                            </div>
+                        </label>
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
 
     <!-- 로딩 상태 -->
@@ -42,81 +116,16 @@
         </div>
     </div>
 
-    <!-- 커스텀 화면이 없을 때 오류 메시지 -->
-    <div x-show="!loading && !error && customScreens.length === 0" class="flex items-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+    <!-- 화면이 없을 때 메시지 -->
+    <div x-show="selectedDomain && filteredScreens.length === 0" class="flex items-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
         <div class="flex-shrink-0">
             <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
             </svg>
         </div>
         <div class="ml-3">
-            <div class="text-sm font-medium text-yellow-800">사용 가능한 화면이 없습니다</div>
-            <div class="text-sm text-yellow-600">선택된 샌드박스에 HTML 또는 PHP 화면 파일이 없습니다.</div>
+            <div class="text-sm font-medium text-yellow-800">해당 도메인에 사용 가능한 화면이 없습니다</div>
+            <div class="text-sm text-yellow-600">선택된 도메인에 화면 파일이 없습니다.</div>
         </div>
     </div>
-
-    <!-- 사용 가능한 커스텀 화면들 -->
-    <template x-for="screen in customScreens" :key="screen.id">
-        <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-            <input
-                type="radio"
-                :id="'custom_screen_' + screen.id"
-                name="custom_screen"
-                :value="screen.id"
-                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                x-model="selectedCustomScreen"
-            >
-            <label :for="'custom_screen_' + screen.id" class="ml-3 flex-1">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <div class="font-medium text-gray-900" x-text="screen.title"></div>
-                        <div class="text-sm text-gray-500" x-text="screen.description"></div>
-                        <div class="flex items-center space-x-3 text-xs text-gray-400 mt-2">
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                  :class="{
-                                      'bg-blue-100 text-blue-800': screen.type === 'html',
-                                      'bg-purple-100 text-purple-800': screen.type === 'php'
-                                  }">
-                                <span x-text="screen.type.toUpperCase()"></span>
-                            </span>
-                            <span class="flex items-center">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v4M16 5v4"></path>
-                                </svg>
-                                <span x-text="screen.created_at"></span>
-                            </span>
-                            <span class="flex items-center">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span x-text="screen.size"></span>
-                            </span>
-                            <span x-show="screen.directory !== '/'" class="flex items-center">
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5l4 0l0 4M16 5l0 4l-4 0"></path>
-                                </svg>
-                                <span x-text="screen.directory"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <!-- 미리보기 버튼 -->
-                    <div class="ml-4">
-                        <button
-                            type="button"
-                            @click="previewScreen(screen.id)"
-                            class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        >
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                            미리보기
-                        </button>
-                    </div>
-                </div>
-            </label>
-        </div>
-    </template>
 </div>

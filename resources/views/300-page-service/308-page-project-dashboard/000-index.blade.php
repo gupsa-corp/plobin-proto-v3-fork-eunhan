@@ -4,8 +4,21 @@
     <div class="min-h-screen" style="position: relative;">
         @include('300-page-service.308-page-project-dashboard.200-sidebar-main')
         <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
-            @include('300-page-service.308-page-project-dashboard.101-unified-header')
-            @include('300-page-service.308-page-project-dashboard.200-content-main')
+            @include('300-page-service.308-page-project-dashboard.101-unified-header', [
+                'organization' => $organization,
+                'project' => $project,
+                'page' => $page,
+                'sandboxInfo' => $sandboxInfo,
+                'customScreen' => $customScreen
+            ])
+            @include('300-page-service.308-page-project-dashboard.200-content-main', [
+                'organization' => $organization,
+                'project' => $project,
+                'page' => $page,
+                'sandboxInfo' => $sandboxInfo,
+                'customScreen' => $customScreen,
+                'customScreens' => $customScreens
+            ])
         </div>
 
     </div>

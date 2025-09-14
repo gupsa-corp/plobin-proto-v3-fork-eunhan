@@ -16,7 +16,7 @@ class SandboxTemplateService
             return '';
         }
 
-        return storage_path("sandbox/{$sandboxName}/frontend");
+        return base_path("sandbox/container/{$sandboxName}");
     }
 
     /**
@@ -50,37 +50,52 @@ class SandboxTemplateService
                 return $customScreens;
             }
 
-            $folders = File::directories($templatePath);
+            // 도메인 폴더 검색 (예: 100-domain-pms, 101-domain-rfx)
+            $domainFolders = File::directories($templatePath);
 
-            foreach ($folders as $folder) {
-                $folderName = basename($folder);
-                $contentFile = $folder . '/000-content.blade.php';
+            foreach ($domainFolders as $domainFolder) {
+                $domainName = basename($domainFolder);
+                
+                // 도메인 폴더가 아닌 경우 건너뛰기
+                if (!preg_match('/^\d+-domain-/', $domainName)) {
+                    continue;
+                }
+                
+                // 도메인 내 화면 폴더 검색 (예: 103-screen-table-view)
+                $screenFolders = File::directories($domainFolder);
+                
+                foreach ($screenFolders as $screenFolder) {
+                    $screenFolderName = basename($screenFolder);
+                    $contentFile = $screenFolder . '/000-content.blade.php';
 
-                if (File::exists($contentFile)) {
-                    // 폴더명에서 화면 정보 추출
-                    $parts = explode('-', $folderName, 3);
-                    $screenId = $parts[0] ?? '000';
-                    $screenType = $parts[1] ?? 'screen';
-                    $screenName = $parts[2] ?? 'unnamed';
+                    if (File::exists($contentFile)) {
+                        // 폴더명에서 화면 정보 추출
+                        $parts = explode('-', $screenFolderName, 3);
+                        $screenId = $parts[0] ?? '000';
+                        $screenType = $parts[1] ?? 'screen';
+                        $screenName = $parts[2] ?? 'unnamed';
 
-                    // 파일 내용 읽기
-                    $fileContent = File::get($contentFile);
+                        // 파일 내용 읽기
+                        $fileContent = File::get($contentFile);
 
-                    $customScreens[] = [
-                        'id' => $folderName, // 전체 폴더명을 사용해서 고유한 ID 생성
-                        'title' => str_replace('-', ' ', $screenName),
-                        'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
-                        'type' => $screenType,
-                        'folder_name' => $folderName,
-                        'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
-                        'created_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
-                        'file_exists' => true,
-                        'full_path' => $contentFile,
-                        'file_size' => File::size($contentFile),
-                        'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
-                        'is_template' => true,
-                        'blade_template' => $fileContent,
-                    ];
+                        $customScreens[] = [
+                            'id' => $screenFolderName, // 화면 폴더명만 ID로 사용
+                            'title' => str_replace('-', ' ', $screenName),
+                            'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
+                            'type' => $screenType,
+                            'folder_name' => $screenFolderName,
+                            'domain_folder' => $domainName,
+                            'full_path_name' => $domainName . '/' . $screenFolderName,
+                            'file_path' => $domainName . '/' . $screenFolderName . '/000-content.blade.php',
+                            'created_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'file_exists' => true,
+                            'full_path' => $contentFile,
+                            'file_size' => File::size($contentFile),
+                            'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'is_template' => true,
+                            'blade_template' => $fileContent,
+                        ];
+                    }
                 }
             }
 
@@ -98,5 +113,75 @@ class SandboxTemplateService
         }
 
         return $customScreens;
+    }
+
+    /**
+     * 샌드박스의 도메인 목록 반환
+     */
+    public function getDomains(string $sandboxName): array
+    {
+        $domains = [];
+        
+        if (empty($sandboxName)) {
+            return $domains;
+        }
+
+        try {
+            $templatePath = $this->getTemplatePath($sandboxName);
+
+            if (!File::exists($templatePath)) {
+                return $domains;
+            }
+
+            // 도메인 폴더 검색 (예: 100-domain-pms, 101-domain-rfx)
+            $domainFolders = File::directories($templatePath);
+
+            foreach ($domainFolders as $domainFolder) {
+                $domainName = basename($domainFolder);
+                
+                // 도메인 폴더가 아닌 경우 건너뛰기
+                if (!preg_match('/^(\d+)-domain-(.+)$/', $domainName, $matches)) {
+                    continue;
+                }
+                
+                $domainId = $matches[1];
+                $domainSlug = $matches[2];
+                
+                $domains[] = [
+                    'folder' => $domainName,
+                    'title' => $this->formatDomainTitle($domainSlug),
+                    'id' => $domainId,
+                    'slug' => $domainSlug
+                ];
+            }
+
+            // ID 순으로 정렬
+            usort($domains, function($a, $b) {
+                return (int)$a['id'] - (int)$b['id'];
+            });
+
+        } catch (\Exception $e) {
+            Log::error('도메인 목록 로드 오류', [
+                'error' => $e->getMessage(), 
+                'sandbox_folder' => $sandboxName
+            ]);
+        }
+
+        return $domains;
+    }
+
+    /**
+     * 도메인 슬러그를 사용자 친화적인 제목으로 변환
+     */
+    private function formatDomainTitle(string $slug): string
+    {
+        $titleMap = [
+            'pms' => 'Domain PMS',
+            'rfx' => 'Domain RFX',
+            'crm' => 'Domain CRM',
+            'hrm' => 'Domain HRM'
+        ];
+
+        return $titleMap[$slug] ?? ucfirst(str_replace('-', ' ', $slug));
     }
 }

@@ -40,8 +40,8 @@ test.describe('특정 커스텀 화면 URL 테스트', () => {
       return;
     }
 
-    // 특정 커스텀 화면 URL로 이동
-    const targetUrl = '/organizations/1/projects/1/pages/4?screen=4e6ee772e0a00052d36693e8028ab3e9';
+    // 특정 커스텀 화면 URL로 이동 (새로운 샌드박스 템플릿 구조)
+    const targetUrl = '/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view';
     console.log(`테스트 URL: ${targetUrl}`);
 
     await page.goto(targetUrl);
@@ -117,7 +117,7 @@ test.describe('특정 커스텀 화면 URL 테스트', () => {
       return;
     }
 
-    // 설정 페이지로 이동
+    // 설정 페이지로 이동 (기존 설정 페이지는 그대로 유지)
     await page.goto('/organizations/1/projects/1/pages/4/settings/custom-screen');
     await page.waitForLoadState('networkidle');
 

@@ -114,7 +114,7 @@
                                 <p class="text-sm text-green-800">
                                     <strong>발행 URL:</strong>
                                     <code class="bg-green-100 px-2 py-1 rounded text-xs">
-                                        http://localhost:9100/organizations/5/projects/3/pages/{{ $previewScreen['id'] }}
+                                        http://localhost:8500/sandbox/storage-sandbox-template/100-domain-pms/{{ $previewScreen['folder_name'] ?? '103-screen-table-view' }}
                                     </code>
                                 </p>
                             </div>
@@ -169,7 +169,7 @@
                                         <span class="text-sm text-gray-600 ml-2">({{ $screen['type'] }})</span>
                                     </div>
                                     <code class="text-xs bg-white px-2 py-1 rounded border">
-                                        /organizations/5/projects/3/pages/{{ $screen['id'] }}
+                                        /sandbox/storage-sandbox-template/100-domain-pms/{{ $screen['folder_name'] ?? '103-screen-table-view' }}
                                     </code>
                                 </div>
                             @endforeach
