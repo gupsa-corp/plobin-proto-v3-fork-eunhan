@@ -166,14 +166,19 @@ function projectListData() {
                     params.append('status', this.statusFilter);
                 }
                 
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects?${params}`);
+                // 현재 URL에서 샌드박스 템플릿 추출 (예: /sandbox/storage-sandbox-template/...)
+                const pathParts = window.location.pathname.split('/');
+                const sandboxIndex = pathParts.indexOf('sandbox');
+                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                
+                const response = await fetch(`/api/sandbox/${sandboxTemplate}/projects?${params}`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
                     this.projects = result.data.projects;
                     this.pagination = result.data.pagination;
                 } else {
-                    console.error('Projects API 오류:', result.message);
+                    console.error('프로젝트 API 응답 오류:', result.message || result);
                     this.projects = [];
                 }
             } catch (error) {

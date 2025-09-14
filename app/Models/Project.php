@@ -16,15 +16,20 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'status',
+        'priority',
+        'progress',
         'organization_id',
         'user_id',
         'default_access_level',
         'project_roles',
-        'sandbox_folder'
+        'sandbox_folder',
+        'pms_metadata'
     ];
 
     protected $casts = [
         'project_roles' => 'json',
+        'pms_metadata' => 'json',
     ];
 
     /**

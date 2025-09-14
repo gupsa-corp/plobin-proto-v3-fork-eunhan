@@ -195,6 +195,19 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/files', [SandboxFileListController::class, 'getFileList']);
     Route::get('/screens', [ListScreensController::class, 'listScreens']);
 
+    // 프로젝트 관리 API (샌드박스용 - 동적 템플릿 지원)
+    Route::get('/{sandboxTemplate}/projects', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'index']);
+    Route::get('/{sandboxTemplate}/projects/{id}', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'show']);
+    Route::put('/{sandboxTemplate}/projects/{id}', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'update']);
+    Route::post('/{sandboxTemplate}/projects', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'store']);
+    Route::delete('/{sandboxTemplate}/projects/{id}', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'destroy']);
+
+    // Kanban board routes
+    Route::get('/{sandboxTemplate}/kanban/boards', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'getKanbanBoards']);
+    Route::get('/{sandboxTemplate}/kanban/cards/{id}', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'getKanbanCard']);
+    Route::put('/{sandboxTemplate}/kanban/cards/{id}', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'updateKanbanCard']);
+    Route::post('/{sandboxTemplate}/kanban/cards', [\App\Http\Controllers\Api\Sandbox\ProjectsController::class, 'createKanbanCard']);
+
     // 파일 업로드 관련 API
     Route::post('/file-upload', [SandboxFileUploadController::class, 'upload']);
     Route::get('/uploaded-files', [SandboxFileUploadController::class, 'index']);
@@ -212,13 +225,6 @@ Route::prefix('sandbox')->group(function () {
     Route::put('/templates/{template}', [SandboxTemplateController::class, 'update']);
     Route::delete('/templates/{template}', [SandboxTemplateController::class, 'destroy']);
     Route::get('/templates/usage/stats', [SandboxTemplateController::class, 'usage']);
-
-
-    // AI Server Callback API
-    Route::prefix('storage-sandbox-1/callbacks')->group(function () {
-        Route::post('/ai-server', \App\Http\Controllers\Sandbox\AIServer\Callback\Controller::class);
-    });
-
 
     // Form Creator API
     Route::prefix('form-creator')->group(function () {
@@ -298,24 +304,3 @@ Route::prefix('platform/admin/permissions')->group(function () {
 
 // 코어 권한 API (개발용 - 인증 없음)
 Route::get('/core/permissions', [\App\Http\Controllers\Core\Permissions\Controller::class, 'getRoles']);
-
-// E2E 테스트 API (개발용 - 인증 없음)
-Route::prefix('test/e2e')->group(function () {
-    // 시스템 상태 조회
-    // Route::get('/status', [\App\Http\Controllers\Api\Test\Controller::class, 'status']);
-
-    // 함수 실행 테스트
-    // Route::post('/execute-function', [\App\Http\Controllers\Api\Test\Controller::class, 'executeFunction']);
-
-    // 파일 조회/쿼리 테스트
-    // Route::get('/query-files', [\App\Http\Controllers\Api\Test\Controller::class, 'queryFiles']);
-
-    // 파일 수정 테스트
-    // Route::post('/modify-files', [\App\Http\Controllers\Api\Test\Controller::class, 'modifyFiles']);
-
-    // 함수 정보 조회
-    // Route::get('/function-info/{functionName}', [\App\Http\Controllers\Api\Test\Controller::class, 'getFunctionInfo']);
-
-    // 테스트 함수 생성
-    // Route::post('/create-test-function', [\App\Http\Controllers\Api\Test\Controller::class, 'createTestFunction']);
-});
