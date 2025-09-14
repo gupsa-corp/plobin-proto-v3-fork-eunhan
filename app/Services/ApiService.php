@@ -14,11 +14,7 @@ abstract class ApiService
      */
     protected function safeTransaction(callable $callback): mixed
     {
-        try {
-            return DB::transaction($callback);
-        } catch (Exception $e) {
-            throw ApiException::serverError('작업 처리 중 오류가 발생했습니다.');
-        }
+        return app(\App\Services\Api\SafeTransaction\Service::class)($callback);
     }
 
     /**
@@ -26,13 +22,7 @@ abstract class ApiService
      */
     protected function findOrFail(string $modelClass, mixed $id): Model
     {
-        $model = $modelClass::find($id);
-        
-        if (!$model) {
-            throw ApiException::notFound('요청한 리소스를 찾을 수 없습니다.');
-        }
-        
-        return $model;
+        return app(\App\Services\Api\FindOrFail\Service::class)($modelClass, $id);
     }
 
     /**
@@ -40,15 +30,7 @@ abstract class ApiService
      */
     protected function checkDuplicate(string $modelClass, string $field, mixed $value, mixed $exceptId = null): void
     {
-        $query = $modelClass::where($field, $value);
-        
-        if ($exceptId) {
-            $query->where('id', '!=', $exceptId);
-        }
-        
-        if ($query->exists()) {
-            throw ApiException::conflict("이미 존재하는 {$field}입니다.");
-        }
+        app(\App\Services\Api\CheckDuplicate\Service::class)($modelClass, $field, $value, $exceptId);
     }
 
     /**
@@ -56,15 +38,6 @@ abstract class ApiService
      */
     protected function formatPagination($paginator): array
     {
-        return [
-            'data' => $paginator->items(),
-            'meta' => [
-                'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
-                'has_more_pages' => $paginator->hasMorePages()
-            ]
-        ];
+        return app(\App\Services\Api\FormatPagination\Service::class)($paginator);
     }
 }

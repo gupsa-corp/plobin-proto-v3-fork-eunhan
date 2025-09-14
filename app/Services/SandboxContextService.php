@@ -10,29 +10,32 @@ class SandboxContextService
 {
     const SESSION_KEY = 'current_sandbox';
 
+    public function __construct(
+        private \App\Services\SandboxContext\GetCurrentSandbox\Service $getCurrentSandboxService,
+        private \App\Services\SandboxContext\SetCurrentSandbox\Service $setCurrentSandboxService,
+        private \App\Services\SandboxContext\GetSandboxPath\Service $getSandboxPathService,
+        private \App\Services\SandboxContext\GetSandboxUrl\Service $getSandboxUrlService,
+        private \App\Services\SandboxContext\GetSandboxStoragePath\Service $getSandboxStoragePathService,
+        private \App\Services\SandboxContext\GetSandboxApiUrl\Service $getSandboxApiUrlService,
+        private \App\Services\SandboxContext\GetScreenUrl\Service $getScreenUrlService,
+        private \App\Services\SandboxContext\ValidateSandboxExists\Service $validateSandboxExistsService,
+        private \App\Services\SandboxContext\GetAvailableSandboxes\Service $getAvailableSandboxesService,
+        private \App\Services\SandboxContext\GenerateDisplayName\Service $generateDisplayNameService,
+        private \App\Services\SandboxContext\CountDomains\Service $countDomainsService,
+        private \App\Services\SandboxContext\CountScreens\Service $countScreensService,
+        private \App\Services\SandboxContext\GetCurrentContext\Service $getCurrentContextService,
+        private \App\Services\SandboxContext\DetectAndSetFromUrl\Service $detectAndSetFromUrlService,
+        private \App\Services\SandboxContext\Reset\Service $resetService,
+        private \App\Services\SandboxContext\FindFirstAvailableSandbox\Service $findFirstAvailableSandboxService,
+        private \App\Services\SandboxContext\GetDebugInfo\Service $getDebugInfoService
+    ) {}
+
     /**
      * 현재 선택된 샌드박스 이름을 가져옵니다.
      */
     public function getCurrentSandbox(): string
     {
-        $sandbox = Session::get(self::SESSION_KEY);
-
-        // 새로운 세션 키에 값이 없으면 레거시 키도 확인
-        if (!$sandbox) {
-            $sandbox = Session::get('sandbox_storage');
-        }
-
-        // 여전히 없으면 사용 가능한 첫 번째 샌드박스를 자동으로 설정
-        if (!$sandbox) {
-            $firstSandbox = $this->findFirstAvailableSandbox();
-            if ($firstSandbox) {
-                $this->setCurrentSandbox($firstSandbox);
-                return $firstSandbox;
-            }
-            throw new \Exception('샌드박스가 선택되지 않았습니다. setCurrentSandbox()로 샌드박스를 선택해주세요.');
-        }
-
-        return $sandbox;
+        return ($this->getCurrentSandboxService)();
     }
 
     /**
@@ -40,14 +43,7 @@ class SandboxContextService
      */
     public function setCurrentSandbox(string $sandbox): void
     {
-        if ($this->validateSandboxExists($sandbox)) {
-            // 새 세션 키와 레거시 키 모두 설정
-            Session::put(self::SESSION_KEY, $sandbox);
-            Session::put('sandbox_storage', $sandbox);
-            Log::info('Sandbox context changed', ['from' => Session::get(self::SESSION_KEY), 'to' => $sandbox]);
-        } else {
-            throw new \InvalidArgumentException("Sandbox '{$sandbox}' does not exist");
-        }
+        ($this->setCurrentSandboxService)($sandbox);
     }
 
     /**
@@ -55,8 +51,7 @@ class SandboxContextService
      */
     public function getSandboxPath(): string
     {
-        $currentSandbox = $this->getCurrentSandbox();
-        return base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$currentSandbox}");
+        return ($this->getSandboxPathService)();
     }
 
     /**
@@ -64,8 +59,7 @@ class SandboxContextService
      */
     public function getSandboxUrl(): string
     {
-        $currentSandbox = $this->getCurrentSandbox();
-        return "/sandbox/{$currentSandbox}";
+        return ($this->getSandboxUrlService)();
     }
 
     /**
@@ -73,8 +67,7 @@ class SandboxContextService
      */
     public function getSandboxStoragePath(): string
     {
-        $currentSandbox = $this->getCurrentSandbox();
-        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentSandbox}");
+        return ($this->getSandboxStoragePathService)();
     }
 
     /**
@@ -82,8 +75,7 @@ class SandboxContextService
      */
     public function getSandboxApiUrl(string $endpoint = ''): string
     {
-        $baseUrl = $this->getSandboxUrl();
-        return $endpoint ? "{$baseUrl}/api/{$endpoint}" : "{$baseUrl}/api";
+        return ($this->getSandboxApiUrlService)($endpoint);
     }
 
     /**
@@ -91,8 +83,7 @@ class SandboxContextService
      */
     public function getScreenUrl(string $domain, string $screen): string
     {
-        $baseUrl = $this->getSandboxUrl();
-        return "{$baseUrl}/{$domain}/{$screen}";
+        return ($this->getScreenUrlService)($domain, $screen);
     }
 
     /**
@@ -100,8 +91,7 @@ class SandboxContextService
      */
     public function validateSandboxExists(string $sandbox): bool
     {
-        $sandboxPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandbox}");
-        return File::exists($sandboxPath) && File::isDirectory($sandboxPath);
+        return ($this->validateSandboxExistsService)($sandbox);
     }
 
     /**
@@ -109,46 +99,7 @@ class SandboxContextService
      */
     public function getAvailableSandboxes(): array
     {
-        $containerPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container'));
-        $sandboxes = [];
-
-        if (!File::exists($containerPath)) {
-            return [];
-        }
-
-        try {
-            $directories = File::directories($containerPath);
-            
-            foreach ($directories as $directory) {
-                $sandboxName = basename($directory);
-                
-                // 기본 구조 검증 (000-common 폴더 존재 여부)
-                $commonPath = $directory . '/000-common';
-                if (File::exists($commonPath)) {
-                    $sandboxes[] = [
-                        'name' => $sandboxName,
-                        'path' => $directory,
-                        'display_name' => $this->generateDisplayName($sandboxName),
-                        'is_active' => $sandboxName === (Session::get(self::SESSION_KEY) ?: Session::get('sandbox_storage')),
-                        'domains_count' => $this->countDomains($directory),
-                        'screens_count' => $this->countScreens($directory)
-                    ];
-                }
-            }
-
-            // 이름순으로 정렬
-            usort($sandboxes, function($a, $b) {
-                return strcmp($a['name'], $b['name']);
-            });
-
-            return $sandboxes;
-
-        } catch (\Exception $e) {
-            Log::error('Error getting available sandboxes', ['error' => $e->getMessage()]);
-            return [
-[]
-            ];
-        }
+        return ($this->getAvailableSandboxesService)();
     }
 
     /**
@@ -156,9 +107,7 @@ class SandboxContextService
      */
     private function generateDisplayName(string $sandboxName): string
     {
-        // Example: my-custom-template -> My Custom Template
-        $displayName = str_replace(['-', '_'], ' ', $sandboxName);
-        return ucwords($displayName);
+        return ($this->generateDisplayNameService)($sandboxName);
     }
 
     /**
@@ -166,22 +115,7 @@ class SandboxContextService
      */
     private function countDomains(string $sandboxPath): int
     {
-        try {
-            $directories = File::directories($sandboxPath);
-            $domainCount = 0;
-
-            foreach ($directories as $directory) {
-                $dirName = basename($directory);
-                // xxx-domain-xxx 패턴의 디렉토리만 카운트
-                if (preg_match('/^\d+-domain-/', $dirName)) {
-                    $domainCount++;
-                }
-            }
-
-            return $domainCount;
-        } catch (\Exception $e) {
-            return 0;
-        }
+        return ($this->countDomainsService)($sandboxPath);
     }
 
     /**
@@ -189,32 +123,7 @@ class SandboxContextService
      */
     private function countScreens(string $sandboxPath): int
     {
-        try {
-            $screenCount = 0;
-            $directories = File::directories($sandboxPath);
-
-            foreach ($directories as $domainDirectory) {
-                $dirName = basename($domainDirectory);
-                // 도메인 디렉토리만 검사
-                if (preg_match('/^\d+-domain-/', $dirName)) {
-                    $screenDirectories = File::directories($domainDirectory);
-                    foreach ($screenDirectories as $screenDirectory) {
-                        $screenName = basename($screenDirectory);
-                        // xxx-screen-xxx 패턴의 디렉토리만 카운트
-                        if (preg_match('/^\d+-screen-/', $screenName)) {
-                            $contentFile = $screenDirectory . '/000-content.blade.php';
-                            if (File::exists($contentFile)) {
-                                $screenCount++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $screenCount;
-        } catch (\Exception $e) {
-            return 0;
-        }
+        return ($this->countScreensService)($sandboxPath);
     }
 
     /**
@@ -222,17 +131,7 @@ class SandboxContextService
      */
     public function getCurrentContext(): array
     {
-        $currentSandbox = $this->getCurrentSandbox();
-        
-        return [
-            'sandbox_name' => $currentSandbox,
-            'sandbox_path' => $this->getSandboxPath(),
-            'sandbox_url' => $this->getSandboxUrl(),
-            'sandbox_storage_path' => $this->getSandboxStoragePath(),
-            'sandbox_api_url' => $this->getSandboxApiUrl(),
-            'display_name' => $this->generateDisplayName($currentSandbox),
-            'exists' => $this->validateSandboxExists($currentSandbox)
-        ];
+        return ($this->getCurrentContextService)();
     }
 
     /**
@@ -240,21 +139,7 @@ class SandboxContextService
      */
     public function detectAndSetFromUrl(?string $url = null): bool
     {
-        if (!$url) {
-            $url = request()->getRequestUri();
-        }
-
-        // /sandbox/{sandbox_name}/... 패턴에서 샌드박스 추출
-        if (preg_match('#/sandbox/([^/]+)#', $url, $matches)) {
-            $detectedSandbox = $matches[1];
-            
-            if ($this->validateSandboxExists($detectedSandbox)) {
-                $this->setCurrentSandbox($detectedSandbox);
-                return true;
-            }
-        }
-
-        return false;
+        return ($this->detectAndSetFromUrlService)($url);
     }
 
     /**
@@ -262,8 +147,7 @@ class SandboxContextService
      */
     public function reset(): void
     {
-        Session::forget(self::SESSION_KEY);
-        Log::info('Sandbox context reset to default');
+        ($this->resetService)();
     }
 
     /**
@@ -271,29 +155,7 @@ class SandboxContextService
      */
     private function findFirstAvailableSandbox(): ?string
     {
-        $containerPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container'));
-
-        if (!File::exists($containerPath)) {
-            return null;
-        }
-
-        try {
-            $directories = File::directories($containerPath);
-
-            foreach ($directories as $directory) {
-                $sandboxName = basename($directory);
-
-                // 기본 구조 검증 (000-common 폴더 존재 여부)
-                $commonPath = $directory . '/000-common';
-                if (File::exists($commonPath)) {
-                    return $sandboxName;
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error finding first available sandbox', ['error' => $e->getMessage()]);
-        }
-
-        return null;
+        return ($this->findFirstAvailableSandboxService)();
     }
 
     /**
@@ -301,13 +163,6 @@ class SandboxContextService
      */
     public function getDebugInfo(): array
     {
-        return [
-            'current_sandbox' => $this->getCurrentSandbox(),
-            'session_key' => self::SESSION_KEY,
-            'session_has_sandbox' => Session::has(self::SESSION_KEY),
-            'context' => $this->getCurrentContext(),
-            'available_sandboxes' => $this->getAvailableSandboxes(),
-            'session_data' => Session::all()
-        ];
+        return ($this->getDebugInfoService)();
     }
 }
