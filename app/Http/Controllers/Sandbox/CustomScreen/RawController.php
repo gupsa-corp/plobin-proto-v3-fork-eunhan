@@ -19,24 +19,34 @@ class RawController extends \App\Http\Controllers\Controller
     public function show($id)
     {
         // 템플릿 경로에서 해당 스크린 파일 찾기
-        $templatePath = $this->sandboxContextService->getSandboxStoragePath() . '/frontend';
+        $templatePath = $this->sandboxContextService->getSandboxStoragePath();
         $screenPath = null;
 
         if (File::exists($templatePath)) {
-            $folders = File::directories($templatePath);
+            // 먼저 도메인 폴더들을 찾기
+            $domainFolders = File::directories($templatePath);
 
-            foreach ($folders as $folder) {
-                $folderName = basename($folder);
-                $contentFile = $folder . '/000-content.blade.php';
+            foreach ($domainFolders as $domainFolder) {
+                $domainFolderName = basename($domainFolder);
 
-                if (File::exists($contentFile)) {
-                    // 폴더명에서 화면 ID 추출
-                    $parts = explode('-', $folderName, 3);
-                    $screenId = $parts[0] ?? '000';
+                // 도메인 폴더인지 확인
+                if (strpos($domainFolderName, '-domain-') !== false) {
+                    $screenFolders = File::directories($domainFolder);
 
-                    if ($screenId === $id) {
-                        $screenPath = $contentFile;
-                        break;
+                    foreach ($screenFolders as $screenFolder) {
+                        $folderName = basename($screenFolder);
+                        $contentFile = $screenFolder . '/000-content.blade.php';
+
+                        if (File::exists($contentFile)) {
+                            // 폴더명에서 화면 ID 추출
+                            $parts = explode('-', $folderName, 3);
+                            $screenId = $parts[0] ?? '000';
+
+                            if ($screenId === $id) {
+                                $screenPath = $contentFile;
+                                break 2; // 양쪽 루프 모두 탈출
+                            }
+                        }
                     }
                 }
             }
@@ -122,11 +132,37 @@ class RawController extends \App\Http\Controllers\Controller
 
     public function showByPath($storageName, $screenFolderName)
     {
-        // 스토리지 경로에서 해당 화면 폴더 찾기
-        $templatePath = storage_path("sandbox/{$storageName}/frontend");
-        $screenPath = $templatePath . '/' . $screenFolderName . '/000-content.blade.php';
+        // 스토리지 경로에서 해당 화면 폴더 찾기 (도메인 폴더 포함)
+        $templatePath = storage_path("sandbox/{$storageName}");
+        $screenPath = null;
 
-        if (!File::exists($screenPath)) {
+        // 도메인 폴더들을 스캔해서 해당 스크린 폴더가 있는지 확인
+        if (File::exists($templatePath)) {
+            $domainFolders = File::directories($templatePath);
+
+            foreach ($domainFolders as $domainFolder) {
+                $domainFolderName = basename($domainFolder);
+
+                // 도메인 폴더인지 확인
+                if (strpos($domainFolderName, '-domain-') !== false) {
+                    $testPath = $domainFolder . '/' . $screenFolderName . '/000-content.blade.php';
+                    if (File::exists($testPath)) {
+                        $screenPath = $testPath;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 도메인 폴더에서 찾지 못했다면 기존 방식으로 시도 (하위 호환성)
+        if (!$screenPath) {
+            $fallbackPath = $templatePath . '/' . $screenFolderName . '/000-content.blade.php';
+            if (File::exists($fallbackPath)) {
+                $screenPath = $fallbackPath;
+            }
+        }
+
+        if (!$screenPath) {
             return response('템플릿 파일을 찾을 수 없습니다.', 404);
         }
 

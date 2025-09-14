@@ -7,16 +7,22 @@ use App\Models\Project;
 use App\Models\ProjectPage;
 use App\Services\AccessControlService;
 use App\Services\SandboxService;
+use App\Services\SandboxContextService;
 use Illuminate\Support\Facades\Auth;
 
 class Controller extends \App\Http\Controllers\Controller
 {
     protected SandboxService $sandboxService;
+    protected SandboxContextService $sandboxContextService;
     protected AccessControlService $accessControlService;
 
-    public function __construct(SandboxService $sandboxService, AccessControlService $accessControlService)
-    {
+    public function __construct(
+        SandboxService $sandboxService,
+        SandboxContextService $sandboxContextService,
+        AccessControlService $accessControlService
+    ) {
         $this->sandboxService = $sandboxService;
+        $this->sandboxContextService = $sandboxContextService;
         $this->accessControlService = $accessControlService;
     }
 
@@ -41,7 +47,12 @@ class Controller extends \App\Http\Controllers\Controller
 
         if ($page) {
             $sandboxInfo = $this->sandboxService->getPageSandboxInfo($page);
-            
+
+            // 샌드박스 컨텍스트 설정
+            if ($sandboxInfo['has_sandbox']) {
+                $this->sandboxContextService->setCurrentSandbox($sandboxInfo['sandbox_name']);
+            }
+
             // 커스텀 스크린 렌더링
             if ($sandboxInfo['has_custom_screen']) {
                 $customScreen = $this->sandboxService->renderCustomScreen($page);

@@ -1,7 +1,7 @@
 <!-- 커스텀 화면 콘텐츠 컴포넌트 -->
 
 <!-- 샌드박스 정보 표시 영역 -->
-<div class="mb-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+<div class="mb-4 bg-gray-50 border border-gray-200 rounded-lg p-3" x-data="{ domainDropdownOpen: false, screenDropdownOpen: false }">
     <div class="flex items-center space-x-4">
 
         <!-- 1. 샌드박스 정보 표시 -->
@@ -14,7 +14,7 @@
 
         <!-- 2. 도메인 선택 드롭다운 -->
         <div class="relative">
-            <button wire:click="$toggle('domainDropdownOpen')" class="flex items-center space-x-2 text-sm bg-white border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button @click="domainDropdownOpen = !domainDropdownOpen" class="flex items-center space-x-2 text-sm bg-white border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
@@ -25,12 +25,22 @@
             </button>
 
             <!-- 도메인 드롭다운 메뉴 -->
-            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+            <div x-show="domainDropdownOpen" @click.away="domainDropdownOpen = false"
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="absolute left-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">100-domain-pms</a>
+                <!-- 다른 도메인들이 여기에 동적으로 추가될 예정 -->
+            </div>
         </div>
 
         <!-- 3. 화면 선택 드롭다운 (현재 도메인의 화면들만) -->
         <div class="relative">
-            <button wire:click="$toggle('dropdownOpen')" class="flex items-center space-x-2 text-sm bg-white border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button @click="screenDropdownOpen = !screenDropdownOpen" class="flex items-center space-x-2 text-sm bg-white border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
@@ -41,7 +51,18 @@
             </button>
 
             <!-- 화면 드롭다운 메뉴 -->
-            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+            <div x-show="screenDropdownOpen" @click.away="screenDropdownOpen = false"
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="absolute left-0 top-full mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">102-screen-project-list (현재)</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">103-screen-table-view</a>
+                <!-- 다른 스크린들이 여기에 동적으로 추가될 예정 -->
+            </div>
         </div>
 
         <!-- 5. 페이지 설정 드롭다운 (Livewire 컴포넌트) -->

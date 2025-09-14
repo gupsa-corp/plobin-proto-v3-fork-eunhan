@@ -197,7 +197,7 @@ class StorageCommonService
     public static function getAvailableScreens(): array
     {
         $templateRoot = self::getTemplateRoot();
-        $frontendDir = $templateRoot . '/frontend';
+        $frontendDir = $templateRoot;
         $screens = [];
         
         try {

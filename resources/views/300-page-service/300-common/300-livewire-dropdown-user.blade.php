@@ -15,7 +15,7 @@
     </div>
 
     {{-- 드롭다운 메뉴 --}}
-    <div x-data="{ open: @entangle('isOpen') }"
+    <div x-data="{ open: $wire.entangle('isOpen') }"
          x-show="open"
          x-transition:enter="transition ease-out duration-100"
          x-transition:enter-start="transform opacity-0 scale-95"

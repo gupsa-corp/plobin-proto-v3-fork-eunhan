@@ -116,8 +116,8 @@ class SandboxService
 
         try {
             $screenId = $sandboxInfo['custom_screen_folder'];
-            // 동적 샌드박스 경로 사용
-            $storagePath = $this->sandboxContextService->getSandboxPath();
+            // 동적 샌드박스 스토리지 경로 사용 (실제 파일이 있는 곳)
+            $storagePath = $this->sandboxContextService->getSandboxStoragePath();
 
             if (!File::exists($storagePath)) {
                 return null;

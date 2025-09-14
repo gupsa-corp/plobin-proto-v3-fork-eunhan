@@ -61,12 +61,12 @@ class Controller extends \App\Http\Controllers\Controller
      */
     public function listScreensBySandbox(Request $request, $sandboxName)
     {
-        // storage/sandbox 경로 사용하고 frontend 하위만 검색
-        $sandboxFrontendPath = storage_path('sandbox/' . $sandboxName . '/frontend');
+        // storage/sandbox 경로 사용
+        $sandboxFrontendPath = storage_path('sandbox/' . $sandboxName);
 
-        // 샌드박스 frontend 디렉토리가 존재하는지 확인
+        // 샌드박스 디렉토리가 존재하는지 확인
         if (!File::exists($sandboxFrontendPath)) {
-            return response()->json(['error' => '샌드박스 frontend 폴더가 존재하지 않습니다.'], 404);
+            return response()->json(['error' => '샌드박스 폴더가 존재하지 않습니다.'], 404);
         }
 
         try {

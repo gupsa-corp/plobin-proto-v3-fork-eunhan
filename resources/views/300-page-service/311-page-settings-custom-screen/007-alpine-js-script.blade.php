@@ -35,13 +35,17 @@ function customScreenSettingsPage() {
 
         // 샌드박스 목록 로드
         loadSandboxes() {
+            @if(!empty($currentSandboxName))
             this.sandboxes = [
                 {
-                    name: '{{ $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}',
-                    title: '{{ ucwords(str_replace(["-", "_"], " ", $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox())) }}'
+                    name: '{{ $currentSandboxName }}',
+                    title: '{{ ucwords(str_replace(["-", "_"], " ", $currentSandboxName)) }}'
                 }
                 // 추후 다른 샌드박스 추가 가능
             ];
+            @else
+            this.sandboxes = [];
+            @endif
             
             // 현재 프로젝트의 샌드박스가 설정되어 있으면 자동 선택
             if (this.selectedSandbox) {
