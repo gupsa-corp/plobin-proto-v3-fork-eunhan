@@ -542,9 +542,10 @@ Route::get('/platform/admin/sandboxes/cron', function () {
     return view('900-page-platform-admin.907-sandboxes.400-cron.000-index');
 })->name('platform.admin.sandboxes.cron');
 
-// 샌드박스 뷰 라우트
+// 샌드박스 뷰 라우트 (기존 호환성을 위해 유지, 새로운 동적 라우트가 우선)
 Route::get('/sandbox/{sandboxName}/{viewName}', [\App\Http\Controllers\Sandbox\CustomScreen\RawController::class, 'showByPath'])
-    ->name('sandbox.view');
+    ->name('sandbox.view.legacy')
+    ->where('viewName', '^(?!\d+-domain-).*'); // 새로운 패턴과 충돌 방지
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
 Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {
@@ -579,11 +580,11 @@ Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxN
     return response()->json(['success' => false, 'message' => '응답이 없습니다.'], 500);
 })->where('path', '.*');
 
-// 샌드박스 페이지들 - 실제 존재하는 파일들만 라우트 등록
-// 메인 인덱스
-Route::get('/sandbox', function () {
+// 샌드박스 페이지들 - 기존 시스템 라우트들 (레거시)
+// 메인 인덱스 (동적 라우팅에 의해 오버라이드됨)
+Route::get('/sandbox/legacy', function () {
     return view('700-page-sandbox.000-index');
-})->name('sandbox.index');
+})->name('sandbox.index.legacy');
 
 // 대시보드
 Route::get('/sandbox/dashboard', function () {
