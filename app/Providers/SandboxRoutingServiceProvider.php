@@ -96,9 +96,18 @@ class SandboxRoutingServiceProvider extends ServiceProvider
                 return abort(404, '템플릿 파일을 찾을 수 없습니다.');
             }
             
-            // 템플릿 내용을 직접 렌더링하여 반환
+            // 템플릿 내용을 Blade 엔진을 통해 처리하여 반환
             try {
-                // 템플릿 뷰어 사용하여 드롭다운 헤더 포함하여 렌더링
+                // 템플릿 내용을 동적으로 컴파일하고 렌더링
+                $templateContent = file_get_contents($templateFile);
+                
+                // 임시 뷰 이름 생성 (캐시 키로 사용)
+                $viewName = 'sandbox_template_' . md5($templateFile . filemtime($templateFile));
+                
+                // Blade 뷰 팩토리에 동적 뷰 추가
+                view()->addNamespace('dynamic', [base_path("sandbox/container/storage-sandbox-template/{$domain}/{$screen}")]);
+                
+                // 템플릿 뷰어에 처리된 템플릿 전달
                 return view('700-page-sandbox.706-page-custom-screens.100-template-viewer', [
                     'sandboxName' => 'storage-sandbox-template',
                     'customScreen' => [
@@ -109,7 +118,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
                         'screen' => $screen,
                         'is_template' => true
                     ],
-                    'templateContent' => file_get_contents($templateFile)
+                    'templateContent' => view('dynamic::000-content')->render()
                 ]);
                 
             } catch (\Exception $e) {
