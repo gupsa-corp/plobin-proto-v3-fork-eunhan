@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Project\SetSandbox;
 
 use App\Models\Project;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class Controller extends \App\Http\Controllers\Controller
@@ -26,8 +27,12 @@ class Controller extends \App\Http\Controllers\Controller
                 $sandboxName = null; // 빈 값을 null로 변환
             }
 
+            // 페이지별 개별 샌드박스 허용 여부
+            $allowIndividualSandbox = $request->boolean('allow_individual_sandbox_per_page', false);
+
             $project->update([
-                'sandbox_folder' => $sandboxName
+                'sandbox_folder' => $sandboxName,
+                'allow_individual_sandbox_per_page' => $allowIndividualSandbox
             ]);
 
             return redirect()->back()->with('success', '샌드박스 설정이 저장되었습니다.');

@@ -1,28 +1,99 @@
 <div class="space-y-6">
-    <!-- 커스텀 화면 사용 안함 옵션 -->
-    <div class="flex items-center p-4 border border-gray-200 rounded-lg">
-        <input
-            type="radio"
-            id="custom_screen_none"
-            name="custom_screen"
-            value=""
-            class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-            x-model="selectedCustomScreen"
-            {{ empty($currentCustomScreenId) ? 'checked' : '' }}
-        >
-        <label for="custom_screen_none" class="ml-3 flex-1">
-            <div class="font-medium text-gray-900">커스텀 화면 사용 안함</div>
-            <div class="text-sm text-gray-500">기본 페이지 레이아웃을 사용합니다.</div>
-        </label>
+    <!-- 커스텀 화면 설정 -->
+    <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900">커스텀 화면 설정</h3>
+        
+        <!-- 커스텀 화면 사용 안함 -->
+        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+            <input
+                type="radio"
+                id="custom_screen_disabled"
+                name="custom_screen_mode"
+                value="disabled"
+                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                x-model="customScreenMode"
+                @change="onCustomScreenModeChange()"
+                {{ empty($currentCustomScreenId) ? 'checked' : '' }}
+            >
+            <label for="custom_screen_disabled" class="ml-3 flex-1">
+                <div class="font-medium text-gray-900">사용 안함</div>
+                <div class="text-sm text-gray-500">기본 페이지 레이아웃을 사용합니다.</div>
+            </label>
+        </div>
+
+        <!-- 커스텀 화면 사용함 -->
+        <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+            <input
+                type="radio"
+                id="custom_screen_enabled"
+                name="custom_screen_mode"
+                value="enabled"
+                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                x-model="customScreenMode"
+                @change="onCustomScreenModeChange()"
+                {{ !empty($currentCustomScreenId) ? 'checked' : '' }}
+            >
+            <label for="custom_screen_enabled" class="ml-3 flex-1">
+                <div class="font-medium text-gray-900">사용함</div>
+                <div class="text-sm text-gray-500">커스텀 화면을 선택하여 사용합니다.</div>
+            </label>
+        </div>
     </div>
 
-    <!-- 3단계 선택 UI -->
-    <div class="border border-gray-200 rounded-lg p-6 space-y-4">
-        <h3 class="text-lg font-medium text-gray-900">커스텀 화면 선택</h3>
+    <!-- 커스텀 화면 선택 UI (사용함일 때만 표시) -->
+    <div x-show="customScreenMode === 'enabled'" class="border border-gray-200 rounded-lg p-6 space-y-4">
+        <h4 class="text-md font-medium text-gray-900">커스텀 화면 선택</h4>
         
-        <!-- 1단계: 샌드박스 선택 -->
+        <!-- 1단계: 샌드박스 모드 선택 -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">1. 샌드박스 선택</label>
+            <label class="block text-sm font-medium text-gray-700 mb-3">1. 샌드박스 모드 선택</label>
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input
+                            type="radio"
+                            id="sandbox-mode-project"
+                            name="sandbox-mode"
+                            value="project"
+                            x-model="sandboxMode"
+                            @change="onSandboxModeChange()"
+                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                        />
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="sandbox-mode-project" class="font-medium text-gray-700">프로젝트를 따름</label>
+                        <p class="text-gray-500">프로젝트에서 설정한 샌드박스를 사용합니다.</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input
+                            type="radio"
+                            id="sandbox-mode-individual"
+                            name="sandbox-mode"
+                            value="individual"
+                            x-model="sandboxMode"
+                            @change="onSandboxModeChange()"
+                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                            :disabled="!projectAllowsIndividualSandbox"
+                        />
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="sandbox-mode-individual" class="font-medium" :class="projectAllowsIndividualSandbox ? 'text-gray-700' : 'text-gray-400'">
+                            페이지별 개별 선택
+                        </label>
+                        <p class="text-gray-500">
+                            <span x-show="projectAllowsIndividualSandbox">이 페이지만의 고유한 샌드박스를 선택합니다.</span>
+                            <span x-show="!projectAllowsIndividualSandbox" class="text-red-500">프로젝트 설정에서 개별 선택을 허용해야 사용할 수 있습니다.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2단계: 샌드박스 선택 (개별 선택 모드일 때만) -->
+        <div x-show="sandboxMode === 'individual'">
+            <label class="block text-sm font-medium text-gray-700 mb-2">2. 샌드박스 선택</label>
             <select
                 x-model="selectedSandbox"
                 @change="loadDomains()"
@@ -35,9 +106,9 @@
             </select>
         </div>
 
-        <!-- 2단계: 도메인 선택 -->
-        <div x-show="selectedSandbox">
-            <label class="block text-sm font-medium text-gray-700 mb-2">2. 도메인 선택</label>
+        <!-- 3단계: 도메인 선택 -->
+        <div x-show="shouldShowDomainSelection()">
+            <label class="block text-sm font-medium text-gray-700 mb-2">3. 도메인 선택</label>
             <select
                 x-model="selectedDomain"
                 @change="loadScreens()"
@@ -50,9 +121,9 @@
             </select>
         </div>
 
-        <!-- 3단계: 화면 선택 -->
+        <!-- 4단계: 화면 선택 -->
         <div x-show="selectedDomain">
-            <label class="block text-sm font-medium text-gray-700 mb-2">3. 화면 선택</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">4. 화면 선택</label>
             <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
                 <template x-for="screen in filteredScreens" :key="screen.id">
                     <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">

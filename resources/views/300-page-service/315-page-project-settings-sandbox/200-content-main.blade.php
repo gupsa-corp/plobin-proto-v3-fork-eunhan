@@ -131,6 +131,40 @@
                     </div>
                 </div>
 
+                <!-- 페이지별 개별 샌드박스 허용 설정 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        페이지별 설정
+                    </label>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input
+                                    type="checkbox"
+                                    id="allow_individual_sandbox"
+                                    name="allow_individual_sandbox_per_page"
+                                    value="1"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    {{ (old('allow_individual_sandbox_per_page', $project->allow_individual_sandbox_per_page ?? false)) ? 'checked' : '' }}
+                                />
+                            </div>
+                            <div class="ml-3">
+                                <label for="allow_individual_sandbox" class="font-medium text-gray-700">
+                                    페이지별로 별개 샌드박스 선택 가능
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    이 옵션을 활성화하면 각 페이지에서 프로젝트 샌드박스와 다른 샌드박스를 개별적으로 선택할 수 있습니다.
+                                    비활성화하면 모든 페이지가 프로젝트 샌드박스 설정을 따르게 됩니다.
+                                </p>
+                                <div class="mt-2 text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                                    <strong>주의:</strong> 이 기능을 비활성화하면 기존에 개별 선택된 페이지들이 프로젝트 설정을 따르게 됩니다.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 저장 버튼 -->
                 <div class="flex justify-end space-x-3 pt-4">
                     <button

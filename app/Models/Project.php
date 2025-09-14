@@ -24,6 +24,7 @@ class Project extends Model
         'default_access_level',
         'project_roles',
         'sandbox_folder',
+        'allow_individual_sandbox_per_page',
         'pms_metadata'
     ];
 

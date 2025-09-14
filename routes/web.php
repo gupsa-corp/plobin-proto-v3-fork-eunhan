@@ -374,10 +374,31 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
 
     $currentSandboxName = ($page && $page->project) ? $page->project->sandbox_folder : null;
     $currentCustomScreenId = $page ? $page->sandbox_custom_screen_folder : null;
+    $currentDomain = $page ? $page->sandbox_domain : null;
 
-    // 샌드박스 템플릿 서비스를 사용하여 커스텀 화면 데이터 가져오기
-    $sandboxTemplateService = app(\App\Services\SandboxTemplateService::class);
-    $customScreens = $sandboxTemplateService->getCustomScreens($currentSandboxName ?? '');
+    // SandboxService를 사용하여 동일한 로직으로 커스텀 화면 데이터 가져오기
+    $sandboxService = app(\App\Services\SandboxService::class);
+    $customScreens = [];
+    $availableDomains = [];
+    
+    if ($page) {
+        $customScreens = $sandboxService->getAvailableCustomScreens($currentSandboxName ?? '');
+        
+        // 도메인별로 그룹화
+        $domains = [];
+        foreach ($customScreens as $screen) {
+            if (!in_array($screen['domain'], $domains)) {
+                $domains[] = $screen['domain'];
+            }
+        }
+        
+        $availableDomains = array_map(function($domain) {
+            return [
+                'folder' => $domain,
+                'title' => str_replace(['-domain-', '-'], [' ', ' '], ucwords($domain, '-'))
+            ];
+        }, $domains);
+    }
 
     return view('300-page-service.311-page-settings-custom-screen.000-index', [
         'currentPageId' => $pageId,
@@ -385,7 +406,9 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
         'page' => $page,
         'currentSandboxName' => $currentSandboxName,
         'currentCustomScreenId' => $currentCustomScreenId,
-        'customScreens' => $customScreens
+        'currentDomain' => $currentDomain,
+        'customScreens' => $customScreens,
+        'availableDomains' => $availableDomains
     ]);
 })->name('project.dashboard.page.settings.custom-screen');
 
@@ -719,5 +742,24 @@ Route::middleware(['auth'])->group(function () {
         $domains = $sandboxTemplateService->getDomains($sandboxName);
         return response()->json($domains);
     })->name('api.sandbox.domains');
+    
+    // 샌드박스 커스텀 화면 API
+    Route::get('/api/sandbox/custom-screens/{sandboxName}', function ($sandboxName) {
+        $sandboxService = app(\App\Services\SandboxService::class);
+        $customScreens = $sandboxService->getAvailableCustomScreens($sandboxName);
+        
+        // 도메인별로 그룹화
+        $domains = [];
+        foreach ($customScreens as $screen) {
+            if (!in_array($screen['domain'], $domains)) {
+                $domains[] = $screen['domain'];
+            }
+        }
+        
+        return response()->json([
+            'screens' => $customScreens,
+            'domains' => $domains
+        ]);
+    })->name('api.sandbox.custom-screens');
 });
 
