@@ -57,19 +57,6 @@
 
             {{-- 헤더 우측 메뉴 --}}
             <div class="flex items-center gap-4">
-
-                {{-- Custom Screen Folder 선택 드롭다운 (Livewire 컴포넌트) --}}
-                <livewire:service.project-dashboard.custom-screen-dropdown
-                    :org-id="$orgId"
-                    :project-id="$projectId"
-                    :page-id="$pageId" />
-
-                {{-- 페이지 설정 드롭다운 (Livewire 컴포넌트) --}}
-                <livewire:service.project-dashboard.page-settings-dropdown
-                    :org-id="$orgId"
-                    :project-id="$projectId"
-                    :page-id="$pageId" />
-
                 {{-- Livewire 사용자 드롭다운 컴포넌트 --}}
                 <livewire:service.header.user-dropdown-livewire />
             </div>
