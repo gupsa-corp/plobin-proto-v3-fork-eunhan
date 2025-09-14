@@ -217,8 +217,7 @@ use App\Services\TemplateCommonService;
 
     {{-- Edit/Create Modal --}}
     <div x-show="showCreateModal || showEditModal"
-         style="background-color: rgba(0,0,0,.5);"
-         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4"
          @click.self="closeModal()">
 
         <div x-show="showCreateModal || showEditModal"
