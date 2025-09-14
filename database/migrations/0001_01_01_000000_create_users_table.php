@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('marketing_consent')->default(false);
+            $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
             
             // 전화번호 관련 필드
@@ -24,6 +26,7 @@ return new class extends Migration
             // 사용자 프로필 필드
             $table->string('name', 100)->nullable(); // Filament 호환성을 위해 추가
             $table->string('nickname', 50)->unique()->nullable();
+            $table->string('display_name_preference', 20)->default('auto')->comment('표시명 설정: auto(자동), real_name(실명), nickname(닉네임), email(이메일)');
             $table->string('first_name', 50)->nullable();
             $table->string('last_name', 50)->nullable();
             

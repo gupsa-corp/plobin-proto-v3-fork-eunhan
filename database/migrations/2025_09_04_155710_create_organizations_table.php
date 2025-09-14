@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('status')->default('active');
             $table->integer('members_count')->default(1);
+            $table->decimal('points_balance', 15, 2)->default(0)->comment('포인트 잔액 (성능 최적화용)');
             $table->unsignedBigInteger('user_id'); // 조직 생성자 ID
             $table->timestamps();
             

@@ -39,12 +39,26 @@ return new class extends Migration
             }
             $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
             $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
+            $table->string('scope_level')->nullable();
+            $table->unsignedBigInteger('organization_id')->nullable();
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->unsignedBigInteger('page_id')->nullable();
+            $table->unsignedBigInteger('parent_role_id')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             if ($teams || config('permission.testing')) {
                 $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
             } else {
                 $table->unique(['name', 'guard_name']);
             }
+            
+            // Add foreign key constraints
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
+            $table->foreign('project_id')->references('id')->on('project_pages')->onDelete('cascade');
+            $table->foreign('page_id')->references('id')->on('project_pages')->onDelete('cascade');
+            $table->foreign('parent_role_id')->references('id')->on('roles')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
         });
 
         Schema::create($tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
