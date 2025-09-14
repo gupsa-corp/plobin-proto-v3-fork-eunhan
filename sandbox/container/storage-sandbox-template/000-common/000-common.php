@@ -30,11 +30,16 @@ $screenName = $pathParts[1] ?? ''; // 화면명
 $currentUrlPath = $_SERVER['REQUEST_URI'] ?? '';
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
 
-// 샌드박스 기본 경로 추출
+// 샌드박스 기본 경로 추출 (동적)
 $sandboxBasePath = '';
-if (preg_match('#/sandbox/storage-sandbox-template#', $currentUrlPath)) {
-    $parts = explode('/sandbox/storage-sandbox-template', $currentUrlPath);
-    $sandboxBasePath = '/sandbox/storage-sandbox-template';
+if (preg_match('#/sandbox/([^/]+)#', $currentUrlPath, $matches)) {
+    $currentSandboxName = $matches[1];
+    $sandboxBasePath = '/sandbox/' . $currentSandboxName;
+} else {
+    // 기본값으로 현재 컨텍스트 사용
+    $sandboxContextService = app(App\Services\SandboxContextService::class);
+    $currentSandboxName = $sandboxContextService->getCurrentSandbox();
+    $sandboxBasePath = $sandboxContextService->getSandboxUrl();
 }
 
 // 현재 화면의 전체 URL
@@ -189,8 +194,11 @@ function getDownloadUrl($relativePath) {
     $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
     $sandboxBasePath = '';
-    if (preg_match('#/sandbox/storage-sandbox-template#', $currentUrlPath)) {
-        $sandboxBasePath = '/sandbox/storage-sandbox-template';
+    if (preg_match('#/sandbox/([^/]+)#', $currentUrlPath, $matches)) {
+        $sandboxBasePath = '/sandbox/' . $matches[1];
+    } else {
+        $sandboxContextService = app(App\Services\SandboxContextService::class);
+        $sandboxBasePath = $sandboxContextService->getSandboxUrl();
     }
 
     return $baseUrl . $sandboxBasePath . '/downloads/' . $relativePath;
@@ -228,7 +236,7 @@ function getAvailableScreens() {
                         'value' => $screenName,
                         'title' => $title,
                         'path' => $dir,
-                        'url' => "/sandbox/storage-sandbox-template/{$screenName}"
+                        'url' => $sandboxBasePath . "/frontend/{$screenName}"
                     ];
                 }
             }

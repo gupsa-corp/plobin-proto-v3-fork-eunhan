@@ -352,7 +352,7 @@ function tableViewData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
 
                 const params = new URLSearchParams({
                     limit: this.pagination.limit,
@@ -432,7 +432,7 @@ function tableViewData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
 
                 const isEdit = this.showEditModal;
                 const url = isEdit
@@ -478,7 +478,7 @@ function tableViewData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
 
                 const response = await fetch(`/api/sandbox/${sandboxTemplate}/projects/${id}`, {
                     method: 'DELETE'

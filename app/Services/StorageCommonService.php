@@ -219,7 +219,7 @@ class StorageCommonService
                             'value' => $screenName,
                             'title' => $title,
                             'path' => $dir,
-                            'url' => "/sandbox/storage-sandbox-template/{$screenName}"
+                            'url' => app(\App\Services\SandboxContextService::class)->getSandboxUrl() . "/{$screenName}"
                         ];
                     }
                 }
@@ -310,7 +310,7 @@ class StorageCommonService
      */
     private static function getTemplateRoot(): string
     {
-        return dirname(__DIR__, 2) . '/sandbox/storage-sandbox-template';
+        return app(\App\Services\SandboxContextService::class)->getSandboxPath();
     }
 
     /**
@@ -329,8 +329,8 @@ class StorageCommonService
         $currentUrlPath = $_SERVER['REQUEST_URI'] ?? '';
         $sandboxBasePath = '';
         
-        if (preg_match('#/sandbox/storage-sandbox-template#', $currentUrlPath)) {
-            $sandboxBasePath = '/sandbox/storage-sandbox-template';
+        if (preg_match('#/sandbox/([^/]+)#', $currentUrlPath, $matches)) {
+            $sandboxBasePath = '/sandbox/' . $matches[1];
         }
         
         return $sandboxBasePath;

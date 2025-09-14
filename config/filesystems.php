@@ -70,7 +70,7 @@ return [
 
         'sandbox_downloads' => [
             'driver' => 'local',
-            'root' => storage_path('sandbox/storage-sandbox-template/downloads'),
+            'root' => storage_path('sandbox/' . config('sandbox-routing.default_template') . '/downloads'),
             'visibility' => 'private',
             'throw' => false,
             'report' => false,

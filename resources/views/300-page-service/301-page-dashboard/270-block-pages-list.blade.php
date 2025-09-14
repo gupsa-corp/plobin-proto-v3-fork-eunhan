@@ -51,10 +51,12 @@
                                 $sandboxCustomScreen = $pageModel ? $pageModel->sandbox_custom_screen_folder : null;
                                 
                                 // 새로운 샌드박스 템플릿 URL 생성 로직
-                                if ($sandboxCustomScreen && $pageModel && $pageModel->project && $pageModel->project->sandbox_folder === 'storage-sandbox-template') {
+                                $sandboxContextService = app(App\Services\SandboxContextService::class);
+                                $currentSandbox = $sandboxContextService->getCurrentSandbox();
+                                if ($sandboxCustomScreen && $pageModel && $pageModel->project && $pageModel->project->sandbox_folder === $currentSandbox) {
                                     // 003-screen-table-view -> 100-domain-pms/103-screen-table-view 형태로 매핑
                                     // 실제 API에서 매칭되는 화면을 찾아야 함
-                                    $newUrl = "/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view";
+                                    $newUrl = "/sandbox/{$currentSandbox}/100-domain-pms/103-screen-table-view";
                                 } else {
                                     $newUrl = route('project.dashboard.page', ['id' => $page->organization_id, 'projectId' => $page->project_id, 'pageId' => $page->id]);
                                 }

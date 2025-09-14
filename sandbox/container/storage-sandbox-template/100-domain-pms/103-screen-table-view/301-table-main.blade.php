@@ -81,7 +81,8 @@
 
              try {
                  // API에서 최신 프로젝트 데이터 가져오기
-                 const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects/' + project.id);
+                 const currentSandbox = window.location.pathname.split('/')[2];
+                 const response = await fetch(`/api/sandbox/${currentSandbox}/api/projects/${project.id}`);
                  const result = await response.json();
 
                  if (result.success && result.data) {
@@ -105,13 +106,13 @@
          }
      }" x-init="window.projectTable = this">
 
-    <?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/302-table-header.blade.php'); ?>
+    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/103-screen-table-view/302-table-header.blade.php'); ?>
 
-    <?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/303-table-body.blade.php'); ?>
+    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/103-screen-table-view/303-table-body.blade.php'); ?>
 
-    <?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/304-table-pagination.blade.php'); ?>
+    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/103-screen-table-view/304-table-pagination.blade.php'); ?>
 
-    <?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/305-sidebar-project-edit.blade.php'); ?>
+    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/103-screen-table-view/305-sidebar-project-edit.blade.php'); ?>
 </div>
 
-<?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/306-table-scripts.blade.php'); ?>
+<?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/103-screen-table-view/306-table-scripts.blade.php'); ?>

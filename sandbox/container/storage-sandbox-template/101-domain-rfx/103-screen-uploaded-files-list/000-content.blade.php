@@ -804,7 +804,7 @@ async function viewDocumentAssets(fileId) {
         
         if (result.success) {
             // 에셋 분석 결과 페이지로 이동
-            const url = `/sandbox/storage-sandbox-template/013-screen-document-analysis?file_id=${fileId}`;
+            const url = `{{ $sandbox_url ?? '/sandbox/' . $current_sandbox }}/101-domain-rfx/105-screen-document-analysis?file_id=${fileId}`;
             window.open(url, '_blank');
         } else {
             throw new Error(result.message || '에셋 정보를 불러오는데 실패했습니다.');

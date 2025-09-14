@@ -5,9 +5,11 @@ namespace App\Livewire\Sandbox\CustomScreens\Browser;
 use Livewire\Component as LivewireComponent;
 use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\File;
+use App\Services\SandboxContextService;
 
 class Component extends LivewireComponent
 {
+    protected $sandboxContextService;
     public $screens = [];
 
     #[Url]
@@ -29,6 +31,7 @@ class Component extends LivewireComponent
 
     public function mount()
     {
+        $this->sandboxContextService = app(SandboxContextService::class);
         $this->loadScreens();
 
         // URL에서 선택된 화면이 있다면 해당 화면을 선택 (화면 목록 로딩 후)
@@ -39,8 +42,10 @@ class Component extends LivewireComponent
 
     public function render()
     {
+        $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
+        
         return view('livewire.sandbox.custom-screens.browser-component', [
-            'selectedSandbox' => 'storage-sandbox-template',
+            'selectedSandbox' => $currentSandbox,
             'availableDomains' => $this->getAvailableDomains(),
             'availableScreenTypes' => $this->getAvailableScreenTypes()
         ]);
@@ -60,7 +65,7 @@ class Component extends LivewireComponent
     private function getScreensFromTemplate()
     {
         $screens = [];
-        $templatePath = base_path('sandbox/container/storage-sandbox-template');
+        $templatePath = $this->sandboxContextService->getSandboxPath();
 
         if (File::exists($templatePath)) {
             // Domain 폴더들 찾기 (100-domain-pms, 101-domain-rfx 등)
@@ -180,8 +185,8 @@ class Component extends LivewireComponent
             return '#';
         }
         
-        // storage-sandbox-template, domain 폴더, screen 폴더로 URL 구성
-        $storageName = 'storage-sandbox-template';
+        // current sandbox, domain 폴더, screen 폴더로 URL 구성
+        $storageName = $this->sandboxContextService->getCurrentSandbox();
         $domainFolderName = $screen['domain_folder_name'];
         $screenFolderName = $screen['folder_name'];
         
@@ -211,7 +216,7 @@ class Component extends LivewireComponent
             }
 
             // 새로운 폴더명 생성 (해당 domain 내에서)
-            $domainPath = base_path('sandbox/container/storage-sandbox-template/' . $originalScreen['domain_folder_name']);
+            $domainPath = $this->sandboxContextService->getSandboxPath() . '/' . $originalScreen['domain_folder_name'];
             $newFolderName = $this->generateNewFolderName($domainPath, $originalScreen['folder_name']);
 
             $sourcePath = $originalScreen['full_path'];
@@ -332,7 +337,7 @@ class Component extends LivewireComponent
     private function getAvailableDomains()
     {
         $domains = [];
-        $templatePath = base_path('sandbox/container/storage-sandbox-template');
+        $templatePath = $this->sandboxContextService->getSandboxPath();
 
         if (File::exists($templatePath)) {
             $domainFolders = File::directories($templatePath);

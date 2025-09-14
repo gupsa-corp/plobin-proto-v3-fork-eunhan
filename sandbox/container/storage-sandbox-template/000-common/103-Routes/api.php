@@ -23,7 +23,7 @@ $pathParts = explode('/', trim($path, '/'));
 
 // API 경로에서 실제 엔드포인트 추출
 $endpoint = '';
-if (count($pathParts) >= 3 && $pathParts[0] === 'sandbox' && $pathParts[1] === 'storage-sandbox-template') {
+if (count($pathParts) >= 3 && $pathParts[0] === 'sandbox') {
     $endpoint = implode('/', array_slice($pathParts, 3));
 }
 

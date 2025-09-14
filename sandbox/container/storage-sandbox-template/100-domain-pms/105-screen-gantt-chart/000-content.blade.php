@@ -564,7 +564,8 @@ function ganttData() {
 
         async loadGanttData() {
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/projects');
+                const currentSandbox = window.location.pathname.split('/')[2];
+                const response = await fetch(`/api/sandbox/${currentSandbox}/projects`);
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -680,7 +681,8 @@ function ganttData() {
             }
 
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/projects', {
+                const currentSandbox = window.location.pathname.split('/')[2];
+                const response = await fetch(`/api/sandbox/${currentSandbox}/projects`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -823,7 +825,8 @@ function ganttData() {
 
         async saveProjectDates(project) {
             try {
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/projects/${project.id}`, {
+                const currentSandbox = window.location.pathname.split('/')[2];
+                const response = await fetch(`/api/sandbox/${currentSandbox}/projects/${project.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -852,7 +855,8 @@ function ganttData() {
             if (!this.selectedProject) return;
 
             try {
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/projects/${this.selectedProject.id}`, {
+                const currentSandbox = window.location.pathname.split('/')[2];
+                const response = await fetch(`/api/sandbox/${currentSandbox}/projects/${this.selectedProject.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

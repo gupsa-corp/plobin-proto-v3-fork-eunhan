@@ -12,7 +12,7 @@ class SandboxRoutingService
      * 샌드박스 기본 설정
      */
     private const SANDBOX_BASE_PATH = 'sandbox/container';
-    private const SANDBOX_TEMPLATE_FOLDER = 'storage-sandbox-template';
+    // SANDBOX_TEMPLATE_FOLDER constant removed - use dynamic sandbox context
     
     /**
      * 샌드박스 라우팅 구성을 가져옵니다.
@@ -36,7 +36,10 @@ class SandboxRoutingService
      */
     public function getDomainList(string $sandboxName = null): array
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         $sandboxPath = $this->getSandboxPath($sandboxName);
         
         if (!File::exists($sandboxPath)) {
@@ -51,7 +54,10 @@ class SandboxRoutingService
      */
     public function getScreenList(string $domainName, string $sandboxName = null): array
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         $domainPath = $this->getDomainPath($sandboxName, $domainName);
         
         if (!File::exists($domainPath)) {
@@ -66,7 +72,10 @@ class SandboxRoutingService
      */
     public function generateViewPath(string $domainName, string $screenName, string $sandboxName = null): string
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         return "sandbox.container.{$sandboxName}.{$domainName}.{$screenName}";
     }
     
@@ -75,7 +84,10 @@ class SandboxRoutingService
      */
     public function generateRoute(string $domainName, string $screenName, string $sandboxName = null): string
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         return "/sandbox/{$sandboxName}/{$domainName}/{$screenName}";
     }
     
@@ -84,7 +96,10 @@ class SandboxRoutingService
      */
     public function generateRouteName(string $domainName, string $screenName, string $sandboxName = null): string
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         return "sandbox.{$sandboxName}.{$domainName}.{$screenName}";
     }
     
@@ -93,7 +108,10 @@ class SandboxRoutingService
      */
     public function getDynamicRoutes(string $sandboxName = null): array
     {
-        $sandboxName = $sandboxName ?: self::SANDBOX_TEMPLATE_FOLDER;
+        if (!$sandboxName) {
+            $sandboxContextService = app(\App\Services\SandboxContextService::class);
+            $sandboxName = $sandboxContextService->getCurrentSandbox();
+        }
         $routes = [];
         
         $domains = $this->getDomainList($sandboxName);

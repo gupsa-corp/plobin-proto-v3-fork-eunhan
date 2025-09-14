@@ -377,9 +377,9 @@ function kanbanData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
                 
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/boards`);
+                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/boards`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -422,7 +422,7 @@ function kanbanData() {
                 // Extract sandbox template from URL  
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
                 
                 // API를 통해 카드 상태 업데이트
                 const statusMap = {
@@ -432,7 +432,7 @@ function kanbanData() {
                     'done': 'completed'
                 };
                 
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/kanban/cards/${originalCard.id}`, {
+                const response = await fetch(`/api/sandbox/${sandboxTemplate}/api/kanban/cards/${originalCard.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -518,10 +518,10 @@ function kanbanData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
                 
                 // 상태가 변경된 경우 API 업데이트
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/cards/${this.selectedCard.id}`, {
+                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/cards/${this.selectedCard.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -622,9 +622,9 @@ function kanbanData() {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
                 
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/cards`, {
+                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/cards`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -425,10 +425,10 @@ function projectListData() {
                     params.append('status', this.statusFilter);
                 }
                 
-                // 현재 URL에서 샌드박스 템플릿 추출 (예: /sandbox/storage-sandbox-template/...)
+                // 현재 URL에서 샌드박스 템플릿 추출 (예: /sandbox/{sandbox}/...)
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
-                const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
+                const sandboxTemplate = pathParts[sandboxIndex + 1];
                 
                 const response = await fetch(`/api/sandbox/${sandboxTemplate}/projects?${params}`);
                 const result = await response.json();

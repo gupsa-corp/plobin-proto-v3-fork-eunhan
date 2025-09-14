@@ -8,9 +8,17 @@ use App\Models\ProjectSandbox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
+use App\Services\SandboxContextService;
 
 class Controller extends BaseController
 {
+    protected $sandboxContextService;
+
+    public function __construct(SandboxContextService $sandboxContextService)
+    {
+        $this->sandboxContextService = $sandboxContextService;
+    }
+
     private function getStoragePath()
     {
         return storage_path();
@@ -18,7 +26,7 @@ class Controller extends BaseController
 
     private function getTemplateStoragePath()
     {
-        return $this->getStoragePath() . '/storage-sandbox-template';
+        return $this->sandboxContextService->getSandboxStoragePath();
     }
 
     public function index($organizationId, $projectId)

@@ -35,7 +35,10 @@
 
         <!-- 사이드바 콘텐츠 -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
-<?php include storage_path('sandbox/storage-sandbox-template/frontend/103-screen-table-view/305-sidebar-form.blade.php'); ?>
+<?php 
+$currentSandbox = basename(dirname(dirname(dirname(__DIR__))));
+include storage_path("sandbox/{$currentSandbox}/frontend/103-screen-table-view/305-sidebar-form.blade.php"); 
+?>
         </div>
 
         <!-- 사이드바 푸터 -->

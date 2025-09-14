@@ -246,16 +246,23 @@ Route::prefix('sandbox')->group(function () {
         Route::post('/save', \App\Http\Controllers\Sandbox\FormPublisher\Save\Controller::class);
     });
 
-    // 샌드박스 템플릿 백엔드 API 프록시 (올바른 경로로 수정)
-    Route::any('storage-sandbox-template/backend/api.php/{path?}', function ($path = '') {
-        $apiFile = base_path('sandbox/container/storage-sandbox-template/000-common/103-Routes/api.php');
+    // 샌드박스 템플릿 백엔드 API 프록시 (동적 샌드박스 지원)
+    Route::any('{sandbox}/backend/api.php/{path?}', function ($sandbox, $path = '') {
+        // 동적 샌드박스 컨텍스트 설정
+        $sandboxContextService = app(\App\Services\SandboxContextService::class);
+        
+        if ($sandboxContextService->validateSandboxExists($sandbox)) {
+            $sandboxContextService->setCurrentSandbox($sandbox);
+        }
+        
+        $apiFile = base_path("sandbox/container/{$sandbox}/000-common/103-Routes/api.php");
 
         if (!file_exists($apiFile)) {
             return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다: ' . $apiFile], 404);
         }
 
         // 원래 URI를 API 파일에 맞게 설정
-        $_SERVER['REQUEST_URI'] = '/sandbox/storage-sandbox-template/backend/api.php/' . $path;
+        $_SERVER['REQUEST_URI'] = "/sandbox/{$sandbox}/backend/api.php/" . $path;
 
         // 출력 버퍼링 시작
         ob_start();
@@ -288,11 +295,11 @@ Route::prefix('sandbox')->group(function () {
         }
     })->where('path', '.*');
     
-    // 직접 API 라우트 추가 (Laravel 컨트롤러 사용)
-    Route::prefix('storage-sandbox-template')->group(function () {
+    // 직접 API 라우트 추가 (Laravel 컨트롤러 사용 - 동적 샌드박스 지원)
+    Route::prefix('{sandbox}')->group(function () {
         Route::get('/projects', [\App\Http\Controllers\Api\Sandbox\SandboxApiController::class, 'getProjects']);
         Route::get('/backend/api.php/dashboard/stats', [\App\Http\Controllers\Api\Sandbox\SandboxApiController::class, 'getDashboardStats']);
-    });
+    })->where('sandbox', '[a-zA-Z0-9\\-_]+');
 });
 
 // 플랫폼 관리자 - 요금제 관리 API (개발용 - 인증 없음)

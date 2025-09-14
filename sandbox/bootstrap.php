@@ -20,7 +20,7 @@ use App\Services\StorageCommonService;
 
 // 샌드박스 환경 설정
 define('SANDBOX_ROOT', __DIR__);
-define('TEMPLATE_PATH', SANDBOX_ROOT . '/container/storage-sandbox-template');
+define('TEMPLATE_PATH', SANDBOX_ROOT . '/container/' . config('sandbox-routing.default_template'));
 
 // 템플릿 복사 및 초기화 함수
 function initializeSandboxFromTemplate($targetPath, $templatePath = null) {

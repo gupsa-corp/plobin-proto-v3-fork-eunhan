@@ -19,7 +19,7 @@
                         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ $sandbox_name ?? 'sandbox' }}</span>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ $sandbox_name ?? $current_sandbox ?? 'sandbox' }}</span>
                     </div>
                 </li>
                 <li>
@@ -57,7 +57,7 @@
                     <div class="space-y-3">
                         <div class="flex justify-between">
                             <span class="font-medium text-gray-700">샌드박스:</span>
-                            <span class="text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">{{ $sandbox_name ?? 'storage-sandbox-template' }}</span>
+                            <span class="text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">{{ $sandbox_name ?? $current_sandbox ?? 'default-sandbox' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="font-medium text-gray-700">도메인:</span>
@@ -182,11 +182,11 @@
                     <div>
                         <h4 class="font-semibold text-gray-900 mb-3">네비게이션 테스트</h4>
                         <div class="space-y-2">
-                            <a href="{{ route('sandbox.domains', $sandbox_name ?? 'storage-sandbox-template') }}" 
+                            <a href="{{ route('sandbox.domains', $sandbox_name ?? $current_sandbox ?? 'default-sandbox') }}" 
                                class="block w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200">
                                 도메인 목록으로 이동
                             </a>
-                            <a href="{{ route('sandbox.screens', [$sandbox_name ?? 'storage-sandbox-template', $domain_name ?? '100-domain-pms']) }}" 
+                            <a href="{{ route('sandbox.screens', [$sandbox_name ?? $current_sandbox ?? 'default-sandbox', $domain_name ?? '100-domain-pms']) }}" 
                                class="block w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50 rounded-md border border-green-200">
                                 화면 목록으로 이동
                             </a>

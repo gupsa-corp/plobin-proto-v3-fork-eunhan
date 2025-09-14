@@ -40,7 +40,16 @@
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">샌드박스</label>
                 <select id="sandbox-selector" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[180px]">
-                    <option value="storage-sandbox-template" selected>storage-sandbox-template</option>
+                    @php
+                        $sandboxContextService = app(App\Services\SandboxContextService::class);
+                        $availableSandboxes = $sandboxContextService->getAvailableSandboxes();
+                        $currentSandbox = $sandboxContextService->getCurrentSandbox();
+                    @endphp
+                    @foreach($availableSandboxes as $sandbox)
+                        <option value="{{ $sandbox['name'] }}" {{ $sandbox['is_active'] ? 'selected' : '' }}>
+                            {{ $sandbox['display_name'] }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -92,7 +101,7 @@
         // 현재 URL에서 sandbox와 view 추출
         const currentUrl = window.location.pathname;
         const urlParts = currentUrl.split('/');
-        const currentSandbox = urlParts[2] || 'storage-sandbox-template';
+        const currentSandbox = urlParts[2] || '{{ $currentSandbox }}';
         const currentView = urlParts[3] || '';
 
         // 현재 선택된 값으로 드롭다운 설정

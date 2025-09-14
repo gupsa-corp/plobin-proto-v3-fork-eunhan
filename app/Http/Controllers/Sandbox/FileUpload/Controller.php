@@ -9,11 +9,18 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
+use App\Services\SandboxContextService;
 
 class Controller extends \App\Http\Controllers\Controller
 {
+    protected $sandboxContextService;
     private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
     private const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total
+
+    public function __construct(SandboxContextService $sandboxContextService)
+    {
+        $this->sandboxContextService = $sandboxContextService;
+    }
 
     /**
      * 파일 업로드 처리
@@ -160,7 +167,7 @@ class Controller extends \App\Http\Controllers\Controller
             }
 
             // 파일이 존재하는지 확인
-            $filePath = storage_path('sandbox/storage-sandbox-template/downloads/' . $file['stored_name']);
+            $filePath = $this->sandboxContextService->getSandboxStoragePath() . '/downloads/' . $file['stored_name'];
             if (!file_exists($filePath)) {
                 return response()->json([
                     'success' => false,
@@ -254,7 +261,7 @@ class Controller extends \App\Http\Controllers\Controller
 
         try {
             // 파일 저장 - downloads 디렉토리에 저장하여 파일 목록에 표시되도록 함
-            $uploadPath = storage_path('sandbox/storage-sandbox-template/downloads');
+            $uploadPath = $this->sandboxContextService->getSandboxStoragePath() . '/downloads';
             if (!is_dir($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
@@ -284,7 +291,7 @@ class Controller extends \App\Http\Controllers\Controller
 
         } catch (\Exception $e) {
             // 저장 실패 시 업로드된 파일 삭제
-            $filePath = storage_path('sandbox/storage-sandbox-template/downloads/' . $fullPath);
+            $filePath = $this->sandboxContextService->getSandboxStoragePath() . '/downloads/' . $fullPath;
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
@@ -371,7 +378,7 @@ class Controller extends \App\Http\Controllers\Controller
 
         try {
             // 물리적 파일 삭제
-            $filePath = storage_path('sandbox/storage-sandbox-template/downloads/' . $file['stored_name']);
+            $filePath = $this->sandboxContextService->getSandboxStoragePath() . '/downloads/' . $file['stored_name'];
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
@@ -453,7 +460,7 @@ class Controller extends \App\Http\Controllers\Controller
     private function getSandboxDownloadFiles(array $params = []): array
     {
         try {
-            $downloadsDir = storage_path('sandbox/storage-sandbox-template/downloads');
+            $downloadsDir = $this->sandboxContextService->getSandboxStoragePath() . '/downloads';
             $files = [];
 
             if (is_dir($downloadsDir)) {
@@ -468,7 +475,7 @@ class Controller extends \App\Http\Controllers\Controller
                         $mimeType = $this->getMimeTypeFromFile($file->getPathname());
 
                         // 다운로드 URL 생성
-                        $downloadUrl = url('/sandbox/storage-sandbox-template/downloads/' . $relativePath);
+                        $downloadUrl = url($this->sandboxContextService->getSandboxUrl() . '/downloads/' . $relativePath);
 
                         $files[] = [
                             'id' => $id++,

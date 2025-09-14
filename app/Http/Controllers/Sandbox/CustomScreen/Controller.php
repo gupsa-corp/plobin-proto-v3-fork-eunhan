@@ -4,13 +4,21 @@ namespace App\Http\Controllers\Sandbox\CustomScreen;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Response;
+use App\Services\SandboxContextService;
 
 class Controller extends \App\Http\Controllers\Controller
 {
+    protected $sandboxContextService;
+
+    public function __construct(SandboxContextService $sandboxContextService)
+    {
+        $this->sandboxContextService = $sandboxContextService;
+    }
+
     public function show($id)
     {
         // 템플릿 경로에서 해당 스크린 파일 찾기
-        $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+        $templatePath = $this->sandboxContextService->getSandboxStoragePath() . '/frontend';
         $screenPath = null;
         
         if (File::exists($templatePath)) {

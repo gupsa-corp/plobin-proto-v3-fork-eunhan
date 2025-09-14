@@ -4,9 +4,11 @@ namespace App\Livewire\Sandbox\CustomScreens;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\File;
+use App\Services\SandboxContextService;
 
 class TemplateScreenViewer extends Component
 {
+    protected $sandboxContextService;
     public $domain;
     public $screen;
     public $screenData = null;
@@ -14,6 +16,7 @@ class TemplateScreenViewer extends Component
 
     public function mount($domain, $screen)
     {
+        $this->sandboxContextService = app(SandboxContextService::class);
         $this->domain = $domain;
         $this->screen = $screen;
         $this->loadScreenData();
@@ -27,7 +30,7 @@ class TemplateScreenViewer extends Component
     private function loadScreenData()
     {
         try {
-            $templatePath = base_path('sandbox/container/storage-sandbox-template');
+            $templatePath = $this->sandboxContextService->getSandboxPath();
             $screenPath = $templatePath . '/' . $this->domain . '/' . $this->screen . '/000-content.blade.php';
 
             if (!File::exists($screenPath)) {

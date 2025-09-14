@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Services\SandboxContextService;
 
 class Component extends LivewireComponent
 {
     use WithPagination;
 
+    protected $sandboxContextService;
     public $selectedTable = null;
     public $tableData = [];
     public $columns = [];
@@ -26,12 +28,14 @@ class Component extends LivewireComponent
 
     public function mount()
     {
+        $this->sandboxContextService = app(SandboxContextService::class);
         $this->setupSandboxDatabase();
     }
 
     private function setupSandboxDatabase()
     {
-        $sandboxDbPath = storage_path('sandbox-template/storage-sandbox-template/backend/database/release.sqlite');
+        $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
+        $sandboxDbPath = $this->sandboxContextService->getSandboxStoragePath() . '/backend/database/release.sqlite';
 
         if (file_exists($sandboxDbPath)) {
             Config::set('database.connections.sandbox_sqlite', [
@@ -46,7 +50,8 @@ class Component extends LivewireComponent
     private function getSandboxConnection()
     {
         try {
-            $sandboxDbPath = storage_path('sandbox-template/storage-sandbox-template/backend/database/release.sqlite');
+            $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
+        $sandboxDbPath = $this->sandboxContextService->getSandboxStoragePath() . '/backend/database/release.sqlite';
 
             // 파일 존재 확인
             if (!file_exists($sandboxDbPath)) {

@@ -242,7 +242,7 @@ foreach ($routes as $path => $config) {
         '/dashboard',
         '/organizations/{id}/dashboard',
         '/organizations/{id}/projects/{projectId}/dashboard',
-        '/sandbox/storage-sandbox-template/{domain}/{screen}' // 이미 직접 등록된 템플릿 뷰어 라우트
+        '/sandbox/{sandbox}/{domain}/{screen}' // 이미 직접 등록된 템플릿 뷰어 라우트
     ];
 
     if (in_array($path, $protectedPaths)) {

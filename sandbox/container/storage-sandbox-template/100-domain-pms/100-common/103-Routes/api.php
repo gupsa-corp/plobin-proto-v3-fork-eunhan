@@ -50,7 +50,7 @@ $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
 $pathParts = explode('/', trim($path, '/'));
 
-// sandbox/storage-sandbox-template/backend/api.php/ 이후 부분 찾기
+// sandbox/{sandbox}/backend/api.php/ 이후 부분 찾기
 $apiIndex = array_search('api.php', $pathParts);
 if ($apiIndex !== false && isset($pathParts[$apiIndex + 1])) {
     $endpoint = implode('/', array_slice($pathParts, $apiIndex + 1));

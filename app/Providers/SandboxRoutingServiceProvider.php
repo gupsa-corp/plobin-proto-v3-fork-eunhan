@@ -88,9 +88,9 @@ class SandboxRoutingServiceProvider extends ServiceProvider
         })->name('index');
         
         // 템플릿 화면 직접 렌더링 라우트 (우선순위를 위해 먼저 등록)
-        Route::get('storage-sandbox-template/{domain}/{screen}', function($domain, $screen) {
+        Route::get('{sandbox}/{domain}/{screen}', function($sandbox, $domain, $screen) {
             // 템플릿 파일 경로 생성
-            $templateFile = base_path("sandbox/container/storage-sandbox-template/{$domain}/{$screen}/000-content.blade.php");
+            $templateFile = base_path("sandbox/container/{$sandbox}/{$domain}/{$screen}/000-content.blade.php");
             
             if (!file_exists($templateFile)) {
                 return abort(404, '템플릿 파일을 찾을 수 없습니다.');
@@ -113,7 +113,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
                 $templateContent = preg_replace('/\{\{--.*?--\}\}/ms', '', $templateContent);
                 
                 // PHP 변수들을 실제 값으로 대체
-                $templateContent = str_replace('{{ $screenInfo }}', json_encode(['screen' => $screen, 'domain' => $domain, 'sandbox' => 'storage-sandbox-template']), $templateContent);
+                $templateContent = str_replace('{{ $screenInfo }}', json_encode(['screen' => $screen, 'domain' => $domain, 'sandbox' => $sandbox]), $templateContent);
                 $templateContent = str_replace('{{ $uploadPaths }}', json_encode(['upload' => '/sandbox/upload', 'temp' => '/sandbox/temp', 'download' => '/sandbox/download']), $templateContent);
                 
                 // 함수 호출들을 간단하게 처리
@@ -129,7 +129,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
                 
                 // 템플릿 뷰어에 처리된 템플릿 전달
                 return view('700-page-sandbox.706-page-custom-screens.100-template-viewer', [
-                    'sandboxName' => 'storage-sandbox-template',
+                    'sandboxName' => $sandbox,
                     'customScreen' => [
                         'id' => $domain . '-' . $screen,
                         'title' => ucwords(str_replace('-', ' ', explode('-screen-', $screen)[1] ?? $screen)),
@@ -154,23 +154,23 @@ class SandboxRoutingServiceProvider extends ServiceProvider
           ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+')
           ->where('screen', '\d+-screen-[a-zA-Z0-9\-_]+');
           
-        // 특정 샌드박스의 도메인 목록 (custom-screens, storage-sandbox-template 제외)
+        // 특정 샌드박스의 도메인 목록 (custom-screens 제외)
         Route::get('{sandbox}', [DynamicRouteController::class, 'showDomainList'])
               ->name('domains')
-              ->where('sandbox', '^(?!custom-screens$|storage-sandbox-template$)[a-zA-Z0-9\-_]+$');
+              ->where('sandbox', '^(?!custom-screens$)[a-zA-Z0-9\-_]+$');
         
-        // 특정 도메인의 화면 목록 (storage-sandbox-template 제외)
+        // 특정 도메인의 화면 목록
         Route::get('{sandbox}/{domain}', [DynamicRouteController::class, 'showScreenList'])
               ->name('screens')
-              ->where('sandbox', '^(?!storage-sandbox-template$)[a-zA-Z0-9\-_]+$')
+              ->where('sandbox', '[a-zA-Z0-9\-_]+')
               ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+');
         
-        // 동적 화면 라우트 (GET/POST 모두 지원) - storage-sandbox-template 제외
+        // 동적 화면 라우트 (GET/POST 모두 지원)
         Route::match(['get', 'post'], 
                      '{sandbox}/{domain}/{screen}', 
                      [DynamicRouteController::class, 'handleDynamicRoute'])
               ->name('screen')
-              ->where('sandbox', '^(?!storage-sandbox-template$)[a-zA-Z0-9\-_]+$')
+              ->where('sandbox', '[a-zA-Z0-9\-_]+')
               ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+')
               ->where('screen', '\d+-screen-[a-zA-Z0-9\-_]+');
     }

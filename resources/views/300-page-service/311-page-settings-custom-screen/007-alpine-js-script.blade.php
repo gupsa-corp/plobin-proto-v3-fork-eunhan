@@ -37,8 +37,8 @@ function customScreenSettingsPage() {
         loadSandboxes() {
             this.sandboxes = [
                 {
-                    name: 'storage-sandbox-template',
-                    title: 'Storage Sandbox Template'
+                    name: '{{ $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}',
+                    title: '{{ ucwords(str_replace(["-", "_"], " ", $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox())) }}'
                 }
                 // 추후 다른 샌드박스 추가 가능
             ];

@@ -37,7 +37,7 @@
                 <?php foreach($projectsData as $project): ?>
                     <tr class="hover:bg-gray-50">
                         
-<?php include storage_path('sandbox/storage-sandbox-template/frontend/003-screen-table-view/303-table-row.blade.php'); ?>
+<?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/frontend/003-screen-table-view/303-table-row.blade.php'); ?>
                         
                     </tr>
                 <?php endforeach; ?>

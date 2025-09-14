@@ -340,7 +340,8 @@ function formExecutionData() {
         // 연결 상태 확인
         async checkConnection() {
             try {
-                const response = await fetch('/sandbox/storage-sandbox-template/backend/form-creator.php?action=status', {
+                const currentSandbox = window.location.pathname.split('/')[2];
+                const response = await fetch(`/sandbox/${currentSandbox}/backend/form-creator.php?action=status`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'

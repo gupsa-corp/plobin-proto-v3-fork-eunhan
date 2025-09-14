@@ -4,9 +4,16 @@ namespace App\Http\Controllers\Sandbox\ListScreens;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use App\Services\SandboxContextService;
 
 class Controller extends \App\Http\Controllers\Controller
 {
+    protected $sandboxContextService;
+
+    public function __construct(SandboxContextService $sandboxContextService)
+    {
+        $this->sandboxContextService = $sandboxContextService;
+    }
     /**
      * 선택된 샌드박스의 화면(스크린) 목록을 반환
      */
@@ -19,8 +26,13 @@ class Controller extends \App\Http\Controllers\Controller
         }
 
         // 템플릿 폴더인 경우 특별 처리
-        if ($sandboxName === 'storage-sandbox-template') {
-            return $this->listTemplateScreens();
+        try {
+            $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
+            if ($sandboxName === $currentSandbox) {
+                return $this->listCurrentSandboxScreens();
+            }
+        } catch (\Exception $e) {
+            // 샌드박스가 설정되지 않은 경우 기본 처리
         }
 
         $sandboxPath = storage_path('storage-sandbox-' . $sandboxName);
@@ -277,11 +289,36 @@ class Controller extends \App\Http\Controllers\Controller
     }
 
     /**
-     * 템플릿 폴더의 스크린 목록을 반환
+     * 현재 샌드박스의 스크린 목록을 반환
+     */
+    private function listCurrentSandboxScreens()
+    {
+        $templatePath = $this->sandboxContextService->getSandboxPath();
+
+        if (!File::exists($templatePath)) {
+            return response()->json(['error' => '샌드박스 폴더가 존재하지 않습니다.'], 404);
+        }
+
+        try {
+            $screens = $this->findTemplateScreens($templatePath);
+
+            return response()->json([
+                'sandbox_folder' => $this->sandboxContextService->getCurrentSandbox(),
+                'screens' => $screens,
+                'total_count' => count($screens)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => '샌드박스 스크린 목록을 가져오는 중 오류가 발생했습니다.'], 500);
+        }
+    }
+
+    /**
+     * 템플릿 폴더의 스크린 목록을 반환 (레거시)
      */
     private function listTemplateScreens()
     {
-        $templatePath = base_path('sandbox/container/storage-sandbox-template');
+        $templatePath = $this->sandboxContextService->getSandboxPath();
 
         if (!File::exists($templatePath)) {
             return response()->json(['error' => '템플릿 폴더가 존재하지 않습니다.'], 404);
@@ -291,7 +328,7 @@ class Controller extends \App\Http\Controllers\Controller
             $screens = $this->findTemplateScreens($templatePath);
 
             return response()->json([
-                'sandbox_folder' => 'storage-sandbox-template',
+                'sandbox_folder' => $this->sandboxContextService->getCurrentSandbox(),
                 'screens' => $screens,
                 'total_count' => count($screens)
             ]);

@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Log;
 
 class SandboxService
 {
+    protected $sandboxContextService;
+
+    public function __construct(SandboxContextService $sandboxContextService)
+    {
+        $this->sandboxContextService = $sandboxContextService;
+    }
     /**
      * 프로젝트 페이지의 샌드박스 정보를 가져옵니다.
      */
@@ -37,8 +43,8 @@ class SandboxService
         }
 
         try {
-            // 새로운 컨테이너 기반 템플릿 경로 사용
-            $templatePath = base_path('sandbox/container/storage-sandbox-template');
+            // 동적 샌드박스 경로 사용
+            $templatePath = $this->sandboxContextService->getSandboxPath();
             
             if (!File::exists($templatePath)) {
                 return [];
@@ -110,8 +116,8 @@ class SandboxService
 
         try {
             $screenId = $sandboxInfo['custom_screen_folder'];
-            // 새로운 컨테이너 기반 템플릿 경로 사용  
-            $storagePath = base_path('sandbox/container/storage-sandbox-template');
+            // 동적 샌드박스 경로 사용
+            $storagePath = $this->sandboxContextService->getSandboxPath();
 
             if (!File::exists($storagePath)) {
                 return null;
@@ -276,7 +282,7 @@ class SandboxService
         }
 
         try {
-            $templatePath = base_path('sandbox/container/storage-sandbox-template');
+            $templatePath = $this->sandboxContextService->getSandboxPath();
             
             if (!File::exists($templatePath)) {
                 return null;

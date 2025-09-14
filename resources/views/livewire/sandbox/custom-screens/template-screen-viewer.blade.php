@@ -70,7 +70,7 @@
                                 @php
                                     // 안전하게 Blade 템플릿 내용 렌더링
                                     try {
-                                        echo view()->make('sandbox.container.storage-sandbox-template.' . str_replace('/', '.', $domain . '.' . $screen . '.000-content'))->render();
+                                        $currentSandbox = app(App\Services\SandboxContextService::class)->getCurrentSandbox();\n                                        echo view()->make('sandbox.container.' . $currentSandbox . '.' . str_replace('/', '.', $domain . '.' . $screen . '.000-content'))->render();
                                     } catch (\Exception $e) {
                                         echo '<div class="bg-yellow-50 border border-yellow-200 rounded p-4">';
                                         echo '<h4 class="text-yellow-800 font-medium">템플릿 렌더링 오류</h4>';

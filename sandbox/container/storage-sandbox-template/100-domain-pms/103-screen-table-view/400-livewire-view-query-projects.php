@@ -208,7 +208,8 @@ class SandboxTableView extends Component
     public function render()
     {
         // 샌드박스 템플릿 경로에서 뷰 렌더링
-        $viewPath = storage_path('sandbox/storage-sandbox-template/frontend/003-screen-table-view/700-livewire-table-view.blade.php');
+        $currentSandbox = basename(dirname(dirname(dirname(__DIR__))));
+        $viewPath = storage_path("sandbox/{$currentSandbox}/frontend/003-screen-table-view/700-livewire-table-view.blade.php");
         return view()->file($viewPath);
     }
 }

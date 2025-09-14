@@ -9,7 +9,7 @@
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
                 </svg>
-                <span>Storage Sandbox Template</span>
+                <span>{{ app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}</span>
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
@@ -25,7 +25,7 @@
                 <div class="py-1">
                     <a href="/sandbox/custom-screens" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full mr-2">현재</span>
-                        Storage Sandbox Template
+                        {{ app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}
                     </a>
                     <a href="/sandbox" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <span class="mr-2">📦</span>
@@ -43,7 +43,7 @@
             
             async loadDomains() {
                 try {
-                    const response = await fetch('/api/sandbox/screens?sandbox_folder=storage-sandbox-template');
+                    const response = await fetch('/api/sandbox/screens?sandbox_folder={{ $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}');
                     const data = await response.json();
                     const uniqueDomains = [...new Set(data.screens.map(s => s.domain))];
                     this.domains = uniqueDomains.map(domain => {
@@ -59,12 +59,12 @@
             },
             
             changeDomain(domainId) {
-                const response = fetch('/api/sandbox/screens?sandbox_folder=storage-sandbox-template')
+                const response = fetch('/api/sandbox/screens?sandbox_folder={{ $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}')
                     .then(response => response.json())
                     .then(data => {
                         const firstScreenInDomain = data.screens.find(s => s.domain === domainId);
                         if (firstScreenInDomain) {
-                            window.location.href = `/sandbox/storage-sandbox-template/${firstScreenInDomain.domain}/${firstScreenInDomain.screen}`;
+                            window.location.href = `{{ $sandbox_url ?? '/sandbox/' . ($current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox()) }}/${firstScreenInDomain.domain}/${firstScreenInDomain.screen}`;
                         }
                     });
             }
@@ -113,7 +113,7 @@
 
             async loadCurrentDomainScreens() {
                 try {
-                    const response = await fetch('/api/sandbox/screens?sandbox_folder=storage-sandbox-template');
+                    const response = await fetch('/api/sandbox/screens?sandbox_folder={{ $current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox() }}');
                     const data = await response.json();
                     // 현재 도메인의 화면들만 필터링
                     this.currentDomainScreens = data.screens.filter(s => s.domain === this.currentDomain) || [];
@@ -125,7 +125,7 @@
             changeScreen(screenId) {
                 const screen = this.currentDomainScreens.find(s => s.screen === screenId);
                 if (screen) {
-                    window.location.href = `/sandbox/storage-sandbox-template/${screen.domain}/${screen.screen}`;
+                    window.location.href = `{{ $sandbox_url ?? '/sandbox/' . ($current_sandbox ?? app(\App\Services\SandboxContextService::class)->getCurrentSandbox()) }}/${screen.domain}/${screen.screen}`;
                 }
             }
         }" x-init="loadCurrentDomainScreens()">

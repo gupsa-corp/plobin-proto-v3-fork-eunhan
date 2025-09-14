@@ -105,7 +105,9 @@ test.describe('커스텀 화면 테스트', () => {
 
     // 4. 커스텀 화면 URL로 직접 이동 시도 (새로운 샌드박스 템플릿 구조)
     console.log('커스텀 화면 URL로 이동 중...');
-    await page.goto('/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view');
+    // 환경 변수에서 템플릿명을 가져오거나 기본 샌드박스 템플릿을 찾아 사용
+    const sandboxTemplate = process.env.TEST_SANDBOX_TEMPLATE || 'default-template';
+    await page.goto(`/sandbox/${sandboxTemplate}/100-domain-pms/103-screen-table-view`);
     await page.waitForLoadState('networkidle');
 
     const customScreenUrl = page.url();

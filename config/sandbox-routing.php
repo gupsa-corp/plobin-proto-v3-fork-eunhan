@@ -18,7 +18,17 @@ return [
     /**
      * 기본 템플릿 폴더명
      */
-    'default_template' => env('SANDBOX_DEFAULT_TEMPLATE', 'storage-sandbox-template'),
+    'default_template' => env('SANDBOX_DEFAULT_TEMPLATE'),
+    
+    /**
+     * 동적 샌드박스 지원 설정
+     */
+    'enable_dynamic_sandbox' => env('SANDBOX_ENABLE_DYNAMIC', true),
+    
+    /**
+     * 샌드박스 자동 감지 설정 (URL에서)
+     */
+    'auto_detect_from_url' => env('SANDBOX_AUTO_DETECT_URL', true),
     
     /**
      * 라우팅 패턴 설정

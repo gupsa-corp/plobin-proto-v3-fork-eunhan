@@ -1,22 +1,22 @@
 {{-- AI 문서 에셋 분석 결과 화면 --}}
-<?php 
+<?php
     require_once __DIR__ . "/../../../../../../bootstrap.php";
 use App\Services\TemplateCommonService;
-    
+
 
     $screenInfo = TemplateCommonService::getCurrentTemplateScreenInfo();
     $uploadPaths = TemplateCommonService::getTemplateUploadPaths();
-    
+
     // URL에서 file_id 파라미터 가져오기
     $fileId = $_GET['file_id'] ?? null;
 ?>
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6" 
-     x-data="documentAnalysisData(<?= intval($fileId) ?>)" 
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6"
+     x-data="documentAnalysisData(<?= intval($fileId) ?>)"
      x-init="init()"
      x-cloak>
     {{-- 글로벌 네비게이션 포함 --}}
     @include('700-page-sandbox.700-common.100-sandbox-navigation')
-    
+
     {{-- 헤더 --}}
     <div class="mb-8">
         <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -35,7 +35,7 @@ use App\Services\TemplateCommonService;
                             <p x-show="documentData.file" class="text-sm text-indigo-600" x-text="documentData.file?.original_name"></p>
                             <div class="flex items-center space-x-2">
                                 <label for="file-selector" class="text-xs text-gray-500">파일 선택:</label>
-                                <select id="file-selector" 
+                                <select id="file-selector"
                                         @change="changeFile($event.target.value)"
                                         :value="fileId"
                                         class="text-xs bg-white border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
@@ -51,7 +51,7 @@ use App\Services\TemplateCommonService;
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center space-x-2">
                             <label for="json-version-selector" class="text-xs text-gray-500">JSON 버전:</label>
-                            <select id="json-version-selector" 
+                            <select id="json-version-selector"
                                     @change="loadJsonVersion($event.target.value)"
                                     :value="currentJsonVersion"
                                     class="text-xs bg-white border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500">
@@ -60,11 +60,11 @@ use App\Services\TemplateCommonService;
                                 </template>
                             </select>
                         </div>
-                        <button @click="showJsonManager = true" 
+                        <button @click="showJsonManager = true"
                                 class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
                             📁 JSON 관리
                         </button>
-                        <button @click="saveCurrentJson()" 
+                        <button @click="saveCurrentJson()"
                                 class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
                             💾 저장
                         </button>
@@ -82,7 +82,7 @@ use App\Services\TemplateCommonService;
     </div>
 
     {{-- JSON 관리 모달 --}}
-    <div x-show="showJsonManager" 
+    <div x-show="showJsonManager"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -91,10 +91,10 @@ use App\Services\TemplateCommonService;
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
          @click="showJsonManager = false">
-        
+
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden"
              @click.stop>
-            
+
             {{-- 모달 헤더 --}}
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
                 <div class="flex items-center justify-between">
@@ -102,7 +102,7 @@ use App\Services\TemplateCommonService;
                         <span class="text-2xl">📁</span>
                         <h2 class="text-xl font-bold">JSON 데이터 관리</h2>
                     </div>
-                    <button @click="showJsonManager = false" 
+                    <button @click="showJsonManager = false"
                             class="text-white hover:text-gray-200 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -110,10 +110,10 @@ use App\Services\TemplateCommonService;
                     </button>
                 </div>
             </div>
-            
+
             {{-- 모달 내용 --}}
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-                
+
                 {{-- 저장 섹션 --}}
                 <div class="mb-8">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -122,37 +122,37 @@ use App\Services\TemplateCommonService;
                     </h3>
                     <div class="bg-green-50 p-4 rounded-lg border border-green-200">
                         <div class="flex items-center space-x-4 mb-3">
-                            <input type="text" 
-                                   x-model="saveFileName" 
+                            <input type="text"
+                                   x-model="saveFileName"
                                    placeholder="파일명을 입력하세요 (예: 프로젝트_분석_v1)"
                                    class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            <button @click="saveToLocalStorage()" 
+                            <button @click="saveToLocalStorage()"
                                     class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center space-x-2">
                                 <span>💾</span>
                                 <span>로컬 저장</span>
                             </button>
-                            <button @click="downloadCurrentJson()" 
+                            <button @click="downloadCurrentJson()"
                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center space-x-2">
                                 <span>⬇️</span>
                                 <span>다운로드</span>
                             </button>
                         </div>
                         <p class="text-sm text-gray-600">
-                            JSON 버전: <span class="font-medium text-green-700" x-text="currentJsonVersion"></span> | 
-                            문서 버전: <span class="font-medium text-green-700" x-text="documentVersion"></span> | 
+                            JSON 버전: <span class="font-medium text-green-700" x-text="currentJsonVersion"></span> |
+                            문서 버전: <span class="font-medium text-green-700" x-text="documentVersion"></span> |
                             파일: <span class="font-medium text-green-700" x-text="fileNames[fileId]"></span> |
                             섹션 수: <span class="font-medium text-green-700" x-text="documentData.assets?.length || 0"></span>개
                         </p>
                     </div>
                 </div>
-                
+
                 {{-- 불러오기 섹션 --}}
                 <div class="mb-8">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="text-blue-500 mr-2">📂</span>
                         저장된 데이터 불러오기
                     </h3>
-                    
+
                     {{-- 로컬 저장소 목록 --}}
                     <div class="mb-6">
                         <h4 class="text-md font-medium text-gray-800 mb-3">로컬 저장소</h4>
@@ -166,19 +166,19 @@ use App\Services\TemplateCommonService;
                                         <div class="flex-1">
                                             <div class="font-medium text-gray-900" x-text="file.fileName"></div>
                                             <div class="text-sm text-gray-500">
-                                                <span x-text="file.version"></span> | 
-                                                <span x-text="file.documentVersion || 'v1.0'"></span> | 
-                                                <span x-text="file.originalFileName"></span> | 
+                                                <span x-text="file.version"></span> |
+                                                <span x-text="file.documentVersion || 'v1.0'"></span> |
+                                                <span x-text="file.originalFileName"></span> |
                                                 <span x-text="file.sectionsCount"></span>개 섹션 |
                                                 <span x-text="new Date(file.createdAt).toLocaleString('ko-KR')"></span>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-2">
-                                            <button @click="loadFromLocalStorage(file.id)" 
+                                            <button @click="loadFromLocalStorage(file.id)"
                                                     class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
                                                 불러오기
                                             </button>
-                                            <button @click="deleteFromLocalStorage(file.id)" 
+                                            <button @click="deleteFromLocalStorage(file.id)"
                                                     class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors">
                                                 삭제
                                             </button>
@@ -188,12 +188,12 @@ use App\Services\TemplateCommonService;
                             </div>
                         </div>
                     </div>
-                    
+
                     {{-- 파일 업로드 --}}
                     <div>
                         <h4 class="text-md font-medium text-gray-800 mb-3">파일에서 불러오기</h4>
                         <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                            <input type="file" 
+                            <input type="file"
                                    accept=".json"
                                    @change="handleFileUpload($event)"
                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700">
@@ -201,7 +201,7 @@ use App\Services\TemplateCommonService;
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- 통계 섹션 --}}
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -225,17 +225,17 @@ use App\Services\TemplateCommonService;
                         </div>
                     </div>
                 </div>
-                
+
             </div>
-            
+
             {{-- 모달 푸터 --}}
             <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
-                <button @click="clearAllLocalStorage()" 
+                <button @click="clearAllLocalStorage()"
                         class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                         x-confirm="정말로 모든 저장된 데이터를 삭제하시겠습니까?">
                     🗑️ 전체 삭제
                 </button>
-                <button @click="showJsonManager = false" 
+                <button @click="showJsonManager = false"
                         class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
                     닫기
                 </button>
@@ -266,19 +266,19 @@ use App\Services\TemplateCommonService;
 
     {{-- 연속된 섹션 표시 (1-30) --}}
     <div x-show="!isLoading && documentData.assets && documentData.assets.length > 0" class="space-y-4">
-        
+
         {{-- 섹션 리스트 --}}
         <template x-for="(asset, index) in documentData.assets.slice(0, 30)" :key="asset.id">
             <div class="bg-white rounded-xl shadow-sm overflow-hidden border-l-4"
                  :class="getAssetBorderColor(asset.asset_type)">
-                
+
                 {{-- 섹션 헤더 --}}
                 <div class="bg-gray-50 px-6 py-3 border-b">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <span class="text-lg" x-text="asset.asset_type_icon"></span>
                             <h3 class="text-lg font-semibold text-gray-900" x-text="asset.section_title"></h3>
-                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full" 
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full"
                                   x-text="asset.asset_type_name"></span>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -287,10 +287,10 @@ use App\Services\TemplateCommonService;
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- 섹션 내용 --}}
                 <div class="p-6 space-y-4">
-                    
+
                     {{-- 원문 --}}
                     <div>
                         <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -301,7 +301,7 @@ use App\Services\TemplateCommonService;
                             <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" x-text="asset.content"></p>
                         </div>
                     </div>
-                    
+
                     {{-- AI 요약 --}}
                     <div>
                         <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
@@ -309,28 +309,28 @@ use App\Services\TemplateCommonService;
                                 <span class="text-green-500 mr-2">🤖</span>
                                 AI 요약
                             </div>
-                            <button @click="toggleEditMode(index, 'ai_summary')" 
+                            <button @click="toggleEditMode(index, 'ai_summary')"
                                     class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                     x-text="isEditing(index, 'ai_summary') ? '취소' : '편집'">
                             </button>
                         </h4>
                         <div class="bg-green-50 p-3 rounded-lg">
                             {{-- 읽기 모드 --}}
-                            <p x-show="!isEditing(index, 'ai_summary')" 
-                               class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" 
+                            <p x-show="!isEditing(index, 'ai_summary')"
+                               class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"
                                x-text="asset.summary?.ai_summary"></p>
-                            
+
                             {{-- 편집 모드 --}}
                             <div x-show="isEditing(index, 'ai_summary')" class="space-y-3">
                                 <textarea x-model="editingContent[index] && editingContent[index]['ai_summary']"
                                           class="w-full p-2 border border-gray-300 rounded resize-vertical min-h-[100px] text-sm"
                                           placeholder="AI 요약을 입력하세요..."></textarea>
                                 <div class="flex space-x-2">
-                                    <button @click="saveEdit(index, 'ai_summary')" 
+                                    <button @click="saveEdit(index, 'ai_summary')"
                                             class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
                                         💾 저장 (새 버전)
                                     </button>
-                                    <button @click="cancelEdit(index, 'ai_summary')" 
+                                    <button @click="cancelEdit(index, 'ai_summary')"
                                             class="px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors">
                                         ❌ 취소
                                     </button>
@@ -338,7 +338,7 @@ use App\Services\TemplateCommonService;
                             </div>
                         </div>
                     </div>
-                    
+
                     {{-- 도움되는 내용 --}}
                     <div>
                         <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -380,7 +380,7 @@ function documentAnalysisData(fileId) {
         selectedAsset: null,
         fileNames: {
             1: 'AI 기술 동향 보고서 2024.pdf',
-            2: '프로젝트 제안서 - 스마트 시티 플랫폼.docx', 
+            2: '프로젝트 제안서 - 스마트 시티 플랫폼.docx',
             3: '시장 분석 리포트 - AI 솔루션 트렌드.pdf',
             4: '대규모 시스템 설계서 - 35개 섹션.pdf',
             5: '블록체인 기술 백서 - 30개 챕터.pdf',
@@ -402,11 +402,11 @@ function documentAnalysisData(fileId) {
         showJsonManager: false,
         saveFileName: '',
         savedJsonFiles: [],
-        
+
         // 편집 상태 관리 데이터
         editingStates: {},     // 각 섹션별 편집 상태 (예: {"0_ai_summary": true})
         editingContent: {},    // 편집 중인 임시 내용 (예: {0: {ai_summary: "편집 중인 내용"}})
-        
+
         // 문서 버전 관리
         documentVersion: 'v1.0',
         documentVersionHistory: [],    // 문서 전체 버전 기록
@@ -419,25 +419,25 @@ function documentAnalysisData(fileId) {
                 // 기본값으로 file_id=1 설정
                 this.showNotification('파일 ID가 지정되지 않아 기본 파일을 로드합니다.', 'info');
                 this.fileId = 1;
-                
+
                 // URL에 file_id 파라미터 추가
                 const url = new URL(window.location);
                 url.searchParams.set('file_id', '1');
                 window.history.replaceState({}, '', url);
             }
-            
+
             // 저장된 JSON 파일 목록 로드
             this.loadSavedJsonFiles();
-            
+
             // fileNames 로드
             await this.loadFileNames();
-            
+
             // 버전 파일 목록 로드
             await this.loadAvailableVersions();
-            
+
             await this.loadDocumentAssets();
         },
-        
+
         // 파일명 로드
         async loadFileNames() {
             try {
@@ -458,7 +458,7 @@ function documentAnalysisData(fileId) {
                 };
             }
         },
-        
+
         // 사용 가능한 버전 파일 목록 로드
         async loadAvailableVersions() {
             try {
@@ -482,22 +482,22 @@ function documentAnalysisData(fileId) {
         async loadDocumentAssets() {
             try {
                 this.isLoading = true;
-                
+
                 // Mock 데이터 로딩 시뮬레이션
                 await new Promise(resolve => setTimeout(resolve, 1500));
-                
+
                 // Mock 데이터 로딩 (JSON 파일에서, 실패시 fallback)
                 const mockData = await this.loadMockData(this.fileId);
-                
+
                 this.documentData.file = mockData.file;
                 this.documentData.assets = mockData.assets;
                 this.documentData.analysis_progress = 100;
                 this.documentData.analysis_status = 'completed';
-                
+
                 if (this.documentData.assets && this.documentData.assets.length > 0) {
                     this.selectAsset(0);
                 }
-                
+
             } catch (error) {
                 console.error('Error loading document assets:', error);
                 this.showNotification('에셋 정보를 불러오는데 실패했습니다: ' + error.message, 'error');
@@ -513,10 +513,10 @@ function documentAnalysisData(fileId) {
                 const currentVersion = this.availableJsonVersions.find(v => v.id === this.currentJsonVersion);
                 const fileName = currentVersion ? currentVersion.file : 'mock-data.json';
                 const filePath = fileName.includes('-') ? `./versions/${fileName}` : `./${fileName}`;
-                
+
                 const response = await fetch(filePath);
                 const data = await response.json();
-                
+
                 // 버전별 데이터인지 확인
                 if (data.file && data.assets) {
                     // 버전별 파일 형식
@@ -544,7 +544,7 @@ function documentAnalysisData(fileId) {
                 return this.generateMockData(fileId);
             }
         },
-        
+
         // Mock 데이터 생성 (폴백용)
         generateMockData(fileId) {
             const mockAssets = {
@@ -682,7 +682,7 @@ function documentAnalysisData(fileId) {
                     }
                 ]
             };
-            
+
             const defaultFile = {
                 id: fileId,
                 original_name: this.fileNames[fileId] || '문서 파일.pdf',
@@ -692,7 +692,7 @@ function documentAnalysisData(fileId) {
                 is_analysis_completed: true,
                 analysis_status: 'completed'
             };
-            
+
             return {
                 file: defaultFile,
                 assets: mockAssets[fileId] || mockAssets[1] // 기본값으로 첫 번째 문서 사용
@@ -754,11 +754,11 @@ function documentAnalysisData(fileId) {
             try {
                 // Mock 저장 시뮬레이션
                 await new Promise(resolve => setTimeout(resolve, 800));
-                
+
                 // 로컬 데이터 업데이트
                 this.selectedAsset.summary[field] = this.editContent[field];
                 this.documentData.assets[this.selectedAssetIndex].summary[field] = this.editContent[field];
-                
+
                 // 새 버전 생성 시뮬레이션
                 const newVersionNumber = this.selectedAsset.summary.versions_count + 1;
                 const newVersion = {
@@ -768,17 +768,17 @@ function documentAnalysisData(fileId) {
                     edit_type: 'user_edit',
                     is_current: true
                 };
-                
+
                 // 기존 버전들을 current가 아니도록 변경
                 this.selectedAsset.summary.versions.forEach(v => v.is_current = false);
-                
+
                 // 새 버전을 맨 앞에 추가
                 this.selectedAsset.summary.versions.unshift(newVersion);
                 this.selectedAsset.summary.versions_count = newVersionNumber;
-                
+
                 this.cancelEdit(field);
                 this.showNotification('성공적으로 저장되었습니다! 새로운 버전이 생성되었습니다.', 'success');
-                
+
             } catch (error) {
                 console.error('Error saving edit:', error);
                 this.showNotification('저장에 실패했습니다: ' + error.message, 'error');
@@ -798,24 +798,24 @@ function documentAnalysisData(fileId) {
                     this.showNotification('해당 버전을 찾을 수 없습니다.', 'error');
                     return;
                 }
-                
+
                 // 모든 버전의 is_current를 false로 변경
                 this.selectedAsset.summary.versions.forEach(version => {
                     version.is_current = version.version_number == versionNumber;
                 });
-                
+
                 // 선택된 버전의 내용으로 현재 표시 내용 업데이트
                 if (selectedVersion.content) {
                     this.selectedAsset.summary.ai_summary = selectedVersion.content.ai_summary;
                     this.selectedAsset.summary.helpful_content = selectedVersion.content.helpful_content;
-                    
+
                     // documentData.assets에도 반영
                     this.documentData.assets[this.selectedAssetIndex].summary.ai_summary = selectedVersion.content.ai_summary;
                     this.documentData.assets[this.selectedAssetIndex].summary.helpful_content = selectedVersion.content.helpful_content;
                 }
-                
+
                 this.showNotification(`버전 ${versionNumber}로 성공적으로 전환되었습니다!`, 'success');
-                
+
             } catch (error) {
                 console.error('Error switching version:', error);
                 this.showNotification('버전 전환에 실패했습니다: ' + error.message, 'error');
@@ -827,25 +827,25 @@ function documentAnalysisData(fileId) {
             try {
                 const asset = this.documentData.assets[sectionIndex];
                 const selectedVersion = asset.summary.versions?.find(v => v.version_number == versionNumber);
-                
+
                 if (!selectedVersion) {
                     this.showNotification('해당 버전을 찾을 수 없습니다.', 'error');
                     return;
                 }
-                
+
                 // 모든 버전의 is_current를 false로 변경
                 asset.summary.versions.forEach(version => {
                     version.is_current = version.version_number == versionNumber;
                 });
-                
+
                 // 선택된 버전의 내용으로 현재 표시 내용 업데이트
                 if (selectedVersion.content) {
                     asset.summary.ai_summary = selectedVersion.content.ai_summary;
                     asset.summary.helpful_content = selectedVersion.content.helpful_content;
                 }
-                
+
                 this.showNotification(`섹션 ${sectionIndex + 1}의 버전 ${versionNumber}로 전환되었습니다!`, 'success');
-                
+
             } catch (error) {
                 console.error('Error switching section version:', error);
                 this.showNotification('버전 전환에 실패했습니다: ' + error.message, 'error');
@@ -888,11 +888,11 @@ function documentAnalysisData(fileId) {
             try {
                 this.isLoading = true;
                 this.currentJsonVersion = versionId;
-                
-                // 실제로는 서버에서 JSON을 로드해야 하지만, 
+
+                // 실제로는 서버에서 JSON을 로드해야 하지만,
                 // 현재는 Mock 데이터를 다시 생성
                 await this.loadDocumentAssets();
-                
+
                 this.showNotification(`JSON 버전 ${versionId}로 전환되었습니다.`, 'success');
             } catch (error) {
                 console.error('Error loading JSON version:', error);
@@ -938,13 +938,13 @@ function documentAnalysisData(fileId) {
                     version: this.currentJsonVersion,
                     fileId: this.fileId,
                     originalFileName: this.fileNames[this.fileId],
-                    
+
                     // 문서 버전 정보
                     documentVersion: this.documentVersion,
                     documentMajorVersion: this.documentMajorVersion,
                     documentMinorVersion: this.documentMinorVersion,
                     documentVersionHistory: this.documentVersionHistory,
-                    
+
                     // 섹션별 완전한 버전 정보 포함
                     assets: this.documentData.assets.map(asset => ({
                         ...asset,
@@ -960,20 +960,20 @@ function documentAnalysisData(fileId) {
                             })) || []
                         }
                     })),
-                    
+
                     sectionsCount: this.documentData.assets?.length || 0,
                     createdAt: new Date().toISOString(),
-                    
+
                     // 현재 문서 스냅샷
                     currentSnapshot: this.createSectionsSnapshot()
                 };
 
                 // 기존 저장된 파일 목록에 추가
                 this.savedJsonFiles.unshift(jsonData);
-                
+
                 // 로컬스토리지에 저장
                 localStorage.setItem('documentAnalysis_savedFiles', JSON.stringify(this.savedJsonFiles));
-                
+
                 this.showNotification(`'${this.saveFileName}' 파일이 ${this.documentVersion}으로 로컬 저장소에 저장되었습니다!`, 'success');
                 this.saveFileName = '';
                 this.generateDefaultFileName();
@@ -990,13 +990,13 @@ function documentAnalysisData(fileId) {
                     version: this.currentJsonVersion,
                     fileId: this.fileId,
                     fileName: this.fileNames[this.fileId],
-                    
+
                     // 문서 버전 정보
                     documentVersion: this.documentVersion,
                     documentMajorVersion: this.documentMajorVersion,
                     documentMinorVersion: this.documentMinorVersion,
                     documentVersionHistory: this.documentVersionHistory,
-                    
+
                     // 섹션별 완전한 버전 정보 포함
                     assets: this.documentData.assets.map(asset => ({
                         ...asset,
@@ -1012,14 +1012,14 @@ function documentAnalysisData(fileId) {
                             })) || []
                         }
                     })),
-                    
+
                     sectionsCount: this.documentData.assets?.length || 0,
                     createdAt: new Date().toISOString(),
-                    
+
                     // 현재 문서 스냅샷
                     currentSnapshot: this.createSectionsSnapshot()
                 };
-                
+
                 const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1048,23 +1048,23 @@ function documentAnalysisData(fileId) {
                 }
 
                 this.isLoading = true;
-                
+
                 // 데이터 로드
                 this.documentData.assets = savedFile.assets;
                 this.currentJsonVersion = savedFile.version;
                 this.fileId = savedFile.fileId;
-                
+
                 // 문서 버전 정보 복원 (기존 파일 호환성 고려)
                 this.documentVersion = savedFile.documentVersion || 'v1.0';
                 this.documentMajorVersion = savedFile.documentMajorVersion || 1;
                 this.documentMinorVersion = savedFile.documentMinorVersion || 0;
                 this.documentVersionHistory = savedFile.documentVersionHistory || [];
-                
+
                 // URL 업데이트
                 const url = new URL(window.location);
                 url.searchParams.set('file_id', this.fileId.toString());
                 window.history.replaceState({}, '', url);
-                
+
                 this.isLoading = false;
                 this.showJsonManager = false;
                 this.showNotification(`'${savedFile.fileName}' (${this.documentVersion}) 파일을 성공적으로 불러왔습니다!`, 'success');
@@ -1084,7 +1084,7 @@ function documentAnalysisData(fileId) {
 
                 this.savedJsonFiles = this.savedJsonFiles.filter(file => file.id !== fileId);
                 localStorage.setItem('documentAnalysis_savedFiles', JSON.stringify(this.savedJsonFiles));
-                
+
                 this.showNotification('파일이 성공적으로 삭제되었습니다.', 'success');
             } catch (error) {
                 console.error('Error deleting file:', error);
@@ -1101,7 +1101,7 @@ function documentAnalysisData(fileId) {
 
                 localStorage.removeItem('documentAnalysis_savedFiles');
                 this.savedJsonFiles = [];
-                
+
                 this.showNotification('모든 저장된 데이터가 삭제되었습니다.', 'success');
             } catch (error) {
                 console.error('Error clearing localStorage:', error);
@@ -1119,7 +1119,7 @@ function documentAnalysisData(fileId) {
                 reader.onload = (e) => {
                     try {
                         const jsonData = JSON.parse(e.target.result);
-                        
+
                         // JSON 데이터 검증
                         if (!jsonData.assets || !Array.isArray(jsonData.assets)) {
                             this.showNotification('올바른 문서 분석 JSON 파일이 아닙니다.', 'error');
@@ -1127,22 +1127,22 @@ function documentAnalysisData(fileId) {
                         }
 
                         this.isLoading = true;
-                        
+
                         // 데이터 로드
                         this.documentData.assets = jsonData.assets;
                         this.currentJsonVersion = jsonData.version || 'v1';
-                        
+
                         if (jsonData.fileId && this.fileNames[jsonData.fileId]) {
                             this.fileId = jsonData.fileId;
                             const url = new URL(window.location);
                             url.searchParams.set('file_id', this.fileId.toString());
                             window.history.replaceState({}, '', url);
                         }
-                        
+
                         this.isLoading = false;
                         this.showJsonManager = false;
                         this.showNotification(`JSON 파일을 성공적으로 불러왔습니다! (${jsonData.sectionsCount || jsonData.assets.length}개 섹션)`, 'success');
-                        
+
                         // 파일 입력 초기화
                         event.target.value = '';
                     } catch (parseError) {
@@ -1177,19 +1177,19 @@ function documentAnalysisData(fileId) {
         // 편집 모드 토글
         toggleEditMode(sectionIndex, field) {
             const key = `${sectionIndex}_${field}`;
-            
+
             if (this.editingStates[key]) {
                 // 편집 모드 종료 (취소)
                 this.cancelEdit(sectionIndex, field);
             } else {
                 // 편집 모드 시작
                 this.editingStates[key] = true;
-                
+
                 // 편집용 임시 데이터 초기화
                 if (!this.editingContent[sectionIndex]) {
                     this.editingContent[sectionIndex] = {};
                 }
-                
+
                 // 현재 내용을 편집 임시 저장소에 복사
                 this.editingContent[sectionIndex][field] = this.documentData.assets[sectionIndex].summary[field] || '';
             }
@@ -1205,10 +1205,10 @@ function documentAnalysisData(fileId) {
         cancelEdit(sectionIndex, field) {
             const key = `${sectionIndex}_${field}`;
             delete this.editingStates[key];
-            
+
             if (this.editingContent[sectionIndex]) {
                 delete this.editingContent[sectionIndex][field];
-                
+
                 // 해당 섹션에 편집 중인 필드가 없으면 객체 자체 삭제
                 if (Object.keys(this.editingContent[sectionIndex]).length === 0) {
                     delete this.editingContent[sectionIndex];
@@ -1220,21 +1220,21 @@ function documentAnalysisData(fileId) {
         async saveEdit(sectionIndex, field) {
             try {
                 const newContent = this.editingContent[sectionIndex][field];
-                
+
                 if (!newContent || !newContent.trim()) {
                     this.showNotification('내용을 입력해주세요.', 'error');
                     return;
                 }
-                
+
                 // 새 버전 생성
                 this.createNewVersion(sectionIndex, field, newContent.trim());
-                
+
                 // 편집 모드 종료
                 this.cancelEdit(sectionIndex, field);
-                
+
                 // 성공 알림
                 this.showNotification(`AI 요약이 새 버전(v${this.getCurrentVersionNumber(sectionIndex)})으로 저장되었습니다!`, 'success');
-                
+
             } catch (error) {
                 console.error('Error saving edit:', error);
                 this.showNotification('저장에 실패했습니다: ' + error.message, 'error');
@@ -1244,11 +1244,11 @@ function documentAnalysisData(fileId) {
         // 새 버전 생성 함수
         createNewVersion(sectionIndex, field, newContent) {
             const asset = this.documentData.assets[sectionIndex];
-            
+
             // 현재 버전 찾기
             const currentVersion = asset.summary.versions?.find(v => v.is_current);
             const newVersionNumber = Math.max(...(asset.summary.versions?.map(v => v.version_number) || [1])) + 1;
-            
+
             // versions 배열이 없으면 초기화
             if (!asset.summary.versions) {
                 asset.summary.versions = [];
@@ -1266,10 +1266,10 @@ function documentAnalysisData(fileId) {
                     created_at: new Date(Date.now() - 1000).toISOString()
                 });
             }
-            
+
             // 기존 버전들을 current false로 변경
             asset.summary.versions.forEach(v => v.is_current = false);
-            
+
             // 새 버전 생성
             const newVersion = {
                 id: Date.now(),
@@ -1283,16 +1283,16 @@ function documentAnalysisData(fileId) {
                 },
                 created_at: new Date().toISOString()
             };
-            
+
             // 새 버전 추가
             asset.summary.versions.push(newVersion);
-            
+
             // 현재 표시되는 내용 업데이트
             asset.summary[field] = newContent;
-            
+
             // 버전 카운트 업데이트
             asset.summary.versions_count = asset.summary.versions.length;
-            
+
             // 문서 버전 증가 및 스냅샷 생성
             this.incrementDocumentVersion(sectionIndex, field, newContent);
         },
@@ -1309,7 +1309,7 @@ function documentAnalysisData(fileId) {
             // 부 버전 증가
             this.documentMinorVersion++;
             this.documentVersion = `v${this.documentMajorVersion}.${this.documentMinorVersion}`;
-            
+
             // 문서 버전 스냅샷 생성
             const documentSnapshot = {
                 id: Date.now(),
@@ -1323,7 +1323,7 @@ function documentAnalysisData(fileId) {
                 created_at: new Date().toISOString(),
                 sections_snapshot: this.createSectionsSnapshot()
             };
-            
+
             // 문서 버전 히스토리에 추가
             this.documentVersionHistory.push(documentSnapshot);
         },
@@ -1350,28 +1350,28 @@ function documentAnalysisData(fileId) {
                 window.location.href = url.toString();
             }
         },
-        
+
         // JSON 버전 변경
         async loadJsonVersion(versionId) {
             try {
                 this.isLoading = true;
                 this.currentJsonVersion = versionId;
-                
+
                 // 새로운 버전의 데이터 로드
                 const mockData = await this.loadMockData(this.fileId);
-                
+
                 this.documentData.file = mockData.file;
                 this.documentData.assets = mockData.assets;
                 this.documentData.analysis_progress = 100;
                 this.documentData.analysis_status = 'completed';
-                
+
                 if (this.documentData.assets && this.documentData.assets.length > 0) {
                     this.selectAsset(0);
                 }
-                
+
                 const versionName = this.availableJsonVersions.find(v => v.id === versionId)?.name || versionId;
                 this.showNotification(`${versionName} 버전을 로드했습니다.`, 'success');
-                
+
             } catch (error) {
                 console.error('Error loading JSON version:', error);
                 this.showNotification('버전 로드에 실패했습니다: ' + error.message, 'error');

@@ -29,9 +29,10 @@ $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "
 
 // 샌드박스 기본 경로 추출
 $sandboxBasePath = '';
-if (preg_match('#/sandbox/storage-sandbox-template#', $currentUrlPath)) {
-    $parts = explode('/sandbox/storage-sandbox-template', $currentUrlPath);
-    $sandboxBasePath = '/sandbox/storage-sandbox-template';
+if (preg_match('#/sandbox/([^/]+)#', $currentUrlPath, $matches)) {
+    $currentSandbox = $matches[1];
+    $parts = explode("/sandbox/{$currentSandbox}", $currentUrlPath);
+    $sandboxBasePath = "/sandbox/{$currentSandbox}";
 }
 
 // 현재 화면의 전체 URL

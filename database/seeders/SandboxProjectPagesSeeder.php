@@ -73,7 +73,7 @@ class SandboxProjectPagesSeeder extends Seeder
                 'title' => '📊 대시보드',
                 'slug' => 'dashboard',
                 'content' => '실시간 프로젝트 통계와 최근 활동을 확인할 수 있는 대시보드입니다.',
-                'sandbox_folder' => 'storage-sandbox-template',
+                'sandbox_folder' => config('sandbox-routing.default_template'),
                 'sandbox_custom_screen_folder' => '001-screen-dashboard',
                 'parent_id' => null,
             ],

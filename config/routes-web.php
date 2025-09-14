@@ -81,8 +81,8 @@ return [
     '/sandbox/database-manager' => ['view' => '700-page-sandbox.705-page-database-manager.000-index', 'name' => 'sandbox.database-manager'],
     '/sandbox/git-version-control' => ['view' => '700-page-sandbox.705-page-git-version-control.000-index', 'name' => 'sandbox.git-version-control'],
     '/sandbox/custom-screens' => ['view' => '700-page-sandbox.706-page-custom-screens.000-index', 'name' => 'sandbox.custom-screens'],
-    // Storage sandbox template screen routes
-    '/sandbox/storage-sandbox-template/{domain}/{screen}' => ['view' => '700-page-sandbox.706-page-custom-screens.100-template-screen-viewer', 'name' => 'sandbox.template-screen'],
+    // 동적 샌드박스 템플릿 스크린 라우트 (모든 샌드박스 지원)
+    '/sandbox/{sandbox}/{domain}/{screen}' => ['view' => '700-page-sandbox.706-page-custom-screens.100-template-screen-viewer', 'name' => 'sandbox.template-screen'],
     '/sandbox/storage-manager' => ['view' => '700-page-sandbox.707-page-storage-manager.000-index', 'name' => 'sandbox.storage-manager'],
     '/sandbox/file-editor-integrated' => ['view' => '700-page-sandbox.708-page-file-editor-integrated.000-index', 'name' => 'sandbox.file-editor-integrated'],
     '/sandbox/form-creator' => ['view' => '700-page-sandbox.709-page-form-creator.000-index', 'name' => 'sandbox.form-creator'],

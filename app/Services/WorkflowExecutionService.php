@@ -267,7 +267,8 @@ class WorkflowExecutionService
     public function saveWorkflow($name, $code, $description = '')
     {
         try {
-            $currentStorage = Session::get('current_sandbox', 'storage-sandbox-template');
+            $sandboxContextService = app(SandboxContextService::class);
+        $currentStorage = $sandboxContextService->getCurrentSandbox();
             $workflowsPath = storage_path("sandbox/{$currentStorage}/workflows");
 
             // 워크플로우 디렉토리 생성
@@ -309,7 +310,8 @@ class WorkflowExecutionService
      */
     public function getSavedWorkflows()
     {
-        $currentStorage = Session::get('current_sandbox', 'storage-sandbox-template');
+        $sandboxContextService = app(SandboxContextService::class);
+        $currentStorage = $sandboxContextService->getCurrentSandbox();
         $workflowsPath = storage_path("sandbox/{$currentStorage}/workflows");
         $workflows = [];
 

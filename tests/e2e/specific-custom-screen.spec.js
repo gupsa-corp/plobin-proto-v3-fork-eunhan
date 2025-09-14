@@ -41,7 +41,9 @@ test.describe('특정 커스텀 화면 URL 테스트', () => {
     }
 
     // 특정 커스텀 화면 URL로 이동 (새로운 샌드박스 템플릿 구조)
-    const targetUrl = '/sandbox/storage-sandbox-template/100-domain-pms/103-screen-table-view';
+    // 환경 변수에서 템플릿명을 가져오거나 기본 샌드박스 템플릿을 찾아 사용
+    const sandboxTemplate = process.env.TEST_SANDBOX_TEMPLATE || 'default-template';
+    const targetUrl = `/sandbox/${sandboxTemplate}/100-domain-pms/103-screen-table-view`;
     console.log(`테스트 URL: ${targetUrl}`);
 
     await page.goto(targetUrl);

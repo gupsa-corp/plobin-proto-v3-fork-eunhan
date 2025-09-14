@@ -10,11 +10,13 @@ use App\Models\SandboxSqlExecution;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use App\Services\SandboxContextService;
 
 class Component extends LivewireComponent
 {
     use WithPagination;
 
+    protected $sandboxContextService;
     public $sqlQuery = '';
     public $executionResult = null;
     public $isExecuting = false;
@@ -26,13 +28,14 @@ class Component extends LivewireComponent
 
     public function mount()
     {
+        $this->sandboxContextService = app(SandboxContextService::class);
         $this->setupSandboxDatabase();
         $this->loadTables();
     }
 
     private function setupSandboxDatabase()
     {
-        $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+        $selectedSandbox = $this->getCurrentSandboxFallback();
         $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
 
         if (file_exists($sandboxDbPath)) {
@@ -75,7 +78,7 @@ class Component extends LivewireComponent
     private function getSandboxConnection()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+            $selectedSandbox = $this->getCurrentSandboxFallback();
             $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
 
             // 파일 존재 확인
@@ -124,7 +127,7 @@ class Component extends LivewireComponent
         $this->isExecuting = true;
         $this->executionResult = null;
         $startTime = microtime(true);
-        $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+        $selectedSandbox = $this->getCurrentSandboxFallback();
 
         try {
             $connection = $this->getSandboxConnection();
@@ -257,7 +260,7 @@ class Component extends LivewireComponent
     public function getExecutionHistory()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+            $selectedSandbox = $this->getCurrentSandboxFallback();
 
             return SandboxSqlExecution::where('sandbox_folder', $selectedSandbox)
                 ->where('user_session_id', session()->getId())
@@ -276,11 +279,11 @@ class Component extends LivewireComponent
     public function render()
     {
         try {
-            $selectedSandbox = Session::get('sandbox_storage', 'storage-sandbox-template');
+            $selectedSandbox = $this->getCurrentSandboxFallback();
             $executionHistory = $this->getExecutionHistory();
 
             return view('700-page-sandbox.702-livewire-sql-executor', [
-                'selectedSandbox' => $selectedSandbox ?? 'storage-sandbox-template',
+                'selectedSandbox' => $selectedSandbox,
                 'executionHistory' => $executionHistory ?? new LengthAwarePaginator([], 0, 10, 1, [
                     'path' => request()->url(),
                     'pageName' => 'page'
@@ -291,12 +294,20 @@ class Component extends LivewireComponent
             $this->addError('render', '페이지 로드 실패: ' . $e->getMessage());
 
             return view('700-page-sandbox.702-livewire-sql-executor', [
-                'selectedSandbox' => Session::get('sandbox_storage', 'storage-sandbox-template'),
+                'selectedSandbox' => $this->getCurrentSandboxFallback(),
                 'executionHistory' => new LengthAwarePaginator([], 0, 10, 1, [
                     'path' => request()->url(),
                     'pageName' => 'page'
                 ])
             ]);
         }
+    }
+
+    /**
+     * Helper method to get current sandbox with fallback
+     */
+    private function getCurrentSandboxFallback()
+    {
+        return $this->sandboxContextService->getCurrentSandbox();
     }
 }

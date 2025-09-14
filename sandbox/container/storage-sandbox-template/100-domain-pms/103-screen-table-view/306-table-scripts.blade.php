@@ -262,6 +262,13 @@
 
 <!-- 컬럼 관리 관련 함수 -->
 <script>
+// Get current sandbox from URL
+function getCurrentSandbox() {
+    const pathParts = window.location.pathname.split('/');
+    const sandboxIndex = pathParts.indexOf('sandbox');
+    return pathParts[sandboxIndex + 1];
+}
+
 // 새 프로젝트 생성 모달 열기
 function openCreateModal() {
     document.getElementById('createProjectModal').classList.remove('hidden');
@@ -290,7 +297,7 @@ async function createProject(event) {
     };
 
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects', {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/projects', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -367,7 +374,7 @@ function closeAddColumnModal() {
 // 컬럼 목록 로드
 async function loadColumns(tabType = 'all') {
     try {
-        let url = '/api/sandbox/storage-sandbox-template/backend/api.php/columns';
+        let url = `/api/sandbox/${getCurrentSandbox()}/api/columns`;
         if (tabType !== 'all') {
             url += '?type=' + tabType;
         }
@@ -453,7 +460,7 @@ async function addColumn(event) {
     };
 
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/columns', {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/columns', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -479,7 +486,7 @@ async function addColumn(event) {
 // 컬럼 활성/비활성 토글
 async function toggleColumn(columnId, isActive) {
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/columns/' + columnId, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/columns/${columnId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -509,7 +516,7 @@ async function deleteColumn(columnId, columnName) {
     }
 
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/columns/' + columnId, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/columns/${columnId}`, {
             method: 'DELETE'
         });
 
@@ -669,7 +676,7 @@ window.updateCustomField = async function(event) {
         const updateData = {};
         updateData[field] = value;
         
-        const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${projectId}`, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/projects/${projectId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -704,7 +711,7 @@ async function finishEdit(element, projectId, field, value, displayValue = null)
         }
         
         // API 호출
-        const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${projectId}`, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/projects/${projectId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -801,7 +808,7 @@ window.saveProject = async function(selectedProject, alpineComponent) {
         }
 
         // API 호출
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects/' + selectedProject.id, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/projects/' + selectedProject.id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -838,7 +845,7 @@ window.deleteProject = async function(projectId, projectName) {
     }
 
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects/' + projectId, {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/projects/' + projectId, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -925,7 +932,7 @@ async function resetColumns() {
 // 컬럼 설정 저장
 async function saveColumnSettings(columnName, show) {
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings', {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/user-column-settings', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -958,7 +965,7 @@ async function saveColumnSettings(columnName, show) {
 // 컬럼 설정 로드
 async function loadColumnSettings() {
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings?screen_type=table_view');
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/user-column-settings?screen_type=table_view');
         const result = await response.json();
         
         if (result.success && result.data) {
@@ -1013,7 +1020,7 @@ async function saveAllColumnSettings() {
     });
     
     try {
-        const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/user-column-settings', {
+        const response = await fetch(`/api/sandbox/${getCurrentSandbox()}/api/user-column-settings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

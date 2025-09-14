@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sandbox_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100); // 템플릿 이름 (storage-sandbox-template-{name} 형태로 저장)
+            $table->string('name', 100); // 템플릿 이름 (샌드박스 컨테이너 폴더명)
             $table->text('description')->nullable(); // 템플릿 설명
             $table->enum('type', ['system', 'custom'])->default('custom'); // 시스템 템플릿 vs 사용자 생성 템플릿
             $table->enum('status', ['active', 'inactive'])->default('active'); // 템플릿 상태
