@@ -22,7 +22,7 @@ use App\Services\TemplateCommonService;
                     <p class="text-gray-600">프로젝트 진행 상황을 시각적으로 관리하세요</p>
                 </div>
             </div>
-            <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">새 카드 추가</button>
+            <button @click="showAddCardModal('todo')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">새 카드 추가</button>
         </div>
     </div>
 
@@ -379,7 +379,7 @@ function kanbanData() {
                 const sandboxIndex = pathParts.indexOf('sandbox');
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
                 
-                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/boards`);
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/boards`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -432,7 +432,7 @@ function kanbanData() {
                     'done': 'completed'
                 };
                 
-                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/cards/${originalCard.id}`, {
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/kanban/cards/${originalCard.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -521,7 +521,7 @@ function kanbanData() {
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
                 
                 // 상태가 변경된 경우 API 업데이트
-                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/cards/${this.selectedCard.id}`, {
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/cards/${this.selectedCard.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -624,7 +624,7 @@ function kanbanData() {
                 const sandboxIndex = pathParts.indexOf('sandbox');
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
                 
-                const response = await fetch(`/api/sandbox/${sandboxTemplate}/kanban/cards`, {
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/kanban/cards`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

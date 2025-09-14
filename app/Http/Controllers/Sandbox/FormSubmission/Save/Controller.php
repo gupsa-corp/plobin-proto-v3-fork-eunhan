@@ -19,32 +19,32 @@ class Controller extends BaseController
 
         try {
             // SQLite 데이터베이스 연결 설정
-            $dbPath = storage_path('sandbox/storage-sandbox-template/frontend/100-pms-common/001-database/release.sqlite');
-            
+            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
+
             // 데이터베이스 파일이 없으면 생성
             if (!file_exists($dbPath)) {
                 $this->initializeDatabase($dbPath);
             }
-            
+
             // SQLite 연결
             $pdo = new \PDO("sqlite:$dbPath", null, null, [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             ]);
-            
+
             // 폼 제출 데이터 저장
             $sql = "
                 INSERT INTO form_submissions (
-                    form_name, 
-                    form_data, 
-                    ip_address, 
-                    user_agent, 
-                    session_id, 
+                    form_name,
+                    form_data,
+                    ip_address,
+                    user_agent,
+                    session_id,
                     submitted_at,
                     created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?)
             ";
-            
+
             $stmt = $pdo->prepare($sql);
             $result = $stmt->execute([
                 $request->formName,
@@ -55,10 +55,10 @@ class Controller extends BaseController
                 $request->timestamp ?? now()->toISOString(),
                 now()->toISOString()
             ]);
-            
+
             if ($result) {
                 $submissionId = $pdo->lastInsertId();
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => '폼이 성공적으로 제출되었습니다.',
@@ -85,7 +85,7 @@ class Controller extends BaseController
             ], 500);
         }
     }
-    
+
     /**
      * 데이터베이스 초기화
      */
@@ -96,12 +96,12 @@ class Controller extends BaseController
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-        
+
         // SQLite 연결 및 테이블 생성
         $pdo = new \PDO("sqlite:$dbPath", null, null, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
         ]);
-        
+
         // 폼 제출 테이블 생성
         $createTableSQL = "
             CREATE TABLE IF NOT EXISTS form_submissions (
@@ -116,16 +116,16 @@ class Controller extends BaseController
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ";
-        
+
         $pdo->exec($createTableSQL);
-        
+
         // 인덱스 추가
         $indexSQL = [
             "CREATE INDEX IF NOT EXISTS idx_form_submissions_form_name ON form_submissions(form_name)",
             "CREATE INDEX IF NOT EXISTS idx_form_submissions_submitted_at ON form_submissions(submitted_at)",
             "CREATE INDEX IF NOT EXISTS idx_form_submissions_created_at ON form_submissions(created_at)"
         ];
-        
+
         foreach ($indexSQL as $sql) {
             $pdo->exec($sql);
         }

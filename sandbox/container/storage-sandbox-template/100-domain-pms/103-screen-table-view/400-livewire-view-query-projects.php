@@ -89,7 +89,7 @@ class SandboxTableView extends Component
     public function deleteProject($projectId)
     {
         try {
-            $dbPath = storage_path('sandbox/storage-sandbox-template/backend/database/release.sqlite');
+            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
             $pdo = new PDO('sqlite:' . $dbPath);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -122,7 +122,7 @@ class SandboxTableView extends Component
     private function loadData()
     {
         try {
-            $dbPath = storage_path('sandbox/storage-sandbox-template/backend/database/release.sqlite');
+            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
             $pdo = new PDO('sqlite:' . $dbPath);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

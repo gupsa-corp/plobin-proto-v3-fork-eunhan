@@ -612,28 +612,56 @@ class ProjectsController extends Controller
             $insertQuery = "
                 INSERT INTO projects (
                     name, description, status, priority, progress, team_members,
-                    sandbox_folder, organization_id, user_id, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    sandbox_folder, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ";
 
             $now = date('Y-m-d H:i:s');
-            $stmt = $pdo->prepare($insertQuery);
-            $result = $stmt->execute([
-                $data['title'],
-                $data['description'] ?? '',
-                $status,
-                $data['priority'],
-                0, // default progress
-                $data['team_members'],
-                $sandboxTemplate,
-                1, // default organization_id
-                1, // default user_id
-                $now,
-                $now
-            ]);
+            
+            try {
+                $stmt = $pdo->prepare($insertQuery);
+                
+                $insertData = [
+                    $data['title'],
+                    $data['description'] ?? '',
+                    $status,
+                    $data['priority'],
+                    0, // default progress
+                    $data['team_members'],
+                    $sandboxTemplate,
+                    $now,
+                    $now
+                ];
+                
+                \Log::info('SQL Insert data:', $insertData);
+                
+                $result = $stmt->execute($insertData);
+                
+                if (!$result) {
+                    $errorInfo = $stmt->errorInfo();
+                    \Log::error('SQL Insert failed:', $errorInfo);
+                    throw new \Exception('SQL Insert failed: ' . $errorInfo[2]);
+                }
+                
+                \Log::info('SQL execute result:', [$result]);
+                
+            } catch (\PDOException $e) {
+                \Log::error('PDO Exception during insert:', [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'data' => $insertData ?? 'not available'
+                ]);
+                throw new \Exception('데이터베이스 오류: ' . $e->getMessage());
+            }
 
             if ($result) {
                 $cardId = $pdo->lastInsertId();
+                \Log::info('Insert successful, cardId:', [$cardId]);
+                
+                if (!$cardId) {
+                    \Log::error('lastInsertId() returned empty/false');
+                    throw new \Exception('카드 생성 실패: ID를 가져올 수 없습니다.');
+                }
                 
                 // Get the created card
                 $getStmt = $pdo->prepare("
@@ -650,8 +678,10 @@ class ProjectsController extends Controller
                     FROM projects 
                     WHERE id = ?
                 ");
+                \Log::info('Fetching created card with ID:', [$cardId]);
                 $getStmt->execute([$cardId]);
                 $card = $getStmt->fetch(PDO::FETCH_ASSOC);
+                \Log::info('Fetched card:', $card ? $card : 'null');
 
                 return response()->json([
                     'success' => true,
@@ -664,11 +694,22 @@ class ProjectsController extends Controller
 
             throw new \Exception('카드 생성에 실패했습니다.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => '카드 생성 중 오류가 발생했습니다.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
+                'details' => [
+                    'exception' => get_class($e),
+                    'line' => $e->getLine(),
+                    'file' => basename($e->getFile())
+                ]
             ], 500);
         }
     }

@@ -564,7 +564,7 @@ function ganttData() {
 
         async loadGanttData() {
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects');
+                const response = await fetch('/api/sandbox/storage-sandbox-template/projects');
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -680,7 +680,7 @@ function ganttData() {
             }
 
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects', {
+                const response = await fetch('/api/sandbox/storage-sandbox-template/projects', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -823,7 +823,7 @@ function ganttData() {
 
         async saveProjectDates(project) {
             try {
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${project.id}`, {
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/projects/${project.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -852,7 +852,7 @@ function ganttData() {
             if (!this.selectedProject) return;
 
             try {
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${this.selectedProject.id}`, {
+                const response = await fetch(`/api/sandbox/storage-sandbox-template/projects/${this.selectedProject.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

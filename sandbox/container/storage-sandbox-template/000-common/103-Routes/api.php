@@ -53,6 +53,18 @@ try {
     StorageCommonService::errorResponse('Internal server error', 500);
 }
 
+// SQLite 데이터베이스 연결 함수
+function getSandboxDatabase() {
+    $dbPath = __DIR__ . '/../../100-domain-pms/100-common/200-Database/release.sqlite';
+    if (!file_exists($dbPath)) {
+        throw new Exception("Database file not found: " . $dbPath);
+    }
+    $pdo = new PDO('sqlite:' . $dbPath);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $pdo;
+}
+
 /**
  * 프로젝트 관련 요청 처리
  */

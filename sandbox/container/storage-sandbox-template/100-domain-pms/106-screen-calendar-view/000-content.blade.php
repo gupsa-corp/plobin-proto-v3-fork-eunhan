@@ -488,7 +488,7 @@ function calendarData() {
 
         async loadCalendarData() {
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/projects');
+                const response = await fetch('/api/sandbox/projects');
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -842,7 +842,7 @@ function calendarData() {
             if (!this.selectedProject) return;
 
             try {
-                const response = await fetch(`/api/sandbox/storage-sandbox-template/backend/api.php/projects/${this.selectedProject.id}`, {
+                const response = await fetch(`/api/sandbox/projects/${this.selectedProject.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

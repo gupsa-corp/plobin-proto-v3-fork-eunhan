@@ -18,40 +18,40 @@ class Controller extends BaseController
                     'error' => 'Invalid submission ID'
                 ], 400);
             }
-            
+
             // SQLite 데이터베이스 연결 설정
-            $dbPath = storage_path('sandbox/storage-sandbox-template/frontend/100-pms-common/001-database/release.sqlite');
-            
+            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
+
             if (!file_exists($dbPath)) {
                 return response()->json([
                     'success' => false,
                     'error' => 'Database not found'
                 ], 404);
             }
-            
+
             // SQLite 연결
             $pdo = new \PDO("sqlite:$dbPath", null, null, [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             ]);
-            
+
             // Check if submission exists
             $checkSql = "SELECT id FROM form_submissions WHERE id = ?";
             $checkStmt = $pdo->prepare($checkSql);
             $checkStmt->execute([$id]);
-            
+
             if (!$checkStmt->fetch()) {
                 return response()->json([
                     'success' => false,
                     'error' => 'Submission not found'
                 ], 404);
             }
-            
+
             // Delete submission
             $deleteSql = "DELETE FROM form_submissions WHERE id = ?";
             $deleteStmt = $pdo->prepare($deleteSql);
             $result = $deleteStmt->execute([$id]);
-            
+
             if ($result && $deleteStmt->rowCount() > 0) {
                 return response()->json([
                     'success' => true,
@@ -63,7 +63,7 @@ class Controller extends BaseController
                     'error' => 'Failed to delete submission'
                 ], 500);
             }
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -157,7 +157,7 @@ function dashboardData() {
         
         async loadDashboardStats() {
             try {
-                const response = await fetch('/api/sandbox/storage-sandbox-template/backend/api.php/dashboard/stats');
+                const response = await fetch('/api/sandbox/dashboard/stats');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
