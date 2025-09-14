@@ -149,115 +149,114 @@ class RawController extends \App\Http\Controllers\Controller
             try {
                 // StorageCommonService 사용
                 // 실제 데이터베이스에서 데이터 조회
-                    $pdo = StorageCommonService::getDatabaseConnection();
+                $pdo = StorageCommonService::getDatabaseConnection();
 
-                    // 페이징 설정
-                    $page = max(1, (int)($_GET['page'] ?? 1));
-                    $perPage = 10;
-                    $offset = ($page - 1) * $perPage;
+                // 페이징 설정
+                $page = max(1, (int)($_GET['page'] ?? 1));
+                $perPage = 10;
+                $offset = ($page - 1) * $perPage;
 
-                    // 검색 및 필터 조건
-                    $search = $_GET['search'] ?? '';
-                    $status = $_GET['status'] ?? '';
-                    $priority = $_GET['priority'] ?? '';
-                    $sortBy = $_GET['sort'] ?? 'created_at';
-                    $sortOrder = $_GET['order'] ?? 'desc';
+                // 검색 및 필터 조건
+                $search = $_GET['search'] ?? '';
+                $status = $_GET['status'] ?? '';
+                $priority = $_GET['priority'] ?? '';
+                $sortBy = $_GET['sort'] ?? 'created_at';
+                $sortOrder = $_GET['order'] ?? 'desc';
 
-                    // WHERE 조건 구성
-                    $whereConditions = [];
-                    $params = [];
+                // WHERE 조건 구성
+                $whereConditions = [];
+                $params = [];
 
-                    if (!empty($search)) {
-                        $whereConditions[] = "(name LIKE :search OR description LIKE :search OR client LIKE :search)";
-                        $params[':search'] = '%' . $search . '%';
-                    }
-
-                    if (!empty($status)) {
-                        $whereConditions[] = "status = :status";
-                        $params[':status'] = $status;
-                    }
-
-                    if (!empty($priority)) {
-                        $whereConditions[] = "priority = :priority";
-                        $params[':priority'] = $priority;
-                    }
-
-                    $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
-
-                    // 정렬 컬럼 검증
-                    $allowedSortColumns = ['name', 'status', 'priority', 'created_at', 'progress', 'start_date', 'end_date'];
-                    $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'created_at';
-                    $sortOrder = strtolower($sortOrder) === 'asc' ? 'ASC' : 'DESC';
-
-                    // 전체 개수 조회
-                    $countSql = "SELECT COUNT(*) FROM projects $whereClause";
-                    $countStmt = $pdo->prepare($countSql);
-                    $countStmt->execute($params);
-                    $totalProjects = $countStmt->fetchColumn();
-
-                    // 프로젝트 데이터 조회
-                    $sql = "SELECT
-                                id, name, description, status, progress, team_members, priority,
-                                start_date, end_date, client, category, budget,
-                                created_at
-                            FROM projects
-                            $whereClause
-                            ORDER BY $sortBy $sortOrder
-                            LIMIT :limit OFFSET :offset";
-
-                    $stmt = $pdo->prepare($sql);
-                    foreach ($params as $key => $value) {
-                        $stmt->bindValue($key, $value);
-                    }
-                    $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-                    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-                    $stmt->execute();
-
-                    $projectsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    // 페이지네이션 계산
-                    $totalPages = ceil($totalProjects / $perPage);
-
-                    // 통계 데이터 조회
-                    $statsStmt = $pdo->query("
-                        SELECT
-                            COUNT(*) as total,
-                            COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
-                            COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
-                            COUNT(CASE WHEN priority = 'high' THEN 1 END) as high_priority,
-                            AVG(COALESCE(progress, 0)) as avg_progress
-                        FROM projects
-                    ");
-                    $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
-
-                    // 동적 컬럼 정보 조회
-                    $columnsStmt = $pdo->query("
-                        SELECT
-                            id, column_name, column_type, column_label, display_type,
-                            is_required, sort_order, options
-                        FROM project_columns
-                        WHERE is_active = 1
-                        ORDER BY sort_order ASC, column_label ASC
-                    ");
-                    $dynamicColumns = $columnsStmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    // 테이블 뷰 관련 변수들 추가
-                    $sampleData = array_merge($sampleData, [
-                        'search' => $search,
-                        'status' => $status,
-                        'priority' => $priority,
-                        'sortBy' => $sortBy,
-                        'sortOrder' => $sortOrder,
-                        'page' => $page,
-                        'perPage' => $perPage,
-                        'totalProjects' => $totalProjects,
-                        'totalPages' => $totalPages,
-                        'projectsData' => $projectsData,
-                        'dynamicColumns' => $dynamicColumns,
-                        'stats' => $stats
-                    ]);
+                if (!empty($search)) {
+                    $whereConditions[] = "(name LIKE :search OR description LIKE :search OR client LIKE :search)";
+                    $params[':search'] = '%' . $search . '%';
                 }
-            } catch (Exception $e) {
+
+                if (!empty($status)) {
+                    $whereConditions[] = "status = :status";
+                    $params[':status'] = $status;
+                }
+
+                if (!empty($priority)) {
+                    $whereConditions[] = "priority = :priority";
+                    $params[':priority'] = $priority;
+                }
+
+                $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+
+                // 정렬 컬럼 검증
+                $allowedSortColumns = ['name', 'status', 'priority', 'created_at', 'progress', 'start_date', 'end_date'];
+                $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'created_at';
+                $sortOrder = strtolower($sortOrder) === 'asc' ? 'ASC' : 'DESC';
+
+                // 전체 개수 조회
+                $countSql = "SELECT COUNT(*) FROM projects $whereClause";
+                $countStmt = $pdo->prepare($countSql);
+                $countStmt->execute($params);
+                $totalProjects = $countStmt->fetchColumn();
+
+                // 프로젝트 데이터 조회
+                $sql = "SELECT
+                            id, name, description, status, progress, team_members, priority,
+                            start_date, end_date, client, category, budget,
+                            created_at
+                        FROM projects
+                        $whereClause
+                        ORDER BY $sortBy $sortOrder
+                        LIMIT :limit OFFSET :offset";
+
+                $stmt = $pdo->prepare($sql);
+                foreach ($params as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
+                $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->execute();
+
+                $projectsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // 페이지네이션 계산
+                $totalPages = ceil($totalProjects / $perPage);
+
+                // 통계 데이터 조회
+                $statsStmt = $pdo->query("
+                    SELECT
+                        COUNT(*) as total,
+                        COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
+                        COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
+                        COUNT(CASE WHEN priority = 'high' THEN 1 END) as high_priority,
+                        AVG(COALESCE(progress, 0)) as avg_progress
+                    FROM projects
+                ");
+                $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
+
+                // 동적 컬럼 정보 조회
+                $columnsStmt = $pdo->query("
+                    SELECT
+                        id, column_name, column_type, column_label, display_type,
+                        is_required, sort_order, options
+                    FROM project_columns
+                    WHERE is_active = 1
+                    ORDER BY sort_order ASC, column_label ASC
+                ");
+                $dynamicColumns = $columnsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // 테이블 뷰 관련 변수들 추가
+                $sampleData = array_merge($sampleData, [
+                    'search' => $search,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'sortBy' => $sortBy,
+                    'sortOrder' => $sortOrder,
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'totalProjects' => $totalProjects,
+                    'totalPages' => $totalPages,
+                    'projectsData' => $projectsData,
+                    'dynamicColumns' => $dynamicColumns,
+                    'stats' => $stats
+                ]);
+            } catch (\Exception $e) {
                 // 데이터베이스 오류 시 기본 샘플 데이터 사용
                 $sampleData = array_merge($sampleData, [
                     'search' => $_GET['search'] ?? '',

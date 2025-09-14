@@ -241,7 +241,8 @@ foreach ($routes as $path => $config) {
     $protectedPaths = [
         '/dashboard',
         '/organizations/{id}/dashboard',
-        '/organizations/{id}/projects/{projectId}/dashboard'
+        '/organizations/{id}/projects/{projectId}/dashboard',
+        '/sandbox/storage-sandbox-template/{domain}/{screen}' // 이미 직접 등록된 템플릿 뷰어 라우트
     ];
 
     if (in_array($path, $protectedPaths)) {
@@ -541,6 +542,8 @@ Route::get('/platform/admin/sandboxes/settings', [\App\Http\Controllers\Platform
 Route::get('/platform/admin/sandboxes/cron', function () {
     return view('900-page-platform-admin.907-sandboxes.400-cron.000-index');
 })->name('platform.admin.sandboxes.cron');
+
+// 템플릿 화면 뷰어 라우트는 SandboxRoutingServiceProvider에서 처리됩니다.
 
 // 샌드박스 뷰 라우트 (기존 호환성을 위해 유지, 새로운 동적 라우트가 우선)
 Route::get('/sandbox/{sandboxName}/{viewName}', [\App\Http\Controllers\Sandbox\CustomScreen\RawController::class, 'showByPath'])

@@ -18,6 +18,11 @@ class Controller extends \App\Http\Controllers\Controller
             return response()->json(['error' => '샌드박스 이름이 필요합니다.'], 400);
         }
 
+        // 템플릿 폴더인 경우 특별 처리
+        if ($sandboxName === 'storage-sandbox-template') {
+            return $this->listTemplateScreens();
+        }
+
         $sandboxPath = storage_path('storage-sandbox-' . $sandboxName);
 
         // 샌드박스 디렉토리가 존재하는지 확인
@@ -269,5 +274,96 @@ class Controller extends \App\Http\Controllers\Controller
         }
 
         return round($size, 1) . ' ' . $units[$unitIndex];
+    }
+
+    /**
+     * 템플릿 폴더의 스크린 목록을 반환
+     */
+    private function listTemplateScreens()
+    {
+        $templatePath = base_path('sandbox/container/storage-sandbox-template');
+
+        if (!File::exists($templatePath)) {
+            return response()->json(['error' => '템플릿 폴더가 존재하지 않습니다.'], 404);
+        }
+
+        try {
+            $screens = $this->findTemplateScreens($templatePath);
+
+            return response()->json([
+                'sandbox_folder' => 'storage-sandbox-template',
+                'screens' => $screens,
+                'total_count' => count($screens)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => '템플릿 스크린 목록을 가져오는 중 오류가 발생했습니다.'], 500);
+        }
+    }
+
+    /**
+     * 템플릿 폴더에서 스크린들을 찾아서 반환
+     */
+    private function findTemplateScreens($templatePath)
+    {
+        $screens = [];
+
+        // 도메인 폴더들 스캔
+        $domainDirs = File::directories($templatePath);
+
+        foreach ($domainDirs as $domainDir) {
+            $domainName = basename($domainDir);
+
+            // 숫자-domain-xxx 형식의 폴더만 처리
+            if (!preg_match('/^\d+-domain-(.+)$/', $domainName)) {
+                continue;
+            }
+
+            // 각 도메인 폴더 내의 스크린 폴더들 찾기
+            $screenDirs = File::directories($domainDir);
+
+            foreach ($screenDirs as $screenDir) {
+                $screenName = basename($screenDir);
+
+                // 숫자-screen-xxx 형식의 폴더만 처리
+                if (!preg_match('/^\d+-screen-(.+)$/', $screenName, $matches)) {
+                    continue;
+                }
+
+                // 000-content.blade.php 파일 찾기
+                $contentFile = $screenDir . '/000-content.blade.php';
+
+                if (File::exists($contentFile)) {
+                    // 고유 ID 생성 (도메인-스크린 형식)
+                    $uniqueId = $domainName . '-' . $screenName;
+                    
+                    // 제목 생성
+                    $screenTitle = str_replace('-', ' ', $matches[1]);
+                    $domainTitle = str_replace('-', ' ', basename($domainName, '-domain'));
+
+                    $screens[] = [
+                        'id' => $uniqueId,
+                        'filename' => '000-content.blade.php',
+                        'title' => ucwords($screenTitle),
+                        'path' => $domainName . '/' . $screenName . '/000-content.blade.php',
+                        'directory' => $domainName . '/' . $screenName,
+                        'type' => 'blade',
+                        'size' => $this->formatBytes(File::size($contentFile)),
+                        'modified_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                        'description' => ucwords($domainTitle) . ' 도메인의 ' . ucwords($screenTitle) . ' 템플릿 화면입니다',
+                        'domain' => $domainName,
+                        'screen' => $screenName,
+                        'is_template' => true
+                    ];
+                }
+            }
+        }
+
+        // ID 기준으로 정렬
+        usort($screens, function($a, $b) {
+            return strcmp($a['id'], $b['id']);
+        });
+
+        return $screens;
     }
 }

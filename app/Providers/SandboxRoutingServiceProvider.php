@@ -87,23 +87,52 @@ class SandboxRoutingServiceProvider extends ServiceProvider
             ]);
         })->name('index');
         
-        // 특정 샌드박스의 도메인 목록 (custom-screens 제외)
+        // 템플릿 화면 직접 렌더링 라우트 (우선순위를 위해 먼저 등록)
+        Route::get('storage-sandbox-template/{domain}/{screen}', function($domain, $screen) {
+            // 템플릿 파일 경로 생성
+            $templateFile = base_path("sandbox/container/storage-sandbox-template/{$domain}/{$screen}/000-content.blade.php");
+            
+            if (!file_exists($templateFile)) {
+                return abort(404, '템플릿 파일을 찾을 수 없습니다.');
+            }
+            
+            // 템플릿 내용을 직접 렌더링하여 반환
+            try {
+                $templateContent = file_get_contents($templateFile);
+                
+                // Blade 템플릿을 컴파일하여 렌더링
+                $viewContent = view('700-page-sandbox.715-page-template-preview.000-index', [
+                    'templateId' => $screen,
+                    'templateFolder' => $domain,
+                    'templateContent' => $templateContent
+                ])->render();
+                
+                return response($viewContent);
+                
+            } catch (\Exception $e) {
+                return abort(500, '템플릿 렌더링 중 오류가 발생했습니다: ' . $e->getMessage());
+            }
+        })->name('template-screen')
+          ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+')
+          ->where('screen', '\d+-screen-[a-zA-Z0-9\-_]+');
+          
+        // 특정 샌드박스의 도메인 목록 (custom-screens, storage-sandbox-template 제외)
         Route::get('{sandbox}', [DynamicRouteController::class, 'showDomainList'])
               ->name('domains')
-              ->where('sandbox', '^(?!custom-screens$)[a-zA-Z0-9\-_]+$');
+              ->where('sandbox', '^(?!custom-screens$|storage-sandbox-template$)[a-zA-Z0-9\-_]+$');
         
-        // 특정 도메인의 화면 목록
+        // 특정 도메인의 화면 목록 (storage-sandbox-template 제외)
         Route::get('{sandbox}/{domain}', [DynamicRouteController::class, 'showScreenList'])
               ->name('screens')
-              ->where('sandbox', '[a-zA-Z0-9\-_]+')
+              ->where('sandbox', '^(?!storage-sandbox-template$)[a-zA-Z0-9\-_]+$')
               ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+');
         
-        // 동적 화면 라우트 (GET/POST 모두 지원)
+        // 동적 화면 라우트 (GET/POST 모두 지원) - storage-sandbox-template 제외
         Route::match(['get', 'post'], 
                      '{sandbox}/{domain}/{screen}', 
                      [DynamicRouteController::class, 'handleDynamicRoute'])
               ->name('screen')
-              ->where('sandbox', '[a-zA-Z0-9\-_]+')
+              ->where('sandbox', '^(?!storage-sandbox-template$)[a-zA-Z0-9\-_]+$')
               ->where('domain', '\d+-domain-[a-zA-Z0-9\-_]+')
               ->where('screen', '\d+-screen-[a-zA-Z0-9\-_]+');
     }
