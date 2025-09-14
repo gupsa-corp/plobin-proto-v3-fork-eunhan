@@ -19,7 +19,7 @@ use App\Services\TemplateCommonService;
                     <p class="text-gray-600">프로젝트 목록을 테이블 형태로 관리하세요</p>
                 </div>
             </div>
-            <button @click="showCreateModal = true" 
+            <button @click="showCreateModal = true"
                     class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                 새 프로젝트 추가
             </button>
@@ -78,14 +78,14 @@ use App\Services\TemplateCommonService;
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div class="flex flex-wrap items-center gap-4">
             <div class="flex-1 min-w-0">
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     x-model="filters.search"
                     @input="debounceSearch()"
                     placeholder="프로젝트 검색..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-            <select 
+            <select
                 x-model="filters.status"
                 @change="loadProjects()"
                 class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -95,7 +95,7 @@ use App\Services\TemplateCommonService;
                 <option value="on_hold">보류</option>
                 <option value="completed">완료</option>
             </select>
-            <select 
+            <select
                 x-model="filters.priority"
                 @change="loadProjects()"
                 class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -112,7 +112,7 @@ use App\Services\TemplateCommonService;
         <div x-show="loading" class="p-8 text-center">
             <div class="text-gray-500">로딩 중...</div>
         </div>
-        
+
         <div x-show="!loading">
             <table class="w-full">
                 <thead class="bg-gray-50">
@@ -147,7 +147,7 @@ use App\Services\TemplateCommonService;
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
-                                        <div class="bg-blue-500 h-2 rounded-full" 
+                                        <div class="bg-blue-500 h-2 rounded-full"
                                              :style="`width: ${project.progress || 0}%`"></div>
                                     </div>
                                     <span class="text-sm text-gray-600" x-text="`${project.progress || 0}%`"></span>
@@ -157,9 +157,9 @@ use App\Services\TemplateCommonService;
                                 <span x-text="formatDate(project.created_at)"></span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button @click="editProject(project)" 
+                                <button @click="editProject(project)"
                                         class="text-blue-600 hover:text-blue-900 mr-3">편집</button>
-                                <button @click="deleteProject(project.id)" 
+                                <button @click="deleteProject(project.id)"
                                         class="text-red-600 hover:text-red-900">삭제</button>
                             </td>
                         </tr>
@@ -175,13 +175,13 @@ use App\Services\TemplateCommonService;
         {{-- Pagination --}}
         <div x-show="!loading && pagination.total > 0" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div class="flex-1 flex justify-between sm:hidden">
-                <button @click="prevPage()" 
+                <button @click="prevPage()"
                         :disabled="!pagination.hasPrev"
                         :class="pagination.hasPrev ? 'text-blue-600 hover:text-blue-900' : 'text-gray-400 cursor-not-allowed'"
                         class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md">
                     이전
                 </button>
-                <button @click="nextPage()" 
+                <button @click="nextPage()"
                         :disabled="!pagination.hasNext"
                         :class="pagination.hasNext ? 'text-blue-600 hover:text-blue-900' : 'text-gray-400 cursor-not-allowed'"
                         class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md">
@@ -191,19 +191,19 @@ use App\Services\TemplateCommonService;
             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                     <p class="text-sm text-gray-700">
-                        총 <span class="font-medium" x-text="pagination.total"></span>개 중 
+                        총 <span class="font-medium" x-text="pagination.total"></span>개 중
                         <span class="font-medium" x-text="pagination.offset + 1"></span>-<span class="font-medium" x-text="Math.min(pagination.offset + pagination.limit, pagination.total)"></span>개 표시
                     </p>
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                        <button @click="prevPage()" 
+                        <button @click="prevPage()"
                                 :disabled="!pagination.hasPrev"
                                 :class="pagination.hasPrev ? 'text-blue-600 hover:text-blue-900' : 'text-gray-400 cursor-not-allowed'"
                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium">
                             이전
                         </button>
-                        <button @click="nextPage()" 
+                        <button @click="nextPage()"
                                 :disabled="!pagination.hasNext"
                                 :class="pagination.hasNext ? 'text-blue-600 hover:text-blue-900' : 'text-gray-400 cursor-not-allowed'"
                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium">
@@ -216,30 +216,19 @@ use App\Services\TemplateCommonService;
     </div>
 
     {{-- Edit/Create Modal --}}
-    <div x-show="showCreateModal || showEditModal" 
-         x-transition:enter="transition-opacity ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    <div x-show="showCreateModal || showEditModal"
+         style="background-color: rgba(0,0,0,.5);"
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
          @click.self="closeModal()">
-        
+
         <div x-show="showCreateModal || showEditModal"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
              class="bg-white rounded-lg shadow-xl w-full max-w-md">
-            
+
             {{-- Modal Header --}}
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900" 
+                <h3 class="text-lg font-semibold text-gray-900"
                     x-text="showCreateModal ? '새 프로젝트 추가' : '프로젝트 편집'"></h3>
-                <button @click="closeModal()" 
+                <button @click="closeModal()"
                         class="text-gray-400 hover:text-gray-600 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -252,7 +241,7 @@ use App\Services\TemplateCommonService;
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">프로젝트 이름</label>
-                        <input type="text" 
+                        <input type="text"
                                x-model="formData.name"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                placeholder="프로젝트 이름을 입력하세요...">
@@ -267,7 +256,7 @@ use App\Services\TemplateCommonService;
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">상태</label>
-                            <select x-model="formData.status" 
+                            <select x-model="formData.status"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="pending">대기</option>
                                 <option value="in_progress">진행 중</option>
@@ -277,7 +266,7 @@ use App\Services\TemplateCommonService;
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">우선순위</label>
-                            <select x-model="formData.priority" 
+                            <select x-model="formData.priority"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="low">낮음</option>
                                 <option value="medium">보통</option>
@@ -289,10 +278,10 @@ use App\Services\TemplateCommonService;
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             진행률 (<span x-text="formData.progress || 0"></span>%)
                         </label>
-                        <input type="range" 
+                        <input type="range"
                                x-model="formData.progress"
-                               min="0" 
-                               max="100" 
+                               min="0"
+                               max="100"
                                step="5"
                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
@@ -306,11 +295,11 @@ use App\Services\TemplateCommonService;
 
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                <button @click="closeModal()" 
+                <button @click="closeModal()"
                         class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     취소
                 </button>
-                <button @click="saveProject()" 
+                <button @click="saveProject()"
                         :disabled="!formData.name.trim() || saving"
                         :class="formData.name.trim() && !saving ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
                         class="px-4 py-2 text-white rounded-lg font-medium transition-colors">
@@ -357,7 +346,7 @@ function tableViewData() {
         },
         saving: false,
         searchTimeout: null,
-        
+
         async loadProjects() {
             this.loading = true;
             try {
@@ -365,7 +354,7 @@ function tableViewData() {
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
-                
+
                 const params = new URLSearchParams({
                     limit: this.pagination.limit,
                     offset: this.pagination.offset,
@@ -376,7 +365,7 @@ function tableViewData() {
 
                 const response = await fetch(`/api/sandbox/${sandboxTemplate}/projects?${params}`);
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     this.projects = result.data.projects;
                     this.pagination = result.data.pagination;
@@ -392,7 +381,7 @@ function tableViewData() {
                 this.loading = false;
             }
         },
-        
+
         calculateStats() {
             this.stats = {
                 total: this.pagination.total,
@@ -401,7 +390,7 @@ function tableViewData() {
                 high_priority: this.projects.filter(p => p.priority === 'high').length
             };
         },
-        
+
         debounceSearch() {
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
@@ -409,21 +398,21 @@ function tableViewData() {
                 this.loadProjects();
             }, 500);
         },
-        
+
         nextPage() {
             if (this.pagination.hasNext) {
                 this.pagination.offset += this.pagination.limit;
                 this.loadProjects();
             }
         },
-        
+
         prevPage() {
             if (this.pagination.hasPrev) {
                 this.pagination.offset = Math.max(0, this.pagination.offset - this.pagination.limit);
                 this.loadProjects();
             }
         },
-        
+
         editProject(project) {
             this.formData = {
                 id: project.id,
@@ -435,24 +424,24 @@ function tableViewData() {
             };
             this.showEditModal = true;
         },
-        
+
         async saveProject() {
             if (!this.formData.name.trim()) return;
-            
+
             this.saving = true;
             try {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
-                
+
                 const isEdit = this.showEditModal;
-                const url = isEdit 
+                const url = isEdit
                     ? `/api/sandbox/${sandboxTemplate}/projects/${this.formData.id}`
                     : `/api/sandbox/${sandboxTemplate}/projects`;
-                    
+
                 const method = isEdit ? 'PUT' : 'POST';
-                
+
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -482,16 +471,16 @@ function tableViewData() {
                 this.saving = false;
             }
         },
-        
+
         async deleteProject(id) {
             if (!confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) return;
-            
+
             try {
                 // Extract sandbox template from URL
                 const pathParts = window.location.pathname.split('/');
                 const sandboxIndex = pathParts.indexOf('sandbox');
                 const sandboxTemplate = sandboxIndex !== -1 && pathParts[sandboxIndex + 1] ? pathParts[sandboxIndex + 1] : 'storage-sandbox-template';
-                
+
                 const response = await fetch(`/api/sandbox/${sandboxTemplate}/projects/${id}`, {
                     method: 'DELETE'
                 });
@@ -508,7 +497,7 @@ function tableViewData() {
                 alert('프로젝트 삭제 중 오류가 발생했습니다.');
             }
         },
-        
+
         closeModal() {
             this.showCreateModal = false;
             this.showEditModal = false;
@@ -521,7 +510,7 @@ function tableViewData() {
                 progress: 0
             };
         },
-        
+
         getStatusClass(status) {
             const statusClasses = {
                 'pending': 'bg-gray-100 text-gray-800',
@@ -531,7 +520,7 @@ function tableViewData() {
             };
             return statusClasses[status] || 'bg-gray-100 text-gray-800';
         },
-        
+
         getStatusText(status) {
             const statusTexts = {
                 'pending': '대기',
@@ -541,7 +530,7 @@ function tableViewData() {
             };
             return statusTexts[status] || status;
         },
-        
+
         getPriorityClass(priority) {
             const priorityClasses = {
                 'low': 'bg-green-100 text-green-800',
@@ -550,7 +539,7 @@ function tableViewData() {
             };
             return priorityClasses[priority] || 'bg-gray-100 text-gray-800';
         },
-        
+
         getPriorityText(priority) {
             const priorityTexts = {
                 'low': '낮음',
@@ -559,14 +548,14 @@ function tableViewData() {
             };
             return priorityTexts[priority] || priority;
         },
-        
+
         formatDate(datetime) {
             if (!datetime) return '';
             const date = new Date(datetime);
-            return date.toLocaleDateString('ko-KR', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
     }

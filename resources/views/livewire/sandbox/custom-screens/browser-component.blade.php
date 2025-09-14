@@ -14,6 +14,56 @@
         <div class="space-y-4">
             <!-- 검색 및 필터 -->
             <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <!-- 도메인 선택 및 뷰 선택 드롭다운 -->
+                <div class="flex items-center space-x-4 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <!-- 도메인 선택 드롭다운 -->
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">도메인</label>
+                        <select wire:model.live="filterDomain" 
+                                class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[150px]">
+                            <option value="">전체 도메인</option>
+                            @foreach($availableDomains as $domain)
+                                <option value="{{ $domain['value'] }}">{{ $domain['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="h-8 w-px bg-gray-300"></div>
+
+                    <!-- 테이블뷰 선택 드롭다운 -->
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">화면 유형</label>
+                        <select wire:model.live="filterType" 
+                                class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[150px]">
+                            <option value="">전체 유형</option>
+                            @foreach($availableScreenTypes as $type)
+                                <option value="{{ $type['value'] }}">{{ $type['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="h-8 w-px bg-gray-300"></div>
+
+                    <!-- 현재 필터 상태 표시 -->
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">현재 필터</label>
+                        <div class="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600">
+                            @if($filterDomain || $filterType)
+                                <span>
+                                    @if($filterDomain) 도메인: {{ collect($availableDomains)->firstWhere('value', $filterDomain)['label'] ?? $filterDomain }} @endif
+                                    @if($filterDomain && $filterType) | @endif
+                                    @if($filterType) 유형: {{ collect($availableScreenTypes)->firstWhere('value', $filterType)['label'] ?? $filterType }} @endif
+                                </span>
+                            @else
+                                <span>필터 없음</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검색 및 추가 필터 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-1">검색</label>
@@ -21,25 +71,22 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                                placeholder="화면 제목으로 검색...">
                     </div>
-                    <div>
-                        <label for="filterType" class="block text-sm font-medium text-gray-700 mb-1">유형</label>
-                        <select wire:model.live="filterType" id="filterType"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                            <option value="">전체</option>
-                            <option value="dashboard">대시보드</option>
-                            <option value="list">목록</option>
-                            <option value="form">폼</option>
-                            <option value="detail">상세</option>
-                            <option value="report">리포트</option>
-                        </select>
+                    <div class="flex items-end">
+                        <button wire:click="loadScreens" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center space-x-2">
+                            <span>🔄</span>
+                            <span>새로고침</span>
+                        </button>
+                        @if($search || $filterDomain || $filterType)
+                            <button wire:click="$set('search', ''); $set('filterDomain', ''); $set('filterType', '')" 
+                                    class="ml-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
+                                초기화
+                            </button>
+                        @endif
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-500">총 {{ count($screens) }}개 템플릿 화면</span>
-                    <button wire:click="loadScreens" class="text-sm text-blue-600 hover:text-blue-800">
-                        🔄 새로고침
-                    </button>
                 </div>
             </div>
 

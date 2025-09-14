@@ -16,6 +16,9 @@ class Component extends LivewireComponent
     #[Url]
     public $filterType = '';
 
+    #[Url]
+    public $filterDomain = '';
+
     #[Url(as: 'screen')]
     public $selectedScreenId = null;
 
@@ -37,7 +40,9 @@ class Component extends LivewireComponent
     public function render()
     {
         return view('livewire.sandbox.custom-screens.browser-component', [
-            'selectedSandbox' => 'storage-sandbox-template'
+            'selectedSandbox' => 'storage-sandbox-template',
+            'availableDomains' => $this->getAvailableDomains(),
+            'availableScreenTypes' => $this->getAvailableScreenTypes()
         ]);
     }
 
@@ -284,6 +289,11 @@ class Component extends LivewireComponent
         $this->applyFilters();
     }
 
+    public function updatedFilterDomain()
+    {
+        $this->applyFilters();
+    }
+
     public function updatedSelectedScreenId()
     {
         if ($this->selectedScreenId) {
@@ -310,7 +320,55 @@ class Component extends LivewireComponent
             });
         }
 
+        if (!empty($this->filterDomain)) {
+            $allScreens = array_filter($allScreens, function($screen) {
+                return $screen['domain_name'] === $this->filterDomain;
+            });
+        }
+
         $this->screens = array_values($allScreens);
+    }
+
+    private function getAvailableDomains()
+    {
+        $domains = [];
+        $templatePath = base_path('sandbox/container/storage-sandbox-template');
+
+        if (File::exists($templatePath)) {
+            $domainFolders = File::directories($templatePath);
+
+            foreach ($domainFolders as $domainFolder) {
+                $domainName = basename($domainFolder);
+                
+                if (preg_match('/^\d+-domain-(.+)$/', $domainName, $matches)) {
+                    $domainType = $matches[1];
+                    $domains[] = [
+                        'value' => $domainType,
+                        'label' => ucfirst(str_replace('-', ' ', $domainType)),
+                        'folder' => $domainName
+                    ];
+                }
+            }
+        }
+
+        return $domains;
+    }
+
+    private function getAvailableScreenTypes()
+    {
+        // Get screen types from existing screens
+        $allScreens = $this->getScreensFromTemplate();
+        $types = array_unique(array_column($allScreens, 'type'));
+        
+        $screenTypes = [];
+        foreach ($types as $type) {
+            $screenTypes[] = [
+                'value' => $type,
+                'label' => ucfirst($type)
+            ];
+        }
+
+        return $screenTypes;
     }
 
 }
