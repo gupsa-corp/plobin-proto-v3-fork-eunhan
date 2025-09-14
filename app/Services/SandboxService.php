@@ -410,10 +410,19 @@ class SandboxService
     {
         try {
             $sandboxPath = storage_path("sandbox/{$sandboxName}");
-            $screenPath = "{$sandboxPath}/{$domainName}/{$screenName}";
+            $domainPath = "{$sandboxPath}/{$domainName}";
+            $screenPath = "{$domainPath}/{$screenName}";
 
+            // 도메인 경로 체크
+            if (!File::exists($domainPath)) {
+                $availableDomains = File::exists($sandboxPath) ? array_map('basename', File::directories($sandboxPath)) : [];
+                throw new \Exception("도메인 '{$domainName}'을 찾을 수 없습니다. 사용 가능한 도메인: " . implode(', ', $availableDomains));
+            }
+
+            // 화면 경로 체크
             if (!File::exists($screenPath)) {
-                throw new \Exception("화면 경로를 찾을 수 없습니다: {$screenPath}");
+                $availableScreens = array_map('basename', File::directories($domainPath));
+                throw new \Exception("화면 '{$screenName}'을 찾을 수 없습니다. 사용 가능한 화면: " . implode(', ', $availableScreens));
             }
 
             // 000-content.blade.php 파일 로드
@@ -422,6 +431,8 @@ class SandboxService
 
             if (File::exists($contentFile)) {
                 $content = File::get($contentFile);
+            } else {
+                throw new \Exception("콘텐츠 파일이 존재하지 않습니다: {$contentFile}");
             }
 
             // 화면 정보 수집
@@ -443,7 +454,9 @@ class SandboxService
                 'error' => $e->getMessage(),
                 'sandbox_name' => $sandboxName,
                 'domain_name' => $domainName,
-                'screen_name' => $screenName
+                'screen_name' => $screenName,
+                'sandbox_path' => $sandboxPath ?? 'undefined',
+                'screen_path' => $screenPath ?? 'undefined'
             ]);
             throw $e;
         }

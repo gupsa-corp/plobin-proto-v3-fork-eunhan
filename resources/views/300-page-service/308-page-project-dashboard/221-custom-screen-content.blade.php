@@ -77,7 +77,7 @@
                     @if(count($customScreens) > 0)
                         @foreach($customScreens as $screen)
                             <a href="#"
-                               @click="selectedScreen = '{{ $screen['folder_name'] }}'; screenDropdownOpen = false; window.loadScreenContent(window.getCurrentSelectedDomain(), '{{ $screen['folder_name'] }}')"
+                               @click="selectedScreen = '{{ $screen['folder_name'] }}'; screenDropdownOpen = false; window.updateSelectedScreen('{{ $screen['folder_name'] }}', window.getCurrentSelectedDomain())"
                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ $screen['folder_name'] === ($customScreen['screen'] ?? '') ? 'bg-blue-50 text-blue-800' : '' }}">
                                 <div class="flex justify-between items-center">
                                     <span>{{ $screen['folder_name'] }}</span>
@@ -186,6 +186,9 @@ window.updateSelectedScreen = function(screenName, domainName) {
 
     // 화면 콘텐츠 로드
     loadScreenContent(domainName || getCurrentSelectedDomain(), screenName);
+
+    // 서버에 커스텀 화면 선택 저장
+    saveCustomScreenSelection(domainName || getCurrentSelectedDomain(), screenName);
 };
 
 window.loadScreenContent = function(domainName, screenName) {
@@ -265,5 +268,76 @@ window.getCurrentSelectedDomain = function() {
         return selectedDisplayName.toLowerCase().replace(/\s+/g, '-');
     }
     return '100-domain-pms'; // 기본값
+};
+
+window.saveCustomScreenSelection = function(domainName, screenName) {
+    // 페이지 정보 추출 (현재 URL에서)
+    const urlParts = window.location.pathname.split('/');
+    const organizationId = urlParts[2];
+    const projectId = urlParts[4];
+    const pageId = urlParts[6];
+
+    // CSRF 토큰 가져오기
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    if (!csrfToken) {
+        console.error('CSRF 토큰을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 서버에 저장 요청
+    fetch('/api/sandbox/save-custom-screen', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            organization_id: organizationId,
+            project_id: projectId,
+            page_id: pageId,
+            domain: domainName,
+            screen: screenName
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 성공 알림 (작은 토스트 메시지)
+            showToastMessage('커스텀 화면이 저장되었습니다.', 'success');
+        } else {
+            console.error('커스텀 화면 저장 실패:', data.message);
+            showToastMessage(data.message || '저장에 실패했습니다.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('커스텀 화면 저장 오류:', error);
+        showToastMessage('네트워크 오류가 발생했습니다.', 'error');
+    });
+};
+
+window.showToastMessage = function(message, type = 'info') {
+    // 토스트 메시지 생성 및 표시
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-md transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    // 3초 후 자동 제거
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
 };
 </script>

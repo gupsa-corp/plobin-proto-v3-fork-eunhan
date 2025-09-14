@@ -223,6 +223,9 @@ Route::prefix('sandbox')->group(function () {
     Route::get('/screens-by-domain', \App\Http\Controllers\Api\Sandbox\GetScreensByDomain\Controller::class);
     Route::get('/load-screen-content', LoadScreenContentController::class);
 
+    // 페이지 커스텀 화면 저장 API
+    Route::post('/save-custom-screen', [\App\Http\Controllers\Api\Sandbox\SaveCustomScreen\Controller::class, '__invoke']);
+
     // 샌드박스 템플릿 관리 API
     Route::get('/templates', [SandboxTemplateController::class, 'index']);
     Route::post('/templates', [SandboxTemplateController::class, 'store']);
