@@ -6,7 +6,7 @@
     <div class="min-h-screen" style="position: relative;">
         @include('300-page-service.302-page-organization-dashboard.200-sidebar-main')
         <div class="main-content" style="margin-left: 240px; min-height: 100vh;">
-            @include('300-page-service.302-page-organization-dashboard.100-header-main')
+            @include('300-page-service.307-page-organization-projects.100-header-main')
             @include('300-page-service.307-page-organization-projects.200-content-main')
         </div>
     </div>

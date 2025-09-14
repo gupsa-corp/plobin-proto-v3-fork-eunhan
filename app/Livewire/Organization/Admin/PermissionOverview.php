@@ -364,7 +364,8 @@ class PermissionOverview extends Component
             'members' => $this->getMembersProperty(),
             'stats' => $this->getStatsProperty(),
             'permissionMatrix' => $this->getPermissionMatrixProperty(),
-            'recentActivity' => $this->getRecentActivityProperty()
+            'recentActivity' => $this->getRecentActivityProperty(),
+            'availableRoles' => $this->getAvailableRolesProperty()
         ]);
     }
 }

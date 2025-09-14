@@ -8,8 +8,13 @@ use Illuminate\Support\Facades\File;
 Route::group(['middleware' => 'loginRequired.auth'], function () {
     // 대시보드 페이지는 인증 필요
     Route::get('/dashboard', function () {
-        // 조직 관련 페이지들에 조직 데이터 전달
-        $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+        // 조직 관련 페이지들에 조직 데이터 전달 (소유자/관리자 역할 포함)
+        $organizations = \App\Models\Organization::select([
+                'organizations.id',
+                'organizations.name',
+                'organizations.user_id',
+                'organization_members.role_name'
+            ])
             ->selectSub(function($query) {
                 $query->from('organization_members')
                       ->whereColumn('organization_id', 'organizations.id')
@@ -20,7 +25,28 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
             ->where('organization_members.user_id', Auth::id())
             ->where('organization_members.invitation_status', 'accepted')
             ->orderBy('organizations.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function($org) {
+                // 조직 소유자인지 확인
+                if ($org->user_id == Auth::id()) {
+                    $org->user_role = '소유자';
+                } else {
+                    // 역할에 따라 표시
+                    switch ($org->role_name) {
+                        case 'admin':
+                            $org->user_role = '관리자';
+                            break;
+                        case 'member':
+                            $org->user_role = '멤버';
+                            break;
+                        case 'guest':
+                        default:
+                            $org->user_role = '게스트';
+                            break;
+                    }
+                }
+                return $org;
+            });
 
         // 1. 내가 소유한 프로젝트들
         $ownedProjects = \App\Models\Project::select(['projects.id', 'projects.name', 'projects.description', 'projects.created_at', 'organizations.name as organization_name', 'organizations.id as organization_id', 'projects.user_id'])
@@ -304,7 +330,12 @@ foreach ($routes as $path => $config) {
             // 조직 관련 페이지들에 조직 데이터 전달
             if (in_array($path, ['/dashboard', '/organizations', '/mypage', '/mypage/edit', '/mypage/delete', '/organizations/create'])) {
 
-                $organizations = \App\Models\Organization::select(['organizations.id', 'organizations.name'])
+                $organizations = \App\Models\Organization::select([
+                        'organizations.id',
+                        'organizations.name',
+                        'organizations.user_id',
+                        'organization_members.role_name'
+                    ])
                     ->selectSub(function($query) {
                         $query->from('organization_members')
                               ->whereColumn('organization_id', 'organizations.id')
@@ -315,7 +346,31 @@ foreach ($routes as $path => $config) {
                     ->where('organization_members.user_id', Auth::id())
                     ->where('organization_members.invitation_status', 'accepted')
                     ->orderBy('organizations.created_at', 'desc')
-                    ->get();
+                    ->get()
+                    ->map(function($org) {
+                        // 조직 소유자인지 확인
+                        if ($org->user_id == Auth::id()) {
+                            $org->user_role = '소유자';
+                        } else {
+                            // 역할에 따라 표시
+                            switch ($org->role_name) {
+                                case 'admin':
+                                    $org->user_role = '관리자';
+                                    break;
+                                case 'pm':
+                                    $org->user_role = 'PM';
+                                    break;
+                                case 'member':
+                                    $org->user_role = '사용자';
+                                    break;
+                                case 'guest':
+                                default:
+                                    $org->user_role = '권한없음';
+                                    break;
+                            }
+                        }
+                        return $org;
+                    });
 
                 // 대시보드 페이지에는 프로젝트 목록도 함께 전달
                 if ($path === '/dashboard') {
@@ -478,6 +533,11 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings', f
 // 프로젝트 설정 라우트들은 loginRequired.auth 그룹으로 이동됨
 
 // 조직 관리자 페이지 라우트들
+// 기본 조직 관리자 라우트 - 회원 관리로 리다이렉트
+Route::get('/organizations/{id}/admin', function ($id) {
+    return redirect()->route('organization.admin.members', ['id' => $id]);
+})->name('organization.admin');
+
 Route::get('/organizations/{id}/admin/members', [\App\Http\Controllers\Organization\Admin\Members\Controller::class, '__invoke'])->name('organization.admin.members');
 
 // 권한 관리 기본 라우트 - 개요 탭으로 리다이렉트

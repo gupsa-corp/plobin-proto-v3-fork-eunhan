@@ -58,9 +58,7 @@ class DeletedProjects extends Component
         $deletedProjects = Project::onlyTrashed()
             ->where('organization_id', $this->organizationId)
             ->with(['user', 'organization'])
-            ->withCount(['projectPages' => function ($query) {
-                $query->withTrashed();
-            }])
+            ->withCount(['projectPages'])
             ->orderBy('deleted_at', 'desc')
             ->get();
 

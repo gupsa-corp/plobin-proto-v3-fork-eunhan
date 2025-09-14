@@ -73,6 +73,7 @@ return [
     '/organizations/{id}/admin/permissions/management' => ['view' => '800-page-organization-admin.807-page-permissions-management.000-index', 'name' => 'organization.admin.permissions.management'],
     '/organizations/{id}/admin/permissions/rules' => ['view' => '800-page-organization-admin.808-page-permissions-rules.000-index', 'name' => 'organization.admin.permissions.rules'],
     '/organizations/{id}/admin/projects' => ['view' => '800-page-organization-admin.804-page-projects.000-index', 'name' => 'organization.admin.projects'],
+    '/organizations/{id}/settings/users' => ['view' => '800-page-organization-admin.809-page-settings-users.000-index', 'name' => 'organization.settings.users'],
     // 샌드박스 라우트들
     '/sandbox' => ['view' => '700-page-sandbox.000-index', 'name' => 'sandbox.index'],
     '/sandbox/dashboard' => ['view' => '700-page-sandbox.701-page-dashboard.000-index', 'name' => 'sandbox.dashboard'],

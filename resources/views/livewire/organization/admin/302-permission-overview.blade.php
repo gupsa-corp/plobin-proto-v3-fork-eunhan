@@ -476,10 +476,8 @@
         </div>
     @endif
 
-</div>
-
-{{-- Custom Styles --}}
-<style>
+    {{-- Custom Styles --}}
+    <style>
     .permission-overview-container {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
@@ -512,4 +510,6 @@
     .overflow-x-auto::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
-</style>
+    </style>
+
+</div>

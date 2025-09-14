@@ -67,9 +67,21 @@
                     {{-- 조직 정보 --}}
                     <div class="mb-4">
                         <div class="mb-2">
-                            <h3 class="font-bold text-lg text-gray-900 leading-tight capitalize">
-                                {{ $org->name ?? '이름 없음' }}
-                            </h3>
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-lg text-gray-900 leading-tight capitalize">
+                                    {{ $org->name ?? '이름 없음' }}
+                                </h3>
+                                {{-- 사용자 역할 배지 --}}
+                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                    @if($org->user_role === '소유자') bg-purple-100 text-purple-800
+                                    @elseif($org->user_role === '관리자') bg-blue-100 text-blue-800
+                                    @elseif($org->user_role === 'PM') bg-green-100 text-green-800
+                                    @elseif($org->user_role === '사용자') bg-yellow-100 text-yellow-800
+                                    @else bg-gray-100 text-gray-800
+                                    @endif">
+                                    {{ $org->user_role }}
+                                </span>
+                            </div>
                         </div>
 
                         <div class="flex items-center text-gray-600">
@@ -79,6 +91,14 @@
                                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="1.5"></path>
                             </svg>
                             <span class="text-base">{{ $org->description ?? '설명 없음' }}</span>
+                        </div>
+
+                        {{-- 멤버 수 표시 --}}
+                        <div class="flex items-center text-gray-500 mt-2">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 5.197V9a3 3 0 00-6 0v2m6 0V9a3 3 0 00-6 0v2"></path>
+                            </svg>
+                            <span class="text-sm">멤버 {{ $org->members_count ?? 0 }}명</span>
                         </div>
                     </div>
                 </a>
