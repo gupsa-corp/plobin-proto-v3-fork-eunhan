@@ -98,16 +98,19 @@ class SandboxRoutingServiceProvider extends ServiceProvider
             
             // 템플릿 내용을 직접 렌더링하여 반환
             try {
-                $templateContent = file_get_contents($templateFile);
-                
-                // Blade 템플릿을 컴파일하여 렌더링
-                $viewContent = view('700-page-sandbox.715-page-template-preview.000-index', [
-                    'templateId' => $screen,
-                    'templateFolder' => $domain,
-                    'templateContent' => $templateContent
-                ])->render();
-                
-                return response($viewContent);
+                // 템플릿 뷰어 사용하여 드롭다운 헤더 포함하여 렌더링
+                return view('700-page-sandbox.706-page-custom-screens.100-template-viewer', [
+                    'sandboxName' => 'storage-sandbox-template',
+                    'customScreen' => [
+                        'id' => $domain . '-' . $screen,
+                        'title' => ucwords(str_replace('-', ' ', explode('-screen-', $screen)[1] ?? $screen)),
+                        'description' => ucwords(str_replace('-', ' ', explode('-domain-', $domain)[1] ?? $domain)) . ' 도메인 템플릿',
+                        'domain' => $domain,
+                        'screen' => $screen,
+                        'is_template' => true
+                    ],
+                    'templateContent' => file_get_contents($templateFile)
+                ]);
                 
             } catch (\Exception $e) {
                 return abort(500, '템플릿 렌더링 중 오류가 발생했습니다: ' . $e->getMessage());
