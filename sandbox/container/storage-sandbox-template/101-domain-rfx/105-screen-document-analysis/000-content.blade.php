@@ -15,20 +15,7 @@ use App\Services\TemplateCommonService;
      x-init="init()"
      x-cloak>
     {{-- 글로벌 네비게이션 포함 --}}
-    <?php 
-        // 디버깅을 제거하고 정상 동작으로 복구
-        
-        $globalNavPath = dirname(dirname(__DIR__)) . '/storage/sandbox/storage-sandbox-template/frontend/000-global-navigation.blade.php';
-        if (file_exists($globalNavPath)) {
-            include $globalNavPath;
-        } else {
-            // 백업 경로 시도
-            $backupPath = dirname(__DIR__) . '/000-global-navigation.blade.php';
-            if (file_exists($backupPath)) {
-                include $backupPath;
-            }
-        }
-    ?>
+    @include('700-page-sandbox.700-common.100-sandbox-navigation')
     
     {{-- 헤더 --}}
     <div class="mb-8">

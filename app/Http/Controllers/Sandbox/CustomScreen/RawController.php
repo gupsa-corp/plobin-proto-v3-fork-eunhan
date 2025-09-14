@@ -61,8 +61,8 @@ class RawController extends \App\Http\Controllers\Controller
         ];
 
         try {
-            // 글로벌 네비게이션 템플릿 읽기 (첫 번째 메소드는 고정 경로 사용)
-            $globalNavPath = storage_path('sandbox/storage-sandbox-template/frontend/000-global-navigation.blade.php');
+            // 글로벌 네비게이션 템플릿 읽기 - 새로운 위치에서
+            $globalNavPath = resource_path('views/700-page-sandbox/700-common/100-sandbox-navigation.blade.php');
             $globalNavContent = '';
             if (File::exists($globalNavPath)) {
                 $globalNavContent = File::get($globalNavPath);
@@ -276,8 +276,8 @@ class RawController extends \App\Http\Controllers\Controller
         }
 
         try {
-            // 글로벌 네비게이션 템플릿 읽기
-            $globalNavPath = storage_path("sandbox/{$storageName}/frontend/000-global-navigation.blade.php");
+            // 글로벌 네비게이션 템플릿 읽기 - 새로운 위치에서
+            $globalNavPath = resource_path('views/700-page-sandbox/700-common/100-sandbox-navigation.blade.php');
             $globalNavContent = '';
             if (File::exists($globalNavPath)) {
                 $globalNavContent = File::get($globalNavPath);
