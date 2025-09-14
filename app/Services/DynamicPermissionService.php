@@ -75,9 +75,63 @@ class DynamicPermissionService
      * 사용자에게 기본 역할과 권한을 할당 (기존 enum 시스템과의 호환성)
      * role_name을 이용한 기본 권한 할당 (역할 기반 시스템)
      */
-    public function assignBasicPermissions($user, $permissionLevelOrRole)
+    public function assignBasicPermissionsByRole($user, string $roleName)
     {
-        return $this->assignBasicPermissionsService->__invoke($user, $permissionLevelOrRole);
+        // 역할 할당
+        $user->assignRole($roleName);
+
+        // 역할에 따른 기본 권한 할당
+        $defaultPermissions = $this->getDefaultPermissionsForRole($roleName);
+
+        foreach ($defaultPermissions as $permission) {
+            $user->givePermissionTo($permission);
+        }
+
+        return $user->getRoleNames()->toArray();
+    }
+    
+    /**
+     * 역할별 기본 권한 반환
+     */
+    private function getDefaultPermissionsForRole(string $roleName): array
+    {
+        return match($roleName) {
+            'user' => [
+                'view dashboard',
+                'view projects'
+            ],
+            'service_manager' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members'
+            ],
+            'organization_admin' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members',
+                'manage members',
+                'manage settings'
+            ],
+            'organization_owner' => [
+                'view dashboard',
+                'view projects',
+                'manage projects',
+                'view members',
+                'manage members',
+                'manage settings',
+                'manage billing',
+                'manage organization'
+            ],
+            'platform_admin' => [
+                'view dashboard',
+                'manage platform',
+                'manage all organizations',
+                'manage all users'
+            ],
+            default => []
+        };
     }
 
     /**

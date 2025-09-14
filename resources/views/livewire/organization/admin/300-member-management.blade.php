@@ -72,7 +72,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">조직 멤버 ({{ count($filteredMembers) }}명)</h3>
-            <button 
+            <button
                 wire:click="openInviteModal"
                 class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 + 멤버 초대
@@ -206,7 +206,7 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
 </div>
 
 {{-- 멤버 편집 모달 --}}
-@if($showEditModal && $editingMember)
+@if($showEditModal && $this->editingMember)
 <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" wire:click="closeEditModal">
     <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white" wire:click.stop>
         <div class="mt-3 text-center">
@@ -217,12 +217,12 @@ JavaScript가 필요한 경우 → Livewire로 재작성 필수
                     <div class="flex items-center">
                         <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
                             <span class="text-white font-medium text-sm">
-                                {{ strtoupper(substr($editingMember->user->name ?? $editingMember->user->email, 0, 1)) }}
+                                {{ strtoupper(substr($this->editingMember->user->name ?? $this->editingMember->user->email, 0, 1)) }}
                             </span>
                         </div>
                         <div class="ml-3">
-                            <div class="text-sm font-medium text-gray-900">{{ $editingMember->user->name ?? $editingMember->user->email }}</div>
-                            <div class="text-sm text-gray-500">{{ $editingMember->user->email }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $this->editingMember->user->name ?? $this->editingMember->user->email }}</div>
+                            <div class="text-sm text-gray-500">{{ $this->editingMember->user->email }}</div>
                         </div>
                     </div>
                 </div>

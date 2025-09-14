@@ -10,6 +10,8 @@ use App\Services\DynamicPermissionService;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrganizationInvitationMail;
 
 class MemberManagement extends Component
 {
@@ -28,7 +30,6 @@ class MemberManagement extends Component
 
     // 멤버 편집 관련 속성
     public $showEditModal = false;
-    public $editingMember = null;
     public $editingMemberId = null;
     public $editingMemberRole = '';
     public $editingMemberPermissions = [];
@@ -201,7 +202,7 @@ class MemberManagement extends Component
             $user->syncRoles([$newRoleName]);
 
             // 동적 권한 서비스를 통한 기본 권한 할당
-            app(DynamicPermissionService::class)->assignBasicPermissions($user, $newRoleName);
+            app(DynamicPermissionService::class)->assignBasicPermissionsByRole($user, $newRoleName);
 
             $this->loadData(); // 데이터 새로고침
 
@@ -272,13 +273,20 @@ class MemberManagement extends Component
                 'invited_at' => now()
             ]);
 
-            // 실제로는 여기에서 이메일 전송 로직이 들어갑니다
-            // Mail::to($member->user->email)->send(new OrganizationInvitation($member));
-
-            $this->dispatch('invitationResent', [
-                'memberId' => $memberId,
-                'message' => $member->user->email . '로 초대가 재전송되었습니다.'
-            ]);
+            // 이메일 재전송
+            try {
+                Mail::to($member->user->email)->send(new OrganizationInvitationMail($member));
+                $this->dispatch('invitationResent', [
+                    'memberId' => $memberId,
+                    'message' => $member->user->email . '로 초대가 재전송되었습니다.'
+                ]);
+            } catch (\Exception $e) {
+                logger()->error('Failed to resend invitation email: ' . $e->getMessage());
+                $this->dispatch('error', [
+                    'message' => '초대 재전송 중 오류가 발생했습니다: ' . $e->getMessage()
+                ]);
+                return;
+            }
 
         } catch (\Exception $e) {
             $this->dispatch('error', [
@@ -301,9 +309,16 @@ class MemberManagement extends Component
 
     public function openInviteModal()
     {
+        logger()->info('Opening invite modal - method called');
         $this->showInviteModal = true;
         $this->inviteEmail = '';
         $this->inviteRole = 'user';
+        logger()->info('Invite modal opened, showInviteModal: ' . ($this->showInviteModal ? 'true' : 'false'));
+
+        // JavaScript 콘솔에도 로그 출력
+        $this->dispatch('console-log', [
+            'message' => 'openInviteModal called, showInviteModal: ' . ($this->showInviteModal ? 'true' : 'false')
+        ]);
     }
 
     public function closeInviteModal()
@@ -348,10 +363,10 @@ class MemberManagement extends Component
             $user->assignRole($this->inviteRole);
 
             // 동적 권한 서비스를 통한 기본 권한 할당
-            app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->inviteRole);
+            app(DynamicPermissionService::class)->assignBasicPermissionsByRole($user, $this->inviteRole);
 
             // 조직 멤버 추가
-            OrganizationMember::create([
+            $member = OrganizationMember::create([
                 'organization_id' => $this->organizationId,
                 'user_id' => $user->id,
                 'role_name' => $this->inviteRole,
@@ -364,6 +379,14 @@ class MemberManagement extends Component
                 'members_count' => $this->organization->members()->count()
             ]);
 
+            // 이메일 전송
+            try {
+                Mail::to($user->email)->send(new OrganizationInvitationMail($member));
+            } catch (\Exception $e) {
+                logger()->error('Failed to send invitation email: ' . $e->getMessage());
+                // 이메일 전송 실패해도 초대는 성공으로 처리
+            }
+
             $this->loadData(); // 데이터 새로고침
             $this->closeInviteModal();
 
@@ -373,9 +396,6 @@ class MemberManagement extends Component
                 'role' => $roleInfo['label'],
                 'message' => "{$this->inviteEmail}로 초대를 전송했습니다."
             ]);
-
-            // 실제로는 여기에서 이메일 전송 로직이 들어갑니다
-            // Mail::to($user->email)->send(new OrganizationInvitation($member));
 
         } catch (\Exception $e) {
             $this->dispatch('error', [
@@ -410,7 +430,6 @@ class MemberManagement extends Component
             }
 
             // 편집 모달 데이터 설정
-            $this->editingMember = $member;
             $this->editingMemberId = $member->id;
             
             // 현재 역할 가져오기
@@ -432,7 +451,6 @@ class MemberManagement extends Component
     public function closeEditModal()
     {
         $this->showEditModal = false;
-        $this->editingMember = null;
         $this->editingMemberId = null;
         $this->editingMemberRole = '';
         $this->editingMemberPermissions = [];
@@ -445,14 +463,14 @@ class MemberManagement extends Component
         ]);
 
         try {
-            if (!$this->editingMember) {
+            if (!$this->editingMemberId) {
                 $this->dispatch('error', [
                     'message' => '편집할 멤버 정보가 없습니다.'
                 ]);
                 return;
             }
 
-            $member = $this->editingMember;
+            $member = OrganizationMember::with('user')->findOrFail($this->editingMemberId);
             $user = $member->user;
 
             // 조직 소유자의 권한을 낮추려고 하는 경우 방지
@@ -467,7 +485,7 @@ class MemberManagement extends Component
             $user->syncRoles([$this->editingMemberRole]);
 
             // 동적 권한 서비스를 통한 기본 권한 할당
-            app(DynamicPermissionService::class)->assignBasicPermissions($user, $this->editingMemberRole);
+            app(DynamicPermissionService::class)->assignBasicPermissionsByRole($user, $this->editingMemberRole);
 
             // role_name 업데이트
             $member->update([
@@ -494,11 +512,12 @@ class MemberManagement extends Component
     public function togglePermission($permissionName)
     {
         try {
-            if (!$this->editingMember) {
+            if (!$this->editingMemberId) {
                 return;
             }
 
-            $user = $this->editingMember->user;
+            $member = OrganizationMember::with('user')->findOrFail($this->editingMemberId);
+            $user = $member->user;
 
             if ($user->hasPermissionTo($permissionName)) {
                 $user->revokePermissionTo($permissionName);
@@ -523,12 +542,21 @@ class MemberManagement extends Component
         return [
             'manage members' => '멤버 관리',
             'manage projects' => '프로젝트 관리',
-            'manage services' => '서비스 관리', 
+            'manage services' => '서비스 관리',
             'view reports' => '보고서 조회',
             'manage settings' => '설정 관리',
             'access api' => 'API 접근',
             'manage billing' => '결제 관리'
         ];
+    }
+
+    public function getEditingMemberProperty()
+    {
+        if (!$this->editingMemberId) {
+            return null;
+        }
+
+        return OrganizationMember::with('user')->find($this->editingMemberId);
     }
 
     public function getAvailableRolesProperty()
