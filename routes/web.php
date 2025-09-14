@@ -545,6 +545,7 @@ Route::get('/platform/admin/sandboxes/cron', function () {
 // 샌드박스 뷰 라우트 (기존 호환성을 위해 유지, 새로운 동적 라우트가 우선)
 Route::get('/sandbox/{sandboxName}/{viewName}', [\App\Http\Controllers\Sandbox\CustomScreen\RawController::class, 'showByPath'])
     ->name('sandbox.view.legacy')
+    ->where('sandboxName', '^(?!custom-screens$).*')
     ->where('viewName', '^(?!\d+-domain-).*'); // 새로운 패턴과 충돌 방지
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)

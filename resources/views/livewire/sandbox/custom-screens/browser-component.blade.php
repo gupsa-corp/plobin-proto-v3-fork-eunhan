@@ -79,7 +79,7 @@
                                         class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50">
                                     ✏️ 편집
                                 </button>
-                                <a href="/sandbox/{{ $selectedSandbox }}/{{ sprintf('%03d', $screen['id']) }}-screen-{{ str_replace(' ', '-', strtolower($screen['title'])) }}"
+                                <a href="{{ $this->getPreviewUrl($screen['id']) }}"
                                    target="_blank"
                                    onclick="event.stopPropagation()"
                                    class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 inline-block text-center">

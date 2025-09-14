@@ -55,40 +55,72 @@ class Component extends LivewireComponent
     private function getScreensFromTemplate()
     {
         $screens = [];
-        $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
+        $templatePath = base_path('sandbox/container/storage-sandbox-template');
 
         if (File::exists($templatePath)) {
-            $folders = File::directories($templatePath);
+            // Domain 폴더들 찾기 (100-domain-pms, 101-domain-rfx 등)
+            $domainFolders = File::directories($templatePath);
 
-            foreach ($folders as $folder) {
-                $folderName = basename($folder);
-                $contentFile = $folder . '/000-content.blade.php';
+            foreach ($domainFolders as $domainFolder) {
+                $domainName = basename($domainFolder);
+                
+                // domain으로 시작하는 폴더만 처리
+                if (!preg_match('/^\d+-domain-/', $domainName)) {
+                    continue;
+                }
 
-                if (File::exists($contentFile)) {
-                    // 폴더명에서 화면 정보 추출
-                    $parts = explode('-', $folderName, 3);
-                    $screenId = $parts[0] ?? '000';
-                    $screenType = $parts[1] ?? 'screen';
-                    $screenName = $parts[2] ?? 'unnamed';
+                // 각 domain 내의 screen 폴더들 찾기
+                $screenFolders = File::directories($domainFolder);
 
-                    // 파일 내용 읽기
-                    $fileContent = File::get($contentFile);
+                foreach ($screenFolders as $screenFolder) {
+                    $screenFolderName = basename($screenFolder);
+                    
+                    // screen으로 시작하는 폴더만 처리
+                    if (!preg_match('/^\d+-screen-/', $screenFolderName)) {
+                        continue;
+                    }
 
-                    $screens[] = [
-                        'id' => $screenId,
-                        'title' => str_replace('-', ' ', $screenName),
-                        'description' => '템플릿 화면 - ' . str_replace('-', ' ', $screenName),
-                        'type' => $screenType,
-                        'folder_name' => $folderName,
-                        'file_path' => 'frontend/' . $folderName . '/000-content.blade.php',
-                        'created_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
-                        'file_exists' => true,
-                        'full_path' => $contentFile,
-                        'file_size' => File::size($contentFile),
-                        'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
-                        'is_template' => true,
-                        'blade_template' => $fileContent, // 렌더러가 기대하는 템플릿 데이터 추가
-                    ];
+                    $contentFile = $screenFolder . '/000-content.blade.php';
+
+                    if (File::exists($contentFile)) {
+                        // Domain 정보 추출
+                        $domainParts = explode('-', $domainName);
+                        $domainId = $domainParts[0] ?? '000';
+                        $domainType = $domainParts[2] ?? 'unknown';
+
+                        // Screen 정보 추출
+                        $screenParts = explode('-', $screenFolderName, 3);
+                        $screenId = $screenParts[0] ?? '000';
+                        $screenType = $screenParts[1] ?? 'screen';
+                        $screenName = $screenParts[2] ?? 'unnamed';
+
+                        // 파일 내용 읽기
+                        $fileContent = File::get($contentFile);
+
+                        // 고유한 ID 생성 (domain + screen)
+                        $uniqueId = $domainId . '-' . $screenId;
+
+                        $screens[] = [
+                            'id' => $uniqueId,
+                            'title' => str_replace('-', ' ', ucwords($screenName, '-')),
+                            'description' => ucwords($domainType, '-') . ' 도메인 - ' . str_replace('-', ' ', ucwords($screenName, '-')),
+                            'type' => $screenType,
+                            'domain_id' => $domainId,
+                            'domain_name' => $domainType,
+                            'screen_id' => $screenId,
+                            'screen_name' => $screenName,
+                            'folder_name' => $screenFolderName,
+                            'domain_folder_name' => $domainName,
+                            'file_path' => $domainName . '/' . $screenFolderName . '/000-content.blade.php',
+                            'created_at' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'file_exists' => true,
+                            'full_path' => $contentFile,
+                            'file_size' => File::size($contentFile),
+                            'file_modified' => date('Y-m-d H:i:s', File::lastModified($contentFile)),
+                            'is_template' => true,
+                            'blade_template' => $fileContent, // 렌더러가 기대하는 템플릿 데이터 추가
+                        ];
+                    }
                 }
             }
         }
@@ -143,11 +175,12 @@ class Component extends LivewireComponent
             return '#';
         }
         
-        // storage-sandbox-template과 화면 폴더명으로 URL 구성
+        // storage-sandbox-template, domain 폴더, screen 폴더로 URL 구성
         $storageName = 'storage-sandbox-template';
+        $domainFolderName = $screen['domain_folder_name'];
         $screenFolderName = $screen['folder_name'];
         
-        return "/sandbox/{$storageName}/{$screenFolderName}";
+        return "/sandbox/{$storageName}/{$domainFolderName}/{$screenFolderName}";
     }
 
     public function openPreviewInNewWindow($screenId)
@@ -172,12 +205,12 @@ class Component extends LivewireComponent
                 return;
             }
 
-            // 새로운 폴더명 생성 (템플릿 내에서)
-            $templatePath = storage_path('sandbox/storage-sandbox-template/frontend');
-            $newFolderName = $this->generateNewFolderName($templatePath, $originalScreen['folder_name']);
+            // 새로운 폴더명 생성 (해당 domain 내에서)
+            $domainPath = base_path('sandbox/container/storage-sandbox-template/' . $originalScreen['domain_folder_name']);
+            $newFolderName = $this->generateNewFolderName($domainPath, $originalScreen['folder_name']);
 
             $sourcePath = $originalScreen['full_path'];
-            $targetPath = $templatePath . '/' . $newFolderName . '/000-content.blade.php';
+            $targetPath = $domainPath . '/' . $newFolderName . '/000-content.blade.php';
 
             // 새 폴더 생성
             $targetDir = dirname($targetPath);

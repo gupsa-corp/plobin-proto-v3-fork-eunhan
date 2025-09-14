@@ -87,10 +87,10 @@ class SandboxRoutingServiceProvider extends ServiceProvider
             ]);
         })->name('index');
         
-        // 특정 샌드박스의 도메인 목록
+        // 특정 샌드박스의 도메인 목록 (custom-screens 제외)
         Route::get('{sandbox}', [DynamicRouteController::class, 'showDomainList'])
               ->name('domains')
-              ->where('sandbox', '[a-zA-Z0-9\-_]+');
+              ->where('sandbox', '^(?!custom-screens$)[a-zA-Z0-9\-_]+$');
         
         // 특정 도메인의 화면 목록
         Route::get('{sandbox}/{domain}', [DynamicRouteController::class, 'showScreenList'])
