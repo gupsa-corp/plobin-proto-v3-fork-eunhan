@@ -273,6 +273,197 @@ class SandboxService
     }
 
     /**
+     * 사용 가능한 도메인 목록을 가져옵니다.
+     */
+    public function getAvailableDomains(?string $sandboxName = null): array
+    {
+        if (empty($sandboxName)) {
+            return [];
+        }
+
+        try {
+            // 동적 샌드박스 경로 사용
+            $templatePath = $this->sandboxContextService->getSandboxPath();
+
+            if (!File::exists($templatePath)) {
+                return [];
+            }
+
+            // 도메인 폴더들을 스캔
+            $domainFolders = File::directories($templatePath);
+            $domains = [];
+
+            foreach ($domainFolders as $domainFolder) {
+                $domainName = basename($domainFolder);
+
+                // 도메인 폴더 형식 검증 (*-domain-* 패턴)
+                if (preg_match('/^\d+-domain-.+/', $domainName)) {
+                    // 도메인명에서 정보 추출
+                    $parts = explode('-', $domainName, 3);
+                    $domainId = $parts[0] ?? '000';
+                    $domainTitle = $parts[2] ?? 'unnamed';
+
+                    // 해당 도메인의 화면 개수 계산
+                    $screenFolders = File::directories($domainFolder);
+                    $screenCount = 0;
+
+                    foreach ($screenFolders as $screenFolder) {
+                        $screenName = basename($screenFolder);
+                        if (preg_match('/^\d+-screen-.+/', $screenName)) {
+                            $contentFile = $screenFolder . '/000-content.blade.php';
+                            if (File::exists($contentFile)) {
+                                $screenCount++;
+                            }
+                        }
+                    }
+
+                    $domains[] = [
+                        'id' => $domainName,
+                        'name' => $domainName,
+                        'title' => str_replace('-', ' ', ucfirst($domainTitle)),
+                        'display_name' => $domainId . ' Domain ' . ucfirst(str_replace('-', ' ', $domainTitle)),
+                        'screen_count' => $screenCount,
+                        'created_at' => date('Y-m-d H:i:s', File::lastModified($domainFolder)),
+                    ];
+                }
+            }
+
+            // 도메인 ID 기준으로 정렬
+            usort($domains, function($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+
+            return $domains;
+
+        } catch (\Exception $e) {
+            Log::error('도메인 목록 로드 오류', ['error' => $e->getMessage(), 'sandbox_name' => $sandboxName]);
+            return [];
+        }
+    }
+
+    /**
+     * 특정 도메인의 사용 가능한 화면 목록을 반환합니다.
+     */
+    public function getScreensByDomain(?string $sandboxName = null, string $domainName = null): array
+    {
+        if (!$sandboxName || !$domainName) {
+            return [];
+        }
+
+        try {
+            $sandboxPath = storage_path('sandbox/storage-sandbox-template');
+            $domainPath = $sandboxPath . '/' . $domainName;
+
+            if (!File::isDirectory($domainPath)) {
+                return [];
+            }
+
+            $screens = [];
+            $screenFolders = File::directories($domainPath);
+
+            foreach ($screenFolders as $screenFolder) {
+                $screenName = basename($screenFolder);
+
+                // 스크린 폴더 이름 패턴 확인 (숫자-screen-이름)
+                if (preg_match('/^\d+-screen-.+/', $screenName)) {
+                    $contentFile = $screenFolder . '/000-content.blade.php';
+
+                    if (File::exists($contentFile)) {
+                        // 스크린명에서 정보 추출
+                        $parts = explode('-', $screenName, 3);
+                        $screenId = $parts[0] ?? '000';
+                        $screenTitle = $parts[2] ?? 'unnamed';
+
+                        $screens[] = [
+                            'id' => $screenName,
+                            'folder_name' => $screenName,
+                            'title' => str_replace('-', ' ', ucfirst($screenTitle)),
+                            'display_name' => $screenId . '-screen-' . $screenTitle,
+                            'domain' => $domainName,
+                            'created_at' => date('Y-m-d H:i:s', File::lastModified($screenFolder)),
+                        ];
+                    }
+                }
+            }
+
+            // 화면 ID 기준으로 정렬
+            usort($screens, function($a, $b) {
+                return strcmp($a['folder_name'], $b['folder_name']);
+            });
+
+            return $screens;
+
+        } catch (\Exception $e) {
+            Log::error('도메인별 화면 목록 로드 오류', [
+                'error' => $e->getMessage(),
+                'sandbox_name' => $sandboxName,
+                'domain_name' => $domainName
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * 특정 화면의 콘텐츠를 로드합니다.
+     */
+    public function loadScreenContent(?string $sandboxName, string $domainName, string $screenName): array
+    {
+        try {
+            $sandboxPath = storage_path("sandbox/{$sandboxName}");
+            $screenPath = "{$sandboxPath}/{$domainName}/{$screenName}";
+
+            if (!File::exists($screenPath)) {
+                throw new \Exception("화면 경로를 찾을 수 없습니다: {$screenPath}");
+            }
+
+            // 000-content.blade.php 파일 로드
+            $contentFile = "{$screenPath}/000-content.blade.php";
+            $content = '';
+
+            if (File::exists($contentFile)) {
+                $content = File::get($contentFile);
+            }
+
+            // 화면 정보 수집
+            $screenInfo = [
+                'folder_name' => $screenName,
+                'domain' => $domainName,
+                'title' => $this->generateScreenTitle($screenName),
+                'description' => "도메인 {$domainName}의 {$screenName} 화면",
+                'type' => 'custom',
+                'created_at' => File::exists($screenPath) ? date('Y-m-d H:i:s', File::lastModified($screenPath)) : null,
+                'content' => $content,
+                'has_content' => !empty($content)
+            ];
+
+            return $screenInfo;
+
+        } catch (\Exception $e) {
+            Log::error('화면 콘텐츠 로드 오류', [
+                'error' => $e->getMessage(),
+                'sandbox_name' => $sandboxName,
+                'domain_name' => $domainName,
+                'screen_name' => $screenName
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * 화면 제목 생성
+     */
+    private function generateScreenTitle(string $screenName): string
+    {
+        // 103-screen-table-view -> Table View
+        if (preg_match('/^\d+-screen-(.+)$/', $screenName, $matches)) {
+            return ucwords(str_replace('-', ' ', $matches[1]));
+        }
+
+        // 일반적인 경우
+        return ucwords(str_replace('-', ' ', $screenName));
+    }
+
+    /**
      * 커스텀 화면 폴더명에서 도메인 정보를 추출합니다.
      */
     private function extractDomainFromScreenFolder(?string $customScreenFolder): ?string
@@ -283,18 +474,18 @@ class SandboxService
 
         try {
             $templatePath = $this->sandboxContextService->getSandboxPath();
-            
+
             if (!File::exists($templatePath)) {
                 return null;
             }
 
             // 도메인별로 검색해서 해당 화면이 있는 도메인을 찾음
             $domainFolders = File::directories($templatePath);
-            
+
             foreach ($domainFolders as $domainFolder) {
                 $domainName = basename($domainFolder);
                 $screenFolders = File::directories($domainFolder);
-                
+
                 foreach ($screenFolders as $screenFolder) {
                     $screenName = basename($screenFolder);
                     if ($screenName === $customScreenFolder) {

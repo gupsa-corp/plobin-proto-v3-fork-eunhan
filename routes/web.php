@@ -89,12 +89,31 @@ Route::group(['middleware' => 'loginRequired.auth'], function () {
         $organization = \App\Models\Organization::find($id);
         $project = \App\Models\Project::find($projectId);
 
+        // 샌드박스 정보 조회
+        $sandboxInfo = [
+            'sandbox_name' => null,
+            'has_sandbox' => false,
+            'custom_screen_folder' => null,
+            'has_custom_screen' => false
+        ];
+        $customScreen = null;
+        $customScreens = [];
+        $availableDomains = [];
+
         // 프로젝트 대시보드를 표시 (자동 리다이렉트 제거)
         return view('300-page-service.308-page-project-dashboard.000-index', [
             'currentPageId' => null,
             'organization' => $organization,
             'project' => $project,
-            'page' => null
+            'page' => null,
+            'sandboxInfo' => $sandboxInfo,
+            'customScreen' => $customScreen,
+            'customScreens' => $customScreens,
+            'availableDomains' => $availableDomains,
+            // 기존 변수들 (하위 호환성)
+            'sandboxName' => null,
+            'hasSandbox' => false,
+            'customScreenFolder' => null,
         ]);
     })->name('project.dashboard');
 

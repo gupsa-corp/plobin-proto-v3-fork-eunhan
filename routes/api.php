@@ -42,6 +42,7 @@ use App\Http\Controllers\Sandbox\ListSandboxes\Controller as ListSandboxesContro
 use App\Http\Controllers\Sandbox\ListScreens\Controller as ListScreensController;
 use App\Http\Controllers\Sandbox\ProjectSandbox\Controller as ProjectSandboxController;
 use App\Http\Controllers\Sandbox\SandboxTemplate\Controller as SandboxTemplateController;
+use App\Http\Controllers\Api\Sandbox\LoadScreenContent\Controller as LoadScreenContentController;
 use App\Http\Controllers\PlatformAdmin\Pricing\Controller as PlatformAdminPricingController;
 use Illuminate\Support\Facades\Route;
 
@@ -217,6 +218,10 @@ Route::prefix('sandbox')->group(function () {
 
     // 샌드박스 템플릿 downloads 파일 목록 API
     Route::get('/sandbox-files', [SandboxFileUploadController::class, 'getSandboxFiles']);
+
+    // 도메인별 화면 목록 조회 API
+    Route::get('/screens-by-domain', \App\Http\Controllers\Api\Sandbox\GetScreensByDomain\Controller::class);
+    Route::get('/load-screen-content', LoadScreenContentController::class);
 
     // 샌드박스 템플릿 관리 API
     Route::get('/templates', [SandboxTemplateController::class, 'index']);

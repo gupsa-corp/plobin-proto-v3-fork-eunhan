@@ -58,10 +58,16 @@ class Controller extends \App\Http\Controllers\Controller
                 $customScreen = $this->sandboxService->renderCustomScreen($page);
             }
 
-            // 사용 가능한 커스텀 스크린 목록 조회
+            // 사용 가능한 커스텀 스크린 목록 및 도메인 목록 조회
             if ($sandboxInfo['has_sandbox']) {
                 $customScreens = $this->sandboxService->getAvailableCustomScreens($sandboxInfo['sandbox_name']);
+                $availableDomains = $this->sandboxService->getAvailableDomains($sandboxInfo['sandbox_name']);
             }
+        }
+
+        // 도메인 목록 초기화 (샌드박스가 없는 경우)
+        if (!isset($availableDomains)) {
+            $availableDomains = [];
         }
 
         return view('300-page-service.308-page-project-dashboard.000-index', [
@@ -73,6 +79,7 @@ class Controller extends \App\Http\Controllers\Controller
             'sandboxInfo' => $sandboxInfo,
             'customScreen' => $customScreen,
             'customScreens' => $customScreens,
+            'availableDomains' => $availableDomains,
             // 기존 변수들 (하위 호환성)
             'sandboxName' => $sandboxInfo['sandbox_name'] ?? null,
             'hasSandbox' => $sandboxInfo['has_sandbox'] ?? false,
