@@ -31,7 +31,7 @@ class Controller extends BaseController
             $formData['modified_at'] = now()->toISOString();
 
             // Save to file system (existing behavior)
-            $directory = storage_path('storage-sandbox-1/form-creator');
+            $directory = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/form-creator');
             if (!is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }

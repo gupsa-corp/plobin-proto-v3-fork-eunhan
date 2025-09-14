@@ -59,7 +59,7 @@ class Component extends LivewireComponent
     private function loadAvailableFunctions()
     {
         // 함수 브라우저에서 사용 가능한 함수 목록 로드
-        $functionsPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/functions");
+        $functionsPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/storage-sandbox-{$this->currentStorage}/functions");
         $functions = [];
 
         if (File::exists($functionsPath)) {
@@ -86,7 +86,7 @@ class Component extends LivewireComponent
     {
         // 함수 설명을 가져오는 로직 (메타데이터 서비스 사용)
         try {
-            $metadataPath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}/functions/{$functionName}/metadata.json");
+            $metadataPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/storage-sandbox-{$this->currentStorage}/functions/{$functionName}/metadata.json");
             if (File::exists($metadataPath)) {
                 $metadata = json_decode(File::get($metadataPath), true);
                 return $metadata['description'] ?? "함수: {$functionName}";
@@ -369,7 +369,7 @@ class GeneratedScreen extends Component
 
     private function getSandboxDbPath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/storage-sandbox-{$this->currentStorage}/database/sqlite.db");
     }
 
     private function generateScreenFiles($title)

@@ -269,7 +269,7 @@ class WorkflowExecutionService
         try {
             $sandboxContextService = app(SandboxContextService::class);
         $currentStorage = $sandboxContextService->getCurrentSandbox();
-            $workflowsPath = storage_path("sandbox/{$currentStorage}/workflows");
+            $workflowsPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentStorage}/workflows");
 
             // 워크플로우 디렉토리 생성
             if (!File::exists($workflowsPath)) {
@@ -312,7 +312,7 @@ class WorkflowExecutionService
     {
         $sandboxContextService = app(SandboxContextService::class);
         $currentStorage = $sandboxContextService->getCurrentSandbox();
-        $workflowsPath = storage_path("sandbox/{$currentStorage}/workflows");
+        $workflowsPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentStorage}/workflows");
         $workflows = [];
 
         if (!File::exists($workflowsPath)) {

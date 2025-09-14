@@ -70,7 +70,7 @@ class FileEditor extends Component implements HasForms
     private function getCurrentStoragePath()
     {
         $currentStorage = Session::get('sandbox_storage', '1');
-        $path = storage_path('storage-sandbox-' . $currentStorage);
+        $path = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-' . $currentStorage);
 
         // 디렉토리가 없으면 생성
         if (!File::exists($path)) {

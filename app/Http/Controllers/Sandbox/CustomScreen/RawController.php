@@ -133,7 +133,7 @@ class RawController extends \App\Http\Controllers\Controller
     public function showByPath($storageName, $screenFolderName)
     {
         // 스토리지 경로에서 해당 화면 폴더 찾기 (도메인 폴더 포함)
-        $templatePath = storage_path("sandbox/{$storageName}");
+        $templatePath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$storageName}");
         $screenPath = null;
 
         // 도메인 폴더들을 스캔해서 해당 스크린 폴더가 있는지 확인

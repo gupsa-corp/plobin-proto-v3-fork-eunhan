@@ -216,8 +216,8 @@ class Controller extends \App\Http\Controllers\Controller
 
         // 이름이 변경된 경우 파일 시스템의 디렉토리명도 변경
         if ($request->has('name') && $request->name !== $oldName) {
-            $oldPath = storage_path('sandbox/' . $oldName);
-            $newPath = storage_path('sandbox/' . $request->name);
+            $oldPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $oldName);
+            $newPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $request->name);
 
             if (File::exists($oldPath)) {
                 File::move($oldPath, $newPath);

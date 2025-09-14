@@ -16,7 +16,7 @@
                         @php
                             $currentStorage = session('sandbox_storage', '1');
                             $storageOptions = [];
-                            $sandboxPath = storage_path('sandbox');
+                            $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox'));
 
                             if (file_exists($sandboxPath)) {
                                 $directories = glob($sandboxPath . '/*', GLOB_ONLYDIR);

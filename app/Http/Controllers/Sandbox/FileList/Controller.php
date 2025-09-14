@@ -14,7 +14,7 @@ class Controller extends \App\Http\Controllers\Controller
     public function getFileList(Request $request)
     {
         $currentStorage = Session::get('sandbox_storage', '1');
-        $storagePath = storage_path('storage-sandbox-' . $currentStorage);
+        $storagePath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-' . $currentStorage);
 
         $path = $request->get('path', '');
         $targetPath = $storagePath . '/' . ltrim($path, '/');

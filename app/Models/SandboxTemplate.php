@@ -36,7 +36,7 @@ class SandboxTemplate extends Model
 
     public function getStoragePathAttribute(): string
     {
-        return storage_path('sandbox-template/' . $this->name);
+        return storage_path(env('SANDBOX_TEMPLATE_PATH', 'sandbox/template') . '/' . $this->name);
     }
 
     public function exists(): bool

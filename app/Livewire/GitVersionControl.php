@@ -16,7 +16,7 @@ class GitVersionControl extends Component
 
     public function mount()
     {
-        $this->sandboxPath = storage_path('storage-sandbox-1');
+        $this->sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1');
         
         // 샌드박스 디렉토리가 없으면 생성
         if (!is_dir($this->sandboxPath)) {

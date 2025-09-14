@@ -436,7 +436,7 @@ class FunctionBrowser extends Component implements HasForms
      */
     private function getFunctionsPath()
     {
-        return storage_path("sandbox/storage-sandbox-{$this->currentStorage}/functions");
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/storage-sandbox-{$this->currentStorage}/functions");
     }
 
     /**

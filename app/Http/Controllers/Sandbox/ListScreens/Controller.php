@@ -35,7 +35,7 @@ class Controller extends \App\Http\Controllers\Controller
             // 샌드박스가 설정되지 않은 경우 기본 처리
         }
 
-        $sandboxPath = storage_path('storage-sandbox-' . $sandboxName);
+        $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-' . $sandboxName);
 
         // 샌드박스 디렉토리가 존재하는지 확인
         if (!File::exists($sandboxPath)) {
@@ -62,7 +62,7 @@ class Controller extends \App\Http\Controllers\Controller
     public function listScreensBySandbox(Request $request, $sandboxName)
     {
         // storage/sandbox 경로 사용
-        $sandboxFrontendPath = storage_path('sandbox/' . $sandboxName);
+        $sandboxFrontendPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $sandboxName);
 
         // 샌드박스 디렉토리가 존재하는지 확인
         if (!File::exists($sandboxFrontendPath)) {

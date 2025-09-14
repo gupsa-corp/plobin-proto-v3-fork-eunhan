@@ -37,7 +37,7 @@
                 <?php foreach($projectsData as $project): ?>
                     <tr class="hover:bg-gray-50">
                         
-<?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/303-table-row.blade.php'); ?>
+<?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/303-table-row.blade.php'); ?>
                         
                     </tr>
                 <?php endforeach; ?>

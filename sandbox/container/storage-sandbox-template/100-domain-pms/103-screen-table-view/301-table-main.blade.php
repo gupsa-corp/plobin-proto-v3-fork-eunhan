@@ -106,13 +106,13 @@
          }
      }" x-init="window.projectTable = this">
 
-    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/302-table-header.blade.php'); ?>
+    <?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/302-table-header.blade.php'); ?>
 
-    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/303-table-body.blade.php'); ?>
+    <?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/303-table-body.blade.php'); ?>
 
-    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/304-table-pagination.blade.php'); ?>
+    <?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/304-table-pagination.blade.php'); ?>
 
-    <?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/305-sidebar-project-edit.blade.php'); ?>
+    <?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/305-sidebar-project-edit.blade.php'); ?>
 </div>
 
-<?php include storage_path('sandbox/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/306-table-scripts.blade.php'); ?>
+<?php include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . basename(dirname(dirname(dirname(__DIR__)))) . '/100-domain-pms/103-screen-table-view/306-table-scripts.blade.php'); ?>

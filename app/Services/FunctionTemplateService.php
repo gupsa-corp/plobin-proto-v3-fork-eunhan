@@ -13,7 +13,7 @@ class FunctionTemplateService
     public function __construct()
     {
         $this->currentStorage = Session::get('sandbox_storage', 'template');
-        $this->basePath = storage_path("sandbox/storage-sandbox-{$this->currentStorage}");
+        $this->basePath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/storage-sandbox-{$this->currentStorage}");
     }
 
     /**

@@ -481,7 +481,7 @@ class {$className}Controller extends Controller
             $results = [];
 
             // 1. Sandbox 디렉토리에 저장 (기존 기능)
-            $sandboxPath = storage_path('sandbox/api/' . $fileName . '.php');
+            $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/api/' . $fileName . '.php');
             
             if (!File::exists(dirname($sandboxPath))) {
                 File::makeDirectory(dirname($sandboxPath), 0755, true);
@@ -631,7 +631,7 @@ class {$className}Controller extends Controller
 
         // 문서 저장
         $fileName = $this->sanitizeFileName($this->apiName);
-        $docPath = storage_path('sandbox/api/docs/' . $fileName . '.md');
+        $docPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/api/docs/' . $fileName . '.md');
         
         if (!File::exists(dirname($docPath))) {
             File::makeDirectory(dirname($docPath), 0755, true);

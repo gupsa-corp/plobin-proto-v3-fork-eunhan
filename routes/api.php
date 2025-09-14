@@ -255,7 +255,7 @@ Route::prefix('sandbox')->group(function () {
             $sandboxContextService->setCurrentSandbox($sandbox);
         }
         
-        $apiFile = base_path("sandbox/container/{$sandbox}/000-common/103-Routes/api.php");
+        $apiFile = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandbox}/000-common/103-Routes/api.php");
 
         if (!file_exists($apiFile)) {
             return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다: ' . $apiFile], 404);

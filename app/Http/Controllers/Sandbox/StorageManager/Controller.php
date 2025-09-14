@@ -11,17 +11,17 @@ class Controller extends \App\Http\Controllers\Api\Core\Controller
 {
     private function getStoragePath()
     {
-        return storage_path('sandbox');
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox'));
     }
 
     private function getTemplateStoragePath($templateName = 'default')
     {
-        return storage_path('sandbox-template/' . $templateName);
+        return storage_path(env('SANDBOX_TEMPLATE_PATH', 'sandbox/template') . '/' . $templateName);
     }
 
     private function getTemplateBasePath()
     {
-        return storage_path('sandbox-template');
+        return storage_path(env('SANDBOX_TEMPLATE_PATH', 'sandbox/template'));
     }
 
     private function getTemplateList()

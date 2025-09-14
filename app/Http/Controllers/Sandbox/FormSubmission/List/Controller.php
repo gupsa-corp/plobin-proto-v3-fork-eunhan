@@ -12,7 +12,7 @@ class Controller extends BaseController
     {
         try {
             // SQLite 데이터베이스 연결 설정
-            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
+            $dbPath = storage_path('../' . env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . '/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
 
             if (!file_exists($dbPath)) {
                 return response()->json([

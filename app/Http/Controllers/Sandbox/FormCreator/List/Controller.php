@@ -11,7 +11,7 @@ class Controller extends BaseController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $formsPath = storage_path('storage-sandbox-1/form-creator/');
+            $formsPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/form-creator/');
             
             if (!is_dir($formsPath)) {
                 mkdir($formsPath, 0755, true);

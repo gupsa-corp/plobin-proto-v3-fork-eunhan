@@ -36,7 +36,7 @@ class Component extends LivewireComponent
     private function setupSandboxDatabase()
     {
         $selectedSandbox = $this->getCurrentSandboxFallback();
-        $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
+        $sandboxDbPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$selectedSandbox}/backend/database/release.sqlite");
 
         if (file_exists($sandboxDbPath)) {
             Config::set('database.connections.sandbox_sqlite', [
@@ -79,7 +79,7 @@ class Component extends LivewireComponent
     {
         try {
             $selectedSandbox = $this->getCurrentSandboxFallback();
-            $sandboxDbPath = storage_path("sandbox/{$selectedSandbox}/backend/database/release.sqlite");
+            $sandboxDbPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$selectedSandbox}/backend/database/release.sqlite");
 
             // 파일 존재 확인
             if (!file_exists($sandboxDbPath)) {

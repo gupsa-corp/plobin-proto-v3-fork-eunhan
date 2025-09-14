@@ -62,7 +62,7 @@ return [
 
         'sandbox_uploads' => [
             'driver' => 'local',
-            'root' => storage_path('sandbox/uploads'),
+            'root' => storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/uploads'),
             'visibility' => 'private',
             'throw' => false,
             'report' => false,
@@ -70,7 +70,7 @@ return [
 
         'sandbox_downloads' => [
             'driver' => 'local',
-            'root' => storage_path('sandbox/' . config('sandbox-routing.default_template') . '/downloads'),
+            'root' => storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . config('sandbox-routing.default_template') . '/downloads'),
             'visibility' => 'private',
             'throw' => false,
             'report' => false,

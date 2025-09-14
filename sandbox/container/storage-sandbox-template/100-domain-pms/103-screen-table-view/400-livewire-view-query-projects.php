@@ -89,7 +89,7 @@ class SandboxTableView extends Component
     public function deleteProject($projectId)
     {
         try {
-            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
+            $dbPath = storage_path('../' . env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . '/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
             $pdo = new PDO('sqlite:' . $dbPath);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -122,7 +122,7 @@ class SandboxTableView extends Component
     private function loadData()
     {
         try {
-            $dbPath = storage_path('../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
+            $dbPath = storage_path('../' . env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . '/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite');
             $pdo = new PDO('sqlite:' . $dbPath);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -209,7 +209,7 @@ class SandboxTableView extends Component
     {
         // 샌드박스 템플릿 경로에서 뷰 렌더링
         $currentSandbox = basename(dirname(dirname(dirname(__DIR__))));
-        $viewPath = storage_path("sandbox/{$currentSandbox}/100-domain-pms/103-screen-table-view/700-livewire-table-view.blade.php");
+        $viewPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentSandbox}/100-domain-pms/103-screen-table-view/700-livewire-table-view.blade.php");
         return view()->file($viewPath);
     }
 }

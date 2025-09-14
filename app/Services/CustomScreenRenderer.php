@@ -198,7 +198,7 @@ class CustomScreenRenderer
     {
         // 파일이 샌드박스 디렉토리 내에 있는지 확인
         $realPath = realpath($filePath);
-        $sandboxPath = realpath(storage_path('sandbox'));
+        $sandboxPath = realpath(storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox')));
         
         if (!$realPath || !str_starts_with($realPath, $sandboxPath)) {
             return false;

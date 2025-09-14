@@ -57,7 +57,7 @@
             @php
                 // storage/sandbox 경로에서 실제 파일 찾기 (도메인 폴더 포함)
                 $customScreenFilePath = null;
-                $sandboxPath = storage_path('sandbox/' . $sandboxName);
+                $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $sandboxName);
 
                 // 디버깅 정보
                 $debugInfo = [
@@ -86,7 +86,7 @@
 
                 // 도메인 폴더에서 찾지 못했다면 기존 방식으로 시도 (하위 호환성)
                 if (!$customScreenFilePath) {
-                    $fallbackPath = storage_path('sandbox/' . $sandboxName . '/' . trim($customScreenFolder, '/') . '/000-content.blade.php');
+                    $fallbackPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $sandboxName . '/' . trim($customScreenFolder, '/') . '/000-content.blade.php');
                     $debugInfo['fallbackPath'] = $fallbackPath;
                     $debugInfo['fallbackExists'] = file_exists($fallbackPath);
                     if (file_exists($fallbackPath)) {

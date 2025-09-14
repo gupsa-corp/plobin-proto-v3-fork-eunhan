@@ -36,7 +36,7 @@ class ProjectSandbox extends Model
 
     public function getStoragePathAttribute(): string
     {
-        return storage_path('sandbox/' . $this->name);
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/' . $this->name);
     }
 
     public function getDatabasePathAttribute(): string

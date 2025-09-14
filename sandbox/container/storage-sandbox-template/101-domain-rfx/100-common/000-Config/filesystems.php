@@ -67,7 +67,7 @@ return [
         */
         'sandbox_uploads' => [
             'driver' => 'local',
-            'root' => storage_path('sandbox/uploads'),
+            'root' => storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/uploads'),
             'visibility' => 'private',
             'throw' => false,
         ],
@@ -83,7 +83,7 @@ return [
         */
         'sandbox_downloads' => [
             'driver' => 'local',
-            'root' => storage_path('sandbox/downloads'),
+            'root' => storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/downloads'),
             'visibility' => 'private',
             'throw' => false,
         ],

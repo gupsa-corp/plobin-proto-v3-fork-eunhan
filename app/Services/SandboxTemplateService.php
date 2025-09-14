@@ -16,7 +16,7 @@ class SandboxTemplateService
             return '';
         }
 
-        return base_path("sandbox/container/{$sandboxName}");
+        return base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandboxName}");
     }
 
     /**

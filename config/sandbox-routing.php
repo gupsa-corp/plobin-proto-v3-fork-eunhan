@@ -13,7 +13,7 @@ return [
     /**
      * 샌드박스 기본 경로 설정
      */
-    'base_path' => env('SANDBOX_BASE_PATH', 'sandbox/container'),
+    'base_path' => env('SANDBOX_CONTAINER_PATH', 'sandbox/container'),
     
     /**
      * 기본 템플릿 폴더명

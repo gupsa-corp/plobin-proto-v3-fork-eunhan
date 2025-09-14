@@ -11,7 +11,6 @@ class SandboxRoutingService
     /**
      * 샌드박스 기본 설정
      */
-    private const SANDBOX_BASE_PATH = 'sandbox/container';
     // SANDBOX_TEMPLATE_FOLDER constant removed - use dynamic sandbox context
     
     /**
@@ -183,7 +182,7 @@ class SandboxRoutingService
      */
     private function getSandboxBasePath(): string
     {
-        return base_path(self::SANDBOX_BASE_PATH);
+        return base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container'));
     }
     
     /**

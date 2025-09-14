@@ -201,7 +201,7 @@ class ProjectsController extends Controller
      */
     private function getSqliteConnection(string $sandboxTemplate): PDO
     {
-        $dbPath = storage_path("../sandbox/container/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite");
+        $dbPath = storage_path("../" . env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandboxTemplate}/100-domain-pms/100-common/200-Database/release.sqlite");
         
         if (!file_exists($dbPath)) {
             throw new \Exception("SQLite database not found at: {$dbPath}");

@@ -13,7 +13,7 @@ class Controller extends \App\Http\Controllers\Controller
     public function listSandboxes(Request $request)
     {
         try {
-            $sandboxPath = storage_path('sandbox');
+            $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox'));
 
             // 샌드박스 디렉토리가 존재하지 않는 경우
             if (!File::exists($sandboxPath) || !File::isDirectory($sandboxPath)) {

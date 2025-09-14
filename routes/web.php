@@ -581,7 +581,7 @@ Route::get('/sandbox/{sandboxName}/{viewName}', [\App\Http\Controllers\Sandbox\C
 
 // 샌드박스 템플릿 백엔드 API 라우트 (CSRF 보호 제외)
 Route::any('/sandbox/{sandboxName}/backend/api.php/{path?}', function ($sandboxName, $path = '') {
-    $apiFile = storage_path("sandbox/{$sandboxName}/backend/api.php");
+    $apiFile = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$sandboxName}/backend/api.php");
 
     if (!file_exists($apiFile)) {
         return response()->json(['success' => false, 'message' => 'API 파일을 찾을 수 없습니다.'], 404);

@@ -33,7 +33,7 @@ class Component extends LivewireComponent implements HasForms
     private function getCurrentStoragePath()
     {
         $currentStorage = Session::get('sandbox_storage', '1');
-        return storage_path('storage-sandbox-' . $currentStorage);
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-' . $currentStorage);
     }
 
     public function form(Form $form): Form

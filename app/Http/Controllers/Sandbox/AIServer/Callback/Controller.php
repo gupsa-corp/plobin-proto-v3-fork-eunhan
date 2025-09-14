@@ -210,7 +210,7 @@ class Controller extends BaseController
 
     private function storeProcessResult(string $processId, array $result, string $callbackId): void
     {
-        $directory = storage_path('storage-sandbox-1/ai-server/results');
+        $directory = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/ai-server/results');
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
@@ -229,7 +229,7 @@ class Controller extends BaseController
 
     private function logCallback(string $callbackId, array $data): void
     {
-        $directory = storage_path('storage-sandbox-1/ai-server/logs');
+        $directory = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/ai-server/logs');
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
         }

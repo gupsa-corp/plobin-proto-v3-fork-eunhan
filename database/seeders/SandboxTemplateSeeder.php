@@ -15,7 +15,7 @@ class SandboxTemplateSeeder extends Seeder
     public function run(): void
     {
         // storage/sandbox-template/ 디렉토리에서 기존 템플릿들을 찾아서 DB에 등록
-        $templatePath = storage_path('sandbox-template');
+        $templatePath = storage_path(env('SANDBOX_TEMPLATE_PATH', 'sandbox/template'));
         
         if (File::exists($templatePath)) {
             $templateDirectories = File::directories($templatePath);

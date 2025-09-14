@@ -12,7 +12,7 @@ class Controller extends BaseController
     {
         try {
             // 샌드박스 FormManager 클래스 로드
-            $formManagerPath = storage_path('storage-sandbox-1/Backend/Functions/FormPublisher/FormManager.php');
+            $formManagerPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/Backend/Functions/FormPublisher/FormManager.php');
             require_once $formManagerPath;
             
             $title = $request->input('title', '');

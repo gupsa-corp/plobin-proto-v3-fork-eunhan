@@ -37,7 +37,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
     {
         // 샌드박스 컨테이너 뷰 경로 등록
         $this->app['view']->addNamespace('sandbox.container', [
-            base_path('sandbox/container'),
+            base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container')),
         ]);
     }
     
@@ -90,7 +90,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
         // 템플릿 화면 직접 렌더링 라우트 (우선순위를 위해 먼저 등록)
         Route::get('{sandbox}/{domain}/{screen}', function($sandbox, $domain, $screen) {
             // 템플릿 파일 경로 생성
-            $templateFile = base_path("sandbox/container/{$sandbox}/{$domain}/{$screen}/000-content.blade.php");
+            $templateFile = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandbox}/{$domain}/{$screen}/000-content.blade.php");
             
             if (!file_exists($templateFile)) {
                 return abort(404, '템플릿 파일을 찾을 수 없습니다.');

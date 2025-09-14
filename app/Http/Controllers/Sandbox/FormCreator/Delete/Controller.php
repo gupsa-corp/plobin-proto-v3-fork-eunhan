@@ -11,7 +11,7 @@ class Controller extends BaseController
     public function __invoke(Request $request, string $filename): JsonResponse
     {
         try {
-            $filePath = storage_path('storage-sandbox-1/form-creator/' . $filename);
+            $filePath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/form-creator/' . $filename);
 
             if (!file_exists($filePath)) {
                 return response()->json([

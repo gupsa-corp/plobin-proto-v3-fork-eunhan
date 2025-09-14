@@ -15,7 +15,7 @@
             <div style="background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
             @php
                 // 샌드박스 경로 설정
-                $sandboxPath = storage_path('storage-sandbox-1/Frontend/Page');
+                $sandboxPath = storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . '/storage-sandbox-1/Frontend/Page');
 
                 // URL에서 페이지 타입 결정
                 $currentPath = request()->path();

@@ -37,7 +37,7 @@
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
 <?php 
 $currentSandbox = basename(dirname(dirname(dirname(__DIR__))));
-include storage_path("sandbox/{$currentSandbox}/100-domain-pms/103-screen-table-view/305-sidebar-form.blade.php"); 
+include storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentSandbox}/100-domain-pms/103-screen-table-view/305-sidebar-form.blade.php"); 
 ?>
         </div>
 

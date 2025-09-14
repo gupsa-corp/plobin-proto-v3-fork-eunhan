@@ -56,7 +56,7 @@ class SandboxContextService
     public function getSandboxPath(): string
     {
         $currentSandbox = $this->getCurrentSandbox();
-        return base_path("sandbox/container/{$currentSandbox}");
+        return base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$currentSandbox}");
     }
 
     /**
@@ -74,7 +74,7 @@ class SandboxContextService
     public function getSandboxStoragePath(): string
     {
         $currentSandbox = $this->getCurrentSandbox();
-        return storage_path("sandbox/{$currentSandbox}");
+        return storage_path(env('SANDBOX_STORAGE_PATH', 'sandbox') . "/{$currentSandbox}");
     }
 
     /**
@@ -100,7 +100,7 @@ class SandboxContextService
      */
     public function validateSandboxExists(string $sandbox): bool
     {
-        $sandboxPath = base_path("sandbox/container/{$sandbox}");
+        $sandboxPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandbox}");
         return File::exists($sandboxPath) && File::isDirectory($sandboxPath);
     }
 
@@ -109,7 +109,7 @@ class SandboxContextService
      */
     public function getAvailableSandboxes(): array
     {
-        $containerPath = base_path('sandbox/container');
+        $containerPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container'));
         $sandboxes = [];
 
         if (!File::exists($containerPath)) {
@@ -271,7 +271,7 @@ class SandboxContextService
      */
     private function findFirstAvailableSandbox(): ?string
     {
-        $containerPath = base_path('sandbox/container');
+        $containerPath = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container'));
 
         if (!File::exists($containerPath)) {
             return null;
