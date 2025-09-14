@@ -670,14 +670,7 @@ Route::get('/sandbox/documentation-manager', function () {
 // 샌드박스 사용 프로젝트 목록
 Route::get('/sandbox/using-projects', [\App\Http\Controllers\Sandbox\UsingProjects\Controller::class, 'index'])->name('sandbox.using-projects');
 
-// 자료 다운로드 페이지
-Route::get('/sandbox/downloads', function () {
-    return view('700-page-sandbox.718-page-downloads.000-index');
-})->name('sandbox.downloads');
 
-// 자료 다운로드 API
-Route::get('/sandbox/downloads/file/{filename}', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'download'])->name('sandbox.downloads.file');
-Route::get('/sandbox/downloads/stats', [\App\Http\Controllers\Sandbox\Downloads\Controller::class, 'getStats'])->name('sandbox.downloads.stats');
 
 // Cron 관리자
 Route::get('/sandbox/cron-manager', function () {

@@ -84,10 +84,6 @@
                     <p class="text-blue-700">개발 시나리오 및 요구사항을 체계적으로 관리하고 추적합니다</p>
                 </a>
 
-                <a href="/sandbox/downloads" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-green-200 bg-green-50">
-                    <h3 class="text-lg font-semibold text-green-900 mb-2">📥 자료 다운로드</h3>
-                    <p class="text-green-700">E2E 테스트용 자료와 샘플 파일을 다운로드할 수 있습니다</p>
-                </a>
 
                 <a href="/sandbox/cron-manager" class="block bg-white border border-gray-200 rounded-lg p-6 hover:bg-gray-50 transition-colors border-orange-200 bg-orange-50">
                     <h3 class="text-lg font-semibold text-orange-900 mb-2">⏰ Cron 관리자</h3>
