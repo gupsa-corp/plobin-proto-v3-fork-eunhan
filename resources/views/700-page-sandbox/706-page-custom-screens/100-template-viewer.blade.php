@@ -1,7 +1,6 @@
-<?php $common = getCommonPath(); ?>
 <!DOCTYPE html>
 @include('000-common-layouts.001-html-lang')
-@include($common . '.301-layout-head', ['title' => '템플릿 미리보기 - ' . $customScreen['title']])
+@include('700-page-sandbox.700-common.301-layout-head', ['title' => '템플릿 미리보기 - ' . $customScreen['title']])
 
 <body class="bg-gray-100">
     <!-- 템플릿 화면용 드롭다운 네비게이션만 표시 -->

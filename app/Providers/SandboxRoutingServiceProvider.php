@@ -50,7 +50,7 @@ class SandboxRoutingServiceProvider extends ServiceProvider
             Route::group([
                 'prefix' => 'sandbox',
                 'as' => 'sandbox.',
-                'middleware' => ['web']
+                'middleware' => ['web', 'sandbox.context']
             ], function () {
                 $this->registerDynamicRoutes();
                 $this->registerApiRoutes();

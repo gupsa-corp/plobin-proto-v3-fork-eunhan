@@ -14,7 +14,6 @@
                             class="text-sm border border-gray-300 rounded-md px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onchange="selectStorage(this.value)">
                         @php
-                            $currentStorage = session('sandbox_storage', '1');
                             $storageOptions = [];
                             $sandboxPath = storage_path('sandbox');
 
@@ -28,6 +27,16 @@
                                     }
                                 }
                                 sort($storageOptions);
+                            }
+
+                            // 기본값을 실제 존재하는 첫 번째 폴더로 설정
+                            $defaultStorage = !empty($storageOptions) ? $storageOptions[0] : '1';
+                            $currentStorage = session('sandbox_storage', $defaultStorage);
+
+                            // 현재 선택된 것이 존재하지 않으면 기본값으로 변경
+                            if (!in_array($currentStorage, $storageOptions) && !empty($storageOptions)) {
+                                $currentStorage = $storageOptions[0];
+                                session(['sandbox_storage' => $currentStorage]);
                             }
                         @endphp
 

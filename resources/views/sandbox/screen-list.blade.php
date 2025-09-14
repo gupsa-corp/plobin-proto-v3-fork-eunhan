@@ -1,6 +1,11 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+@include('000-common-layouts.001-html-lang')
+@include('700-page-sandbox.700-common.301-layout-head', ['title' => $page_title])
 
-@section('content')
+<body class="bg-gray-100">
+    @include('700-page-sandbox.700-common.400-sandbox-header')
+
+    <div class="min-h-screen"
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
         <!-- 브레드크럼 -->
@@ -206,4 +211,12 @@
         @endif
     </div>
 </div>
-@endsection
+    </div>
+
+    <!-- Livewire Scripts -->
+    @livewireScripts
+
+    <!-- Filament Scripts -->
+    @filamentScripts
+</body>
+</html>

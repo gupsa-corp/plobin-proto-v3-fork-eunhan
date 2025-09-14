@@ -32,18 +32,30 @@ class Component extends LivewireComponent
     public function mount()
     {
         $this->sandboxContextService = app(SandboxContextService::class);
-        $this->loadScreens();
 
-        // URL에서 선택된 화면이 있다면 해당 화면을 선택 (화면 목록 로딩 후)
-        if ($this->selectedScreenId) {
-            $this->selectScreenById($this->selectedScreenId);
+        // 샌드박스가 설정되어 있는 경우에만 화면을 로드
+        try {
+            $this->sandboxContextService->getCurrentSandbox();
+            $this->loadScreens();
+
+            // URL에서 선택된 화면이 있다면 해당 화면을 선택 (화면 목록 로딩 후)
+            if ($this->selectedScreenId) {
+                $this->selectScreenById($this->selectedScreenId);
+            }
+        } catch (\Exception $e) {
+            // 샌드박스가 설정되지 않은 경우 빈 화면 목록으로 시작
+            $this->screens = [];
         }
     }
 
     public function render()
     {
-        $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
-        
+        try {
+            $currentSandbox = $this->sandboxContextService->getCurrentSandbox();
+        } catch (\Exception $e) {
+            $currentSandbox = null;
+        }
+
         return view('livewire.sandbox.custom-screens.browser-component', [
             'selectedSandbox' => $currentSandbox,
             'availableDomains' => $this->getAvailableDomains(),
@@ -337,7 +349,12 @@ class Component extends LivewireComponent
     private function getAvailableDomains()
     {
         $domains = [];
-        $templatePath = $this->sandboxContextService->getSandboxPath();
+
+        try {
+            $templatePath = $this->sandboxContextService->getSandboxPath();
+        } catch (\Exception $e) {
+            return $domains; // 샌드박스가 설정되지 않은 경우 빈 배열 반환
+        }
 
         if (File::exists($templatePath)) {
             $domainFolders = File::directories($templatePath);
@@ -361,9 +378,13 @@ class Component extends LivewireComponent
 
     private function getAvailableScreenTypes()
     {
-        // Get screen types from existing screens
-        $allScreens = $this->getScreensFromTemplate();
-        $types = array_unique(array_column($allScreens, 'type'));
+        try {
+            // Get screen types from existing screens
+            $allScreens = $this->getScreensFromTemplate();
+            $types = array_unique(array_column($allScreens, 'type'));
+        } catch (\Exception $e) {
+            return []; // 샌드박스가 설정되지 않은 경우 빈 배열 반환
+        }
         
         $screenTypes = [];
         foreach ($types as $type) {

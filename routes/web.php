@@ -353,6 +353,11 @@ foreach ($routes as $path => $config) {
     if ($routeName) {
         $route->name($routeName);
     }
+
+    // 샌드박스 관련 라우트에 컨텍스트 미들웨어 적용
+    if (str_starts_with($path, '/sandbox')) {
+        $route->middleware('sandbox.context');
+    }
 }
 
 // 페이지 설정 관련 라우트들

@@ -16,11 +16,22 @@ class SandboxContextService
     public function getCurrentSandbox(): string
     {
         $sandbox = Session::get(self::SESSION_KEY);
-        
+
+        // 새로운 세션 키에 값이 없으면 레거시 키도 확인
         if (!$sandbox) {
+            $sandbox = Session::get('sandbox_storage');
+        }
+
+        // 여전히 없으면 사용 가능한 첫 번째 샌드박스를 자동으로 설정
+        if (!$sandbox) {
+            $firstSandbox = $this->findFirstAvailableSandbox();
+            if ($firstSandbox) {
+                $this->setCurrentSandbox($firstSandbox);
+                return $firstSandbox;
+            }
             throw new \Exception('샌드박스가 선택되지 않았습니다. setCurrentSandbox()로 샌드박스를 선택해주세요.');
         }
-        
+
         return $sandbox;
     }
 
@@ -30,7 +41,9 @@ class SandboxContextService
     public function setCurrentSandbox(string $sandbox): void
     {
         if ($this->validateSandboxExists($sandbox)) {
+            // 새 세션 키와 레거시 키 모두 설정
             Session::put(self::SESSION_KEY, $sandbox);
+            Session::put('sandbox_storage', $sandbox);
             Log::info('Sandbox context changed', ['from' => Session::get(self::SESSION_KEY), 'to' => $sandbox]);
         } else {
             throw new \InvalidArgumentException("Sandbox '{$sandbox}' does not exist");
@@ -116,7 +129,7 @@ class SandboxContextService
                         'name' => $sandboxName,
                         'path' => $directory,
                         'display_name' => $this->generateDisplayName($sandboxName),
-                        'is_active' => $sandboxName === $this->getCurrentSandbox(),
+                        'is_active' => $sandboxName === (Session::get(self::SESSION_KEY) ?: Session::get('sandbox_storage')),
                         'domains_count' => $this->countDomains($directory),
                         'screens_count' => $this->countScreens($directory)
                     ];
@@ -251,6 +264,36 @@ class SandboxContextService
     {
         Session::forget(self::SESSION_KEY);
         Log::info('Sandbox context reset to default');
+    }
+
+    /**
+     * 사용 가능한 첫 번째 샌드박스를 찾습니다 (순환 참조 방지용)
+     */
+    private function findFirstAvailableSandbox(): ?string
+    {
+        $containerPath = base_path('sandbox/container');
+
+        if (!File::exists($containerPath)) {
+            return null;
+        }
+
+        try {
+            $directories = File::directories($containerPath);
+
+            foreach ($directories as $directory) {
+                $sandboxName = basename($directory);
+
+                // 기본 구조 검증 (000-common 폴더 존재 여부)
+                $commonPath = $directory . '/000-common';
+                if (File::exists($commonPath)) {
+                    return $sandboxName;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error finding first available sandbox', ['error' => $e->getMessage()]);
+        }
+
+        return null;
     }
 
     /**
