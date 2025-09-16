@@ -1,6 +1,6 @@
 <!-- 샌드박스 선택 시 커스텀 화면 설정 폼 -->
 <div x-show="sandboxSelected">
-    <form action="{{ route('project.dashboard.page.settings.custom-screen.post', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" method="POST" class="space-y-6">
+    <form action="{{ route('project.dashboard.page.settings.custom-screen.post', ['id' => request()->route('id'), 'projectId' => request()->route('projectId'), 'pageId' => request()->route('pageId')]) }}" method="POST" class="space-y-6" id="customScreenForm">
         @csrf
 
         <!-- 커스텀 화면 사용 안함 옵션 -->
@@ -20,7 +20,8 @@
                     새로고침
                 </button>&nbsp;
                 <button
-                    type="submit"
+                    type="button"
+                    @click="handleSave()"
                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     저장
@@ -29,5 +30,7 @@
 
             @include('300-page-service.311-page-settings-custom-screen.006-custom-screen-options')
         </div>
+        <!-- 하위 페이지 생성 확인을 위한 숨겨진 필드 -->
+        <input type="hidden" name="create_sub_pages" id="create_sub_pages" value="no">
     </form>
 </div>

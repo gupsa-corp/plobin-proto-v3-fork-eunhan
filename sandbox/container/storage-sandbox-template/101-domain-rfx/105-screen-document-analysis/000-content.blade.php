@@ -1,17 +1,13 @@
 {{-- AI 문서 에셋 분석 결과 화면 --}}
-<?php
-    require_once __DIR__ . "/../../../../../../bootstrap.php";
-use App\Services\TemplateCommonService;
-
-
-    $screenInfo = TemplateCommonService::getCurrentTemplateScreenInfo();
-    $uploadPaths = TemplateCommonService::getTemplateUploadPaths();
+@php
+    $screenInfo = app(\App\Services\TemplateCommonService::class)->getCurrentTemplateScreenInfo();
+    $uploadPaths = app(\App\Services\TemplateCommonService::class)->getTemplateUploadPaths();
 
     // URL에서 file_id 파라미터 가져오기
-    $fileId = $_GET['file_id'] ?? null;
-?>
+    $fileId = request()->get('file_id');
+@endphp
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6"
-     x-data="documentAnalysisData(<?= intval($fileId) ?>)"
+     x-data="documentAnalysisData({{ intval($fileId) }})"
      x-init="init()"
      x-cloak>
     {{-- 글로벌 네비게이션 포함 --}}

@@ -1,6 +1,7 @@
 {{-- 글로벌 샌드박스 네비게이션 드롭다운 --}}
 <?php
-    $availableScreens = getAvailableScreens();
+    use App\Helpers\SandboxHelper;
+    $availableScreens = SandboxHelper::getAvailableScreens();
 
     // getAvailableScreens()가 비어있을 경우 frontend 디렉토리에서 자동으로 스크린 목록 생성
     if (empty($availableScreens)) {

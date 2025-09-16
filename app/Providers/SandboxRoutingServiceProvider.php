@@ -91,42 +91,60 @@ class SandboxRoutingServiceProvider extends ServiceProvider
         Route::get('{sandbox}/{domain}/{screen}', function($sandbox, $domain, $screen) {
             // 템플릿 파일 경로 생성
             $templateFile = base_path(env('SANDBOX_CONTAINER_PATH', 'sandbox/container') . "/{$sandbox}/{$domain}/{$screen}/000-content.blade.php");
-            
+
             if (!file_exists($templateFile)) {
                 return abort(404, '템플릿 파일을 찾을 수 없습니다.');
             }
-            
-            // 간단하고 안전한 템플릿 처리 - raw 내용을 직접 정리해서 표시  
+
+            // 안전한 템플릿 처리 - Blade 템플릿으로 렌더링
             try {
+                // TemplateCommonService 메서드들을 뷰 데이터로 준비
+                $screenInfo = \App\Services\TemplateCommonService::getCurrentTemplateScreenInfo();
+                $uploadPaths = \App\Services\TemplateCommonService::getTemplateUploadPaths();
+
+                // helper 함수들을 뷰에서 사용할 수 있도록 준비
+                $helpers = [
+                    'getFileIcon' => function($ext) {
+                        return \App\Services\TemplateCommonService::getFileIcon($ext);
+                    },
+                    'formatFileSize' => function($bytes) {
+                        return \App\Services\TemplateCommonService::formatFileSize($bytes);
+                    },
+                    'getFileTypeName' => function($ext) {
+                        return \App\Services\TemplateCommonService::getFileTypeName($ext);
+                    }
+                ];
+
+                // 템플릿 파일 내용을 읽고 처리
                 $templateContent = file_get_contents($templateFile);
-                
-                // 문제가 되는 PHP 구문들 완전 제거
-                $templateContent = preg_replace('/^.*require_once.*$/m', '', $templateContent);
-                $templateContent = preg_replace('/^use App\\.*$/m', '', $templateContent);
-                $templateContent = preg_replace('/<\?php.*?\?>/ms', '', $templateContent);
-                
-                // 빈 줄 정리
-                $templateContent = preg_replace('/^\s*$/m', '', $templateContent);
-                $templateContent = preg_replace('/\n+/', "\n", $templateContent);
-                
-                // Blade 주석 제거
-                $templateContent = preg_replace('/\{\{--.*?--\}\}/ms', '', $templateContent);
-                
-                // PHP 변수들을 실제 값으로 대체
-                $templateContent = str_replace('{{ $screenInfo }}', json_encode(['screen' => $screen, 'domain' => $domain, 'sandbox' => $sandbox]), $templateContent);
-                $templateContent = str_replace('{{ $uploadPaths }}', json_encode(['upload' => '/sandbox/upload', 'temp' => '/sandbox/temp', 'download' => '/sandbox/download']), $templateContent);
-                
-                // 함수 호출들을 간단하게 처리
-                $templateContent = preg_replace('/\{\{\s*getFileIcon\([^}]+\)\s*\}\}/', '📄', $templateContent);
-                $templateContent = preg_replace('/\{\{\s*formatFileSize\([^}]+\)\s*\}\}/', '1.2 MB', $templateContent);
-                $templateContent = preg_replace('/\{\{\s*getFileTypeName\([^}]+\)\s*\}\}/', '문서', $templateContent);
-                
-                // Service 호출들 제거
-                $templateContent = str_replace('TemplateCommonService::', '', $templateContent);
-                
-                // 완전히 정리된 내용을 렌더링
-                $renderedContent = $templateContent;
-                
+
+                // PHP 태그와 require 문 제거 (보안상 위험한 코드 제거)
+                $templateContent = preg_replace('/<\?php.*?require_once.*?\?>/ms', '', $templateContent);
+                $templateContent = preg_replace('/<\?php.*?use\s+App\\\\.*?\?>/ms', '', $templateContent);
+
+                // TemplateCommonService 관련 PHP 코드 제거
+                $templateContent = preg_replace('/<\?php[^>]*\$screenInfo\s*=.*?\?>/ms', '', $templateContent);
+                $templateContent = preg_replace('/<\?php[^>]*\$uploadPaths\s*=.*?\?>/ms', '', $templateContent);
+
+                // 변수 출력 형식 변경: {{ $variable }} 형태로 유지
+                // TemplateCommonService:: 호출을 helper 함수 호출로 변경
+                $templateContent = preg_replace('/TemplateCommonService::getFileIcon\(([^)]+)\)/', 'getFileIcon($1)', $templateContent);
+                $templateContent = preg_replace('/TemplateCommonService::formatFileSize\(([^)]+)\)/', 'formatFileSize($1)', $templateContent);
+                $templateContent = preg_replace('/TemplateCommonService::getFileTypeName\(([^)]+)\)/', 'getFileTypeName($1)', $templateContent);
+
+                // 임시 파일로 저장하여 Blade 엔진으로 렌더링
+                $tempViewPath = storage_path('framework/views/sandbox_temp_' . md5($templateFile) . '.blade.php');
+                file_put_contents($tempViewPath, $templateContent);
+
+                // 뷰 렌더링
+                $renderedContent = view()->file($tempViewPath, array_merge([
+                    'screenInfo' => $screenInfo,
+                    'uploadPaths' => $uploadPaths
+                ], $helpers))->render();
+
+                // 임시 파일 삭제
+                @unlink($tempViewPath);
+
                 // 템플릿 뷰어에 처리된 템플릿 전달
                 return view('700-page-sandbox.706-page-custom-screens.100-template-viewer', [
                     'sandboxName' => $sandbox,
@@ -140,13 +158,14 @@ class SandboxRoutingServiceProvider extends ServiceProvider
                     ],
                     'templateContent' => $renderedContent
                 ]);
-                
+
             } catch (\Exception $e) {
                 Log::error('Sandbox template rendering error', [
                     'domain' => $domain,
                     'screen' => $screen,
                     'file' => $templateFile,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
                 ]);
                 return abort(500, '템플릿 렌더링 중 오류가 발생했습니다: ' . $e->getMessage());
             }

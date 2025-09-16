@@ -271,6 +271,8 @@ window.getCurrentSelectedDomain = function() {
 };
 
 window.saveCustomScreenSelection = function(domainName, screenName) {
+    console.log('saveCustomScreenSelection called:', { domainName, screenName });
+
     // 페이지 정보 추출 (현재 URL에서)
     const urlParts = window.location.pathname.split('/');
     const organizationId = urlParts[2];
@@ -285,7 +287,78 @@ window.saveCustomScreenSelection = function(domainName, screenName) {
         return;
     }
 
-    // 서버에 저장 요청
+    console.log('Screen name check:', screenName, 'Is dashboard?', screenName === '106-screen-analysis-dashboard');
+
+    // 분석 대시보드 선택 시 확인 다이얼로그 표시
+    if (screenName === '106-screen-analysis-dashboard') {
+        console.log('Dashboard detected, showing confirm dialog');
+        if (confirm('문서 분석 대시보드를 선택하셨습니다.\n\n관련 하위 페이지들을 자동으로 추가하시겠습니까?\n- 업로드 파일 목록 (103-screen-uploaded-files-list)\n- 분석 요청 (104-screen-analysis-requests)\n- 문서 분석 (105-screen-document-analysis)')) {
+            // 하위 페이지 자동 생성 요청 포함
+            console.log('User selected YES - creating sub pages');
+            saveWithSubPages(organizationId, projectId, pageId, domainName, screenName, csrfToken);
+        } else {
+            // 대시보드만 저장
+            console.log('User selected NO - saving dashboard only');
+            saveScreenOnly(organizationId, projectId, pageId, domainName, screenName, csrfToken);
+        }
+    } else {
+        // 일반 화면 저장
+        console.log('Regular screen - saving normally');
+        saveScreenOnly(organizationId, projectId, pageId, domainName, screenName, csrfToken);
+    }
+};
+
+window.saveWithSubPages = function(organizationId, projectId, pageId, domainName, screenName, csrfToken) {
+    fetch('/api/sandbox/save-custom-screen', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            organization_id: organizationId,
+            project_id: projectId,
+            page_id: pageId,
+            domain: domainName,
+            screen: screenName,
+            create_sub_pages: true,
+            sub_pages: [
+                {
+                    title: '업로드 파일 목록',
+                    screen: '103-screen-uploaded-files-list'
+                },
+                {
+                    title: '분석 요청',
+                    screen: '104-screen-analysis-requests'
+                },
+                {
+                    title: '문서 분석',
+                    screen: '105-screen-document-analysis'
+                }
+            ]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToastMessage('대시보드와 하위 페이지들이 생성되었습니다.', 'success');
+            // 페이지 새로고침하여 새로운 페이지들 표시
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            console.error('커스텀 화면 저장 실패:', data.message);
+            showToastMessage(data.message || '저장에 실패했습니다.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('커스텀 화면 저장 오류:', error);
+        showToastMessage('네트워크 오류가 발생했습니다.', 'error');
+    });
+};
+
+window.saveScreenOnly = function(organizationId, projectId, pageId, domainName, screenName, csrfToken) {
     fetch('/api/sandbox/save-custom-screen', {
         method: 'POST',
         headers: {
@@ -304,7 +377,6 @@ window.saveCustomScreenSelection = function(domainName, screenName) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // 성공 알림 (작은 토스트 메시지)
             showToastMessage('커스텀 화면이 저장되었습니다.', 'success');
         } else {
             console.error('커스텀 화면 저장 실패:', data.message);

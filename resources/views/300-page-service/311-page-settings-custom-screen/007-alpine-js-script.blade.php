@@ -212,12 +212,69 @@ function customScreenSettingsPage() {
         previewScreen(screenId) {
             const screen = this.allScreens.find(s => s.id == screenId);
             const sandbox = this.sandboxMode === 'project' ? this.projectSandboxName : this.selectedSandbox;
-            
+
             if (screen && sandbox) {
                 const fullPath = screen.full_path_name || `${screen.domain}/${screen.folder_name}`;
                 const previewUrl = `/sandbox/${sandbox}/${fullPath}`;
                 window.open(previewUrl, 'screen-preview', 'width=1200,height=800,scrollbars=yes,resizable=yes');
             }
+        },
+
+        // 저장 처리 함수
+        async handleSave() {
+            // 현재 화면이 분석 대시보드인데 다른 화면으로 변경하는 경우
+            const currentScreen = '{{ $currentCustomScreenId ?? '' }}';
+            const previousWasAnalysisDashboard = currentScreen.includes('106-screen-analysis-dashboard');
+
+            // 커스텀 화면이 활성화되어 있고 선택된 화면이 있는지 확인
+            if (this.customScreenMode === 'enabled' && this.selectedCustomScreen) {
+                const selectedScreen = this.allScreens.find(s => s.id === this.selectedCustomScreen);
+
+                // 분석 대시보드에서 다른 화면으로 변경하는 경우 확인
+                if (previousWasAnalysisDashboard &&
+                    selectedScreen &&
+                    selectedScreen.folder_name !== '106-screen-analysis-dashboard') {
+
+                    if (!confirm('분석 대시보드에서 다른 화면으로 변경하시면\n자동 생성된 하위 페이지들이 삭제됩니다.\n\n계속하시겠습니까?')) {
+                        return; // 취소
+                    }
+                }
+
+                if (selectedScreen && selectedScreen.folder_name === '106-screen-analysis-dashboard') {
+                    // 이미 같은 화면이 선택되어 있으면 confirm 없이 저장
+                    if ('{{ $currentCustomScreenId ?? '' }}' === selectedScreen.id) {
+                        document.getElementById('create_sub_pages').value = 'no';
+                    } else {
+                        // 새로 106-screen-analysis-dashboard를 선택하는 경우에만 하위 페이지 체크
+                        const currentPageId = {{ $pageId ?? 'null' }};
+
+                        // 하위 페이지 존재 여부 확인 (서버에서 체크)
+                        try {
+                            const response = await fetch(`/api/page/${currentPageId}/check-sub-pages`);
+                            const data = await response.json();
+
+                            if (data.hasAnalysisSubPages) {
+                                // 이미 하위 페이지가 있으면 confirm 없이 저장만 진행
+                                document.getElementById('create_sub_pages').value = 'no';
+                            } else {
+                                // 하위 페이지가 없을 때만 confirm 표시
+                                if (confirm('문서 분석 대시보드를 선택하셨습니다.\n\n관련 하위 페이지들을 자동으로 추가하시겠습니까?\n- 업로드 파일 목록 (103-screen-uploaded-files-list)\n- 분석 요청 (104-screen-analysis-requests)\n- 문서 분석 (105-screen-document-analysis)')) {
+                                    document.getElementById('create_sub_pages').value = 'yes';
+                                } else {
+                                    document.getElementById('create_sub_pages').value = 'no';
+                                }
+                            }
+                        } catch (error) {
+                            console.error('API error:', error);
+                            // API 호출 실패 시 confirm 없이 저장
+                            document.getElementById('create_sub_pages').value = 'no';
+                        }
+                    }
+                }
+            }
+
+            // 폼 제출
+            document.getElementById('customScreenForm').submit();
         }
     }
 }

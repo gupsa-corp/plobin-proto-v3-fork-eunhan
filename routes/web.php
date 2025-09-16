@@ -452,8 +452,14 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
     })->first();
 
     $currentSandboxName = ($page && $page->project) ? $page->project->sandbox_folder : null;
-    $currentCustomScreenId = $page ? $page->sandbox_custom_screen_folder : null;
+    $currentCustomScreenFolder = $page ? $page->sandbox_custom_screen_folder : null;
     $currentDomain = $page ? $page->sandbox_domain : null;
+
+    // JavaScript에서 기대하는 형식으로 ID 생성 (도메인-화면폴더)
+    $currentCustomScreenId = null;
+    if ($currentDomain && $currentCustomScreenFolder) {
+        $currentCustomScreenId = $currentDomain . '-' . $currentCustomScreenFolder;
+    }
 
     // SandboxService를 사용하여 동일한 로직으로 커스텀 화면 데이터 가져오기
     $sandboxService = app(\App\Services\SandboxService::class);
@@ -492,6 +498,9 @@ Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/cus
 })->name('project.dashboard.page.settings.custom-screen');
 
 Route::post('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/custom-screen', [\App\Http\Controllers\Page\SetCustomScreen\Controller::class, '__invoke'])->name('project.dashboard.page.settings.custom-screen.post');
+
+// API route for checking sub pages
+Route::get('/api/page/{pageId}/check-sub-pages', [\App\Http\Controllers\Api\Page\CheckSubPages\Controller::class, '__invoke']);
 
 Route::get('/organizations/{id}/projects/{projectId}/pages/{pageId}/settings/deployment', function ($id, $projectId, $pageId) {
     return view('300-page-service.313-page-settings-deployment.000-index', ['currentPageId' => $pageId, 'activeTab' => 'deployment']);
