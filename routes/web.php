@@ -775,7 +775,15 @@ Route::get('/sandbox/callback-manager', function () {
     return view('700-page-sandbox.720-page-callback-manager.000-index');
 })->name('sandbox.callback-manager');
 
+// Function Automation
+Route::get('/sandbox/function-automation', function () {
+    return view('700-page-sandbox.711-page-function-automation.000-index');
+})->name('sandbox.function-automation');
 
+// Function Creator
+Route::get('/sandbox/function-creator', function () {
+    return view('700-page-sandbox.709-page-function-creator.000-index');
+})->name('sandbox.function-creator');
 
 // Form Publisher - 샌드박스 폼 생성 및 관리 도구 (Livewire + Filament)
 Route::prefix('sandbox/form-publisher')->group(function () {

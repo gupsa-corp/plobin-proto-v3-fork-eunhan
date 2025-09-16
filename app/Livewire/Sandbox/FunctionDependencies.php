@@ -23,13 +23,13 @@ class FunctionDependencies extends Component
 
     public function loadFunctions()
     {
-        $metadataService = new FunctionMetadataService();
+        $metadataService = app(FunctionMetadataService::class);
         $this->functions = $metadataService->getFunctions();
     }
 
     public function selectFunction($functionName)
     {
-        $metadataService = new FunctionMetadataService();
+        $metadataService = app(FunctionMetadataService::class);
         $this->selectedFunction = $functionName;
         $this->selectedFunctionData = [
             'info' => $this->functions[$functionName] ?? null,

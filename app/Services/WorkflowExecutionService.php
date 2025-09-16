@@ -27,18 +27,26 @@ class WorkflowExecutionService
     }
 
     /**
-     * 사용 가능한 함수 목록 반환 (BaseWorkflow에서 로드)
+     * 사용 가능한 함수 목록 반환
      */
     public function getAvailableFunctions()
     {
-        // 임시 워크플로우 인스턴스 생성하여 함수 목록 가져오기
-        $tempWorkflow = new class extends BaseWorkflow {
-            public function execute($input) {
-                return $input;
-            }
-        };
-
-        return $tempWorkflow->getAvailableFunctions();
+        // 하드코딩된 함수 목록 반환
+        return [
+            'global' => [
+                ['name' => 'log', 'description' => 'Log a message'],
+                ['name' => 'alert', 'description' => 'Show alert'],
+                ['name' => 'confirm', 'description' => 'Show confirmation dialog'],
+            ],
+            'storage' => [
+                ['name' => 'get', 'description' => 'Get value from storage'],
+                ['name' => 'set', 'description' => 'Set value to storage'],
+                ['name' => 'delete', 'description' => 'Delete from storage'],
+            ],
+            'all' => [
+                'log', 'alert', 'confirm', 'get', 'set', 'delete'
+            ]
+        ];
     }
 
     /**

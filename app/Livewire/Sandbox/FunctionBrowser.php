@@ -76,8 +76,8 @@ class FunctionBrowser extends Component implements HasForms
      */
     private function initializeServices()
     {
-        $this->templateService = new FunctionTemplateService();
-        $this->metadataService = new FunctionMetadataService();
+        $this->templateService = app(FunctionTemplateService::class);
+        $this->metadataService = app(FunctionMetadataService::class);
     }
 
     /**

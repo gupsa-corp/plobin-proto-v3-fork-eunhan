@@ -42,8 +42,8 @@ class FunctionCreator extends Component implements HasForms
 
     public function boot()
     {
-        $this->templateService = new FunctionTemplateService();
-        $this->metadataService = new FunctionMetadataService();
+        $this->templateService = app(FunctionTemplateService::class);
+        $this->metadataService = app(FunctionMetadataService::class);
     }
 
     public function mount()

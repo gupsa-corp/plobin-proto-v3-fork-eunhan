@@ -38,7 +38,7 @@ class FunctionAutomation extends Component
     
     public function boot()
     {
-        $this->workflowService = new WorkflowExecutionService();
+        $this->workflowService = app(WorkflowExecutionService::class);
     }
     
     public function mount()
